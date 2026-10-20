@@ -68,3 +68,12 @@ test("registries are isolated and support safe extension removal", () => {
   remove();
   assert.equal(a.render("launch", {}), 42);
 });
+
+
+test("CommonJS consumers receive the same public API", async () => {
+  const { createRequire } = await import("node:module");
+  const require = createRequire(import.meta.url);
+  const commonjs = require("../dist/cjs/index.js");
+  assert.equal(typeof commonjs.wrapCopy, "function");
+  assert.deepEqual(commonjs.layoutMatrix({ x: 0, y: 0, width: 10, height: 10 }), [1, 0, 0, 1, 0, 0]);
+});
