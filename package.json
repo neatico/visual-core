@@ -1,0 +1,54 @@
+{
+  "name": "@neatico/visual-core",
+  "version": "0.1.0",
+  "description": "Framework-independent geometry, measured text wrapping, and extensible scene registries for visual editors.",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/cjs/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node scripts/cjs.mjs",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "prepack": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neatico/visual-core.git"
+  },
+  "homepage": "https://www.neatico.app",
+  "bugs": {
+    "url": "https://github.com/neatico/visual-core/issues"
+  },
+  "author": "PowerDuckie",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "visual-editor",
+    "layout",
+    "typography",
+    "affine-transform",
+    "neatico"
+  ],
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

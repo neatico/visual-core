@@ -1,0 +1,86 @@
+# @neatico/visual-core
+
+Framework-independent building blocks for editable visual products, extracted from [Neatico](https://www.neatico.app/?utm_source=github&utm_medium=readme&utm_campaign=visual-core).
+
+Create visuals with AI at **[neatico.app](https://www.neatico.app/?utm_source=npm&utm_medium=readme&utm_campaign=visual-core)**, or use this package to build your own editor, layout pipeline, or scene extension.
+
+## Install
+
+```sh
+npm install @neatico/visual-core
+```
+
+This package provides native ES modules and TypeScript declarations. It has no runtime dependencies and does not require React, a browser, a database, or an AI provider. Node.js 20 or later is supported. CommonJS projects can use `require()` or dynamic `import()`.
+
+## Preserve transforms when ungrouping
+
+```ts
+import { flattenGroupLayout } from "@neatico/visual-core";
+
+const group = { x: 100, y: 50, width: 400, height: 300, rotation: 30 };
+const child = { x: 20, y: 30, width: 120, height: 60, rotation: 15 };
+const ungrouped = flattenGroupLayout(group, child);
+```
+
+Coordinates are in logical canvas units. Rotations and skew angles are in degrees. Transforms use the center of the element as their origin. `flattenGroupLayout` preserves additional child properties and returns a new object. It supports translation, rotation, scaling, skew, and horizontal or vertical flips. Nonfinite values, negative dimensions, and degenerate ungrouping transforms fail explicitly.
+
+Additional exports include `layoutMatrix`, `multiplyMatrix`, `layoutBounds`, and the `Layout` and `Matrix` types. Matrices use the six-value CSS affine format `[a, b, c, d, e, f]`.
+
+## Wrap text using your font measurements
+
+```ts
+import { wrapCopy } from "@neatico/visual-core";
+
+const context = document.createElement("canvas").getContext("2d")!;
+await document.fonts.load("400 24px Inter");
+const lines = wrapCopy(
+  "One idea. Every format.",
+  240,
+  24,
+  false,
+  (text, size, bold) => {
+    context.font = `${bold ? 700 : 400} ${size}px Inter`;
+    return context.measureText(text).width;
+  },
+);
+```
+
+Supply a measurement function for the actual font used by your renderer. Explicit line breaks are preserved. Long tokens and CJK text can break by code point. A character wider than the available line fails instead of silently overflowing. This is a wrapping utility, not a complete Unicode line-breaking or hyphenation engine. Complex scripts and emoji sequences should be verified with the target renderer. The returned lines are plain text; escape them before inserting them into HTML.
+
+## Add custom scenes
+
+```ts
+import { createSceneRegistry } from "@neatico/visual-core";
+
+type Brief = { headline: string };
+type Scene = { text: string; accent: string };
+const scenes = createSceneRegistry<Brief, Scene>();
+const unregister = scenes.register("product-launch", (brief) => ({
+  text: brief.headline,
+  accent: "#6950e8",
+}));
+const scene = scenes.render("product-launch", {
+  headline: "Meet your next idea.",
+});
+unregister();
+```
+
+Registries are isolated instances. Duplicate names and unknown scenes throw errors. Renderers own their input validation and output format, so you can return your own canvas schema, SVG tree, or other representation. Async renderers are supported by choosing a promise as the output type. No global registry is created.
+
+## Development
+
+```sh
+npm ci
+npm test
+npm pack --dry-run
+```
+
+Tests cover transform equivalence, invalid geometry, text wrapping, and extension isolation. `npm pack` runs the build and tests before assembling the package. Only compiled output, this README, and the license are published.
+
+## Contributing
+
+Open an issue or pull request at [neatico/visual-core](https://github.com/neatico/visual-core). Include a minimal reproduction and a regression test. Keep APIs independent of application state and use American English in documentation and code comments.
+
+## License
+
+MIT. See [LICENSE](./LICENSE).
