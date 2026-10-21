@@ -111,3 +111,89 @@ test("validateComposition accepts a minimal valid tree and exports prompt", () =
   assert.throws(() => validateComposition({ version: 2, root: { type: "text", bind: "title" } }, fields));
 });
 
+test("wrapCopy keeps non-ASCII words intact when they fit", () => {
+  const measure = (text) => Array.from(text).length;
+  assert.deepEqual(wrapCopy("café", 10, 12, false, measure), ["café"]);
+  assert.deepEqual(wrapCopy("don't", 10, 12, false, measure), ["don't"]);
+  assert.deepEqual(wrapCopy("Москва", 10, 12, false, measure), ["Москва"]);
+  assert.deepEqual(wrapCopy("Ελλάδα", 10, 12, false, measure), ["Ελλάδα"]);
+  assert.deepEqual(wrapCopy("مرحبا", 10, 12, false, measure), ["مرحبا"]);
+  assert.throws(() => wrapCopy("x", 10, 12, false, null));
+});
+
+test("flattenGroupLayout rehydrates flip flags when skew is ~0", () => {
+  const parent = { ...base, flipY: true };
+  const child = { ...base, x: 0, y: 0, id: "flipped" };
+  const result = flattenGroupLayout(parent, child);
+  const expected = multiplyMatrix(layoutMatrix(parent), layoutMatrix(child));
+  layoutMatrix(result).forEach((n, i) =>
+    assert.ok(Math.abs(n - expected[i]) < 1e-8),
+  );
+  assert.equal(result.flipY, true);
+  assert.equal(result.flipX, false);
+  assert.ok(result.scaleY > 0);
+  assert.ok(result.scaleX > 0);
+});
+
+test("validateComposition rejects depth, duplicates, and missing binds", () => {
+  const fields = compositionFields({ title: "T", body: "B" });
+  assert.throws(() =>
+    validateComposition(
+      {
+        version: 1,
+        root: {
+          type: "column",
+          children: [{ type: "text", bind: "title" }],
+        },
+      },
+      fields,
+    ),
+  );
+  assert.throws(() =>
+    validateComposition(
+      {
+        version: 1,
+        root: {
+          type: "column",
+          children: [
+            { type: "text", bind: "title" },
+            { type: "text", bind: "title" },
+          ],
+        },
+      },
+      fields,
+    ),
+  );
+  assert.throws(() =>
+    validateComposition(
+      {
+        version: 1,
+        root: {
+          type: "column",
+          children: [
+            { type: "text", bind: "title" },
+            { type: "text", bind: "missing" },
+          ],
+        },
+      },
+      fields,
+    ),
+  );
+  const deep = { type: "text", bind: "title", role: "body" };
+  let node = deep;
+  // Build depth > 5 via nested columns wrapping a sibling filler
+  for (let i = 0; i < 6; i++) {
+    node = {
+      type: "column",
+      children: [node, { type: "divider" }],
+    };
+  }
+  assert.throws(() =>
+    validateComposition({ version: 1, root: node }, { title: "T" }),
+  );
+  const inherited = Object.create({ title: "SECRET" });
+  inherited.description = "Own";
+  const itemFields = compositionFields({ items: [inherited] });
+  assert.equal(itemFields["items.0.title"], undefined);
+  assert.equal(itemFields["items.0.description"], "Own");
+});

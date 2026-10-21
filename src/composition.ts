@@ -5,7 +5,7 @@ export const COMPOSITION_PROMPT = `Also return composition:{version:1,root:node}
 export function compositionFields(value:Record<string,unknown>):Record<string,string>{
  const fields:Record<string,string>={};
  for(const key of ['title','headline','body','eyebrow','cta','value','attribution'])if(typeof value[key]==='string'&&(value[key] as string).trim())fields[key]=value[key] as string;
- if(Array.isArray(value.items))value.items.forEach((item,i)=>{for(const key of ['title','description'])if(typeof item?.[key]==='string'&&item[key].trim())fields[`items.${i}.${key}`]=item[key];});
+ if(Array.isArray(value.items))value.items.forEach((item,i)=>{if(!item||typeof item!=='object')return;for(const key of ['title','description']){if(!Object.prototype.hasOwnProperty.call(item,key))continue;const v=(item as Record<string,unknown>)[key];if(typeof v==='string'&&v.trim())fields[`items.${i}.${key}`]=v;}});
  return fields;
 }
 export function validateComposition(raw:unknown,fields:Record<string,string>):Composition{

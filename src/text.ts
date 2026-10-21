@@ -1,5 +1,14 @@
 export type Measure = (text: string, size: number, bold: boolean) => number;
-/** Wrap measured text without depending on DOM, canvas, or a specific font engine. */
+
+/**
+ * Wrap measured text without depending on DOM, canvas, or a specific font engine.
+ *
+ * Tokenization (not UAX #14):
+ * 1. CJK ideographs break per character
+ * 2. Unicode letters/marks/numbers stay together (Latin, Cyrillic, Arabic, Greek, …),
+ *    with an optional internal URL/API separator run (`HTTP`, `a.b`, `user@host`)
+ * 3. Any other non-space glyph is its own token
+ */
 export function wrapCopy(
   text: string,
   width: number,
@@ -7,6 +16,8 @@ export function wrapCopy(
   bold: boolean,
   measure: Measure,
 ): string[] {
+  if (typeof measure !== "function")
+    throw new TypeError("measure must be a function");
   if (
     !Number.isFinite(width) ||
     width <= 0 ||
@@ -22,12 +33,13 @@ export function wrapCopy(
       );
     return measured <= width;
   };
+  // CJK first so ideographs are not swallowed by \p{L} word runs.
+  const tokenRe =
+    /[\u2e80-\u9fff\uf900-\ufaff]\s*|(?:[\p{L}\p{M}\p{N}]+(?:[._/@+\-][\p{L}\p{M}\p{N}]+)*)\s*|[^\s]\s*/gu;
   const lines: string[] = [];
   for (const paragraph of text.replace(/\r\n?/g, "\n").split("\n")) {
     let line = "";
-    for (const token of paragraph.match(
-      /[^\s\u2e80-\u9fff\uf900-\ufaff]+\s*|[\u2e80-\u9fff\uf900-\ufaff]\s*/gu,
-    ) || []) {
+    for (const token of paragraph.match(tokenRe) || []) {
       if (fits(line + token.trimEnd())) {
         line += token;
         continue;

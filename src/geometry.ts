@@ -66,17 +66,33 @@ export function flattenGroupLayout<T extends Layout>(
   const scaleX = Math.hypot(a, b);
   if (!Number.isFinite(scaleX) || scaleX < 1e-8)
     throw new Error("Cannot ungroup a degenerate transform");
+  const det = a * d - b * c;
+  let outScaleX = scaleX;
+  let outScaleY = det / scaleX;
+  let skewX =
+    (Math.atan((a * c + b * d) / (scaleX * scaleX)) * 180) / Math.PI;
+  let skewY = 0;
+  let flipX = false;
+  let flipY = false;
+  // When skew is ~0, move reflection into flip flags so editor checkboxes
+  // stay in sync with the mirrored visual (world matrix unchanged).
+  if (Math.abs(skewX) < 1e-6 && Math.abs(skewY) < 1e-6) {
+    if (outScaleY < 0) {
+      flipY = true;
+      outScaleY = -outScaleY;
+    }
+  }
   return {
     ...child,
     x: e - child.width / 2 + (a * child.width) / 2 + (c * child.height) / 2,
     y: f - child.height / 2 + (b * child.width) / 2 + (d * child.height) / 2,
     rotation: (Math.atan2(b, a) * 180) / Math.PI,
-    scaleX,
-    scaleY: (a * d - b * c) / scaleX,
-    skewX: (Math.atan((a * c + b * d) / (scaleX * scaleX)) * 180) / Math.PI,
-    skewY: 0,
-    flipX: false,
-    flipY: false,
+    scaleX: outScaleX,
+    scaleY: outScaleY,
+    skewX,
+    skewY,
+    flipX,
+    flipY,
   };
 }
 export function layoutBounds(l: Layout) {
