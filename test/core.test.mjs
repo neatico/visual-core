@@ -7,6 +7,9 @@ import {
   layoutBounds,
   wrapCopy,
   createSceneRegistry,
+  compositionFields,
+  validateComposition,
+  COMPOSITION_PROMPT,
 } from "../dist/index.js";
 const base = { x: 12, y: 20, width: 100, height: 50 };
 for (const rotation of [0, 35, 90, 180])
@@ -77,3 +80,34 @@ test("CommonJS consumers receive the same public API", async () => {
   assert.equal(typeof commonjs.wrapCopy, "function");
   assert.deepEqual(commonjs.layoutMatrix({ x: 0, y: 0, width: 10, height: 10 }), [1, 0, 0, 1, 0, 0]);
 });
+
+test("mixed Chinese punctuation does not split API tokens that fit",()=>{
+ const measure=text=>Array.from(text).length;
+ const lines=wrapCopy("支持HTTP、SSE、WebSocket等",10,12,false,measure);
+ assert.ok(lines.some(line=>line.includes("SSE")));
+ assert.ok(lines.some(line=>line.includes("WebSocket")));
+});
+
+test("validateComposition accepts a minimal valid tree and exports prompt", () => {
+  assert.equal(typeof COMPOSITION_PROMPT, "string");
+  assert.ok(COMPOSITION_PROMPT.length > 0);
+  const fields = compositionFields({ title: "Hello", body: "World" });
+  assert.deepEqual(fields, { title: "Hello", body: "World" });
+  const composition = validateComposition(
+    {
+      version: 1,
+      root: {
+        type: "column",
+        children: [
+          { type: "text", bind: "title", role: "hero" },
+          { type: "text", bind: "body", role: "body" },
+        ],
+      },
+    },
+    fields,
+  );
+  assert.equal(composition.version, 1);
+  assert.equal(composition.root.type, "column");
+  assert.throws(() => validateComposition({ version: 2, root: { type: "text", bind: "title" } }, fields));
+});
+
