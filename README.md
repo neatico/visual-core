@@ -134,3 +134,5 @@ catalog, and `layoutCandidates` returns a bounded deterministic shortlist.
 These are structural eligibility checks, not a guarantee that arbitrary copy
 fits. Hosts must measure emitted geometry, verify all source fields remain
 visible and reject or paginate unreadable output. No text is rewritten here.
+
+Blueprints may declare `intents` (0.8.0), such as `['cover']` for presentation layouts or `['features']` for social scenes. Registry lookup accepts the semantic intent as its third argument and excludes scoped templates when the intent is absent or incompatible. Omit this property only for deliberately generic layouts. This keeps identical field shapes from turning a cover-only layout into a closing slide or unrelated social format.

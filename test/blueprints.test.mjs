@@ -18,3 +18,10 @@ test('registries isolate mutations, match content and unregister safely',()=>{
 test('missing identities cannot be coerced into valid registry keys',()=>{
  const input=sample();delete input.id;assert.throws(()=>validateBlueprint(input));
 });
+test('semantic scopes prevent cover-only templates from matching unrelated slides',()=>{
+ const registry=createBlueprintRegistry();registry.register({...sample(),intents:['cover']});
+ assert.equal(registry.find(sample().fields,sample().ratios[0],'cover').length,1);
+ assert.equal(registry.find(sample().fields,sample().ratios[0],'closing').length,0);
+ assert.equal(registry.find(sample().fields,sample().ratios[0]).length,0);
+ assert.throws(()=>validateBlueprint({...sample(),intents:['../unsafe']}));
+});
