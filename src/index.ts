@@ -3,3 +3,5 @@ export * from "./text.js";
 export * from "./scenes.js";
 
 export * from "./composition.js";
+
+export * from "./blueprints.js";
