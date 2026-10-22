@@ -17,3 +17,5 @@ export * from "./pagination.js";
 export * from "./content.js";
 
 export * from "./designSystem.js";
+
+export * from "./designBlueprint.js";
