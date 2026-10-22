@@ -84,3 +84,44 @@ Open an issue or pull request at [neatico/visual-core](https://github.com/neatic
 ## License
 
 MIT. See [LICENSE](./LICENSE).
+
+## Portable template blueprints
+
+`validateBlueprint` accepts a versioned, data-only template with an `id`, localized
+`labels` (including `en` as the fallback), required `fields`, supported `ratios`,
+and a `composition`. Every required field must be bound exactly once. The
+composition validator returns only supported structural properties; executable
+markup and arbitrary style properties are not part of this contract.
+
+```ts
+import { createBlueprintRegistry, blueprintLabel } from '@neatico/visual-core';
+
+const catalog = createBlueprintRegistry();
+const unregister = catalog.register({
+  version: 1,
+  id: 'editorial-introduction',
+  labels: { en: 'Editorial introduction', zh: '编辑式导言' },
+  fields: ['title', 'body'],
+  ratios: [1, 16 / 9],
+  composition: {
+    version: 1,
+    root: { type: 'column', children: [
+      { type: 'text', bind: 'title', role: 'hero' },
+      { type: 'text', bind: 'body', role: 'body' },
+    ] },
+  },
+});
+const choices = catalog.find(['title', 'body'], 16 / 9);
+const name = blueprintLabel(choices[0], 'zh-CN');
+unregister();
+```
+
+Registries are isolated, reject duplicate IDs, and return defensive copies.
+Field matching is exact: a template cannot silently omit extra user content.
+Locale lookup tries the exact locale, then its language, then English.
+
+Structural validation is not visual approval. Before registering AI-authored
+blueprints in a production catalog, the host must render representative samples
+at every supported ratio with the actual font metrics and check bounds, text
+collisions, readability, and content preservation. The host also owns persistence,
+workspace permissions, review status, and migration between blueprint versions.
