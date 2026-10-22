@@ -66,7 +66,13 @@ export function designCandidates(page:ContentPage,context:CandidateContext):Desi
    const intent=page.purpose==='cover'||page.purpose==='conclude'?r.family.startsWith('hero'):page.purpose==='instruct'?r.family.startsWith('steps')||r.family.startsWith('code'):true;
    return (intent?30:0)+(r.renderer==='catalog'?8:0)-(r.id.includes('mixed')?20:0)-repeats*18+(context.ratio<1&&r.id.endsWith('stack')?6:0);
  };
- return candidates.map((r,index)=>({r,index,score:score(r)})).sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,Math.max(1,Math.min(32,context.limit??12))).map(e=>e.r);
+ const ranked=candidates.map((r,index)=>({r,index,score:score(r)})).sort((a,b)=>b.score-a.score||a.index-b.index).map(e=>e.r);
+ const limit=Math.max(1,Math.min(32,context.limit??12));
+ // Catalog size must not prevent semantic renderers from reaching measurement.
+ const semantic=ranked.filter(r=>r.renderer==='semantic').slice(0,Math.min(8,Math.ceil(limit/2)));
+ const reserved=new Set(semantic.map(r=>r.id));
+ const selected=new Set([...semantic,...ranked.filter(r=>!reserved.has(r.id)).slice(0,limit-semantic.length)].map(r=>r.id));
+ return ranked.filter(r=>selected.has(r.id));
 }
 
 export interface GeometryItem {role:string;x:number;y:number;width:number;height:number}
