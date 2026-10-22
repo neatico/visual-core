@@ -197,3 +197,25 @@ test("validateComposition rejects depth, duplicates, and missing binds", () => {
   assert.equal(itemFields["items.0.title"], undefined);
   assert.equal(itemFields["items.0.description"], "Own");
 });
+
+test('Unicode wrapping keeps closing CJK punctuation off the start of a line',()=>{
+ const measure=text=>Array.from(text).length;
+ for(const text of ['这是一个测试。再测试一下！','これは操作の説明です。次に進みます。']){
+  const lines=wrapCopy(text,7,12,false,measure);
+  assert.equal(lines.join(''),text);
+  assert.ok(lines.every(line=>!/^[。，、！？）」]/.test(line)));
+ }
+});
+test('balanced copy removes tiny trailing lines without deleting text or growing line count',()=>{
+ const measure=text=>Array.from(text).length;const text='复制文档地址并打开，即可查看完整的接口文档。';
+ const normal=wrapCopy(text,21,12,false,measure,{balance:false}),balanced=wrapCopy(text,21,12,false,measure,{balance:true});
+ assert.equal(balanced.join(''),text);assert.ok(balanced.length<=normal.length);assert.ok(balanced.at(-1).length>normal.at(-1).length);
+});
+test('title wrapping respects fitting CJK words and emergency wrapping keeps grapheme clusters intact',()=>{
+ const measure=text=>Array.from(text).length;
+ const lines=wrapCopy('Apipost快速上手：接口说明',13,12,true,measure,{keepWords:true});
+ assert.ok(lines.every(line=>!line.endsWith('接')));assert.equal(lines.join(''),'Apipost快速上手：接口说明');
+ assert.throws(()=>wrapCopy('👩‍💻',1,12,false,measure),/character/);
+});
+
+test('heading clause breaks keep a topic prefix separate when a title wraps',()=>{const measure=text=>Array.from(text).length;const text='Apipost快速上手：调试接口与生成文档';const lines=wrapCopy(text,13,12,true,measure,{keepWords:true,preferClauseBreaks:true});assert.equal(lines[0],'Apipost快速上手：');assert.equal(lines.join(''),text);});

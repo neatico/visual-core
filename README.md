@@ -10,7 +10,7 @@ Create visuals with AI at **[neatico.app](https://www.neatico.app/?utm_source=np
 npm install @neatico/visual-core
 ```
 
-This package provides native ES modules and TypeScript declarations. It has no runtime dependencies and does not require React, a browser, a database, or an AI provider. Node.js 20 or later is supported. CommonJS projects can use `require()` or dynamic `import()`.
+This package provides native ES modules and TypeScript declarations. It uses the MIT-licensed `linebreak` package for Unicode line opportunities and does not require React, a browser, a database, or an AI provider. Node.js 20 or later is supported. CommonJS projects can use `require()` or dynamic `import()`.
 
 ## Preserve transforms when ungrouping
 
@@ -45,7 +45,7 @@ const lines = wrapCopy(
 );
 ```
 
-Supply a measurement function for the actual font used by your renderer. Explicit line breaks are preserved. Long tokens and CJK text can break by code point. A character wider than the available line fails instead of silently overflowing. This is a wrapping utility, not a complete Unicode line-breaking or hyphenation engine. Complex scripts and emoji sequences should be verified with the target renderer. The returned lines are plain text; escape them before inserting them into HTML.
+Supply measurements for the actual font used by your renderer. Explicit line breaks are preserved. Break opportunities follow UAX #14 through [linebreak](https://github.com/foliojs/linebreak) (Unicode 13); oversized tokens use grapheme boundaries where `Intl.Segmenter` is available. A grapheme wider than the available line fails explicitly. Tiny trailing lines are balanced without adding lines; pass `{ balance: false }` as the sixth argument to disable this. Titles may opt into `{ keepWords: true, preferClauseBreaks: true }` to respect available word segmentation and a fitting topic prefix before a colon. Dictionary segmentation is language-dependent and is not a semantic guarantee. Hyphenation, font shaping and cross-device font installation remain the renderer’s responsibility. Returned lines are plain text; escape them before inserting them into HTML.
 
 ## Add custom scenes
 
