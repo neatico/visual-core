@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateEditableContentPage} from '../dist/index.js';
+const page={id:'page',title:'Request',purpose:'instruct',evidence:[{sourceId:'source-1'}],blocks:[{id:'code',kind:'code',sourceId:'source-1',language:'bash',code:'curl https://edited.example',evidence:[{sourceId:'source-1'}]}]};
+test('retains explicit user edits and strips unknown nested properties',()=>{const parsed=validateEditableContentPage({...page,unsafe:true,blocks:[{...page.blocks[0],url:'https://untrusted.example'}]});assert.equal(parsed.blocks[0].code,page.blocks[0].code);assert.equal(parsed.unsafe,undefined);assert.equal(parsed.blocks[0].url,undefined);});
+test('rejects malformed nested arrays, duplicate identities and non-finite values',()=>{for(const block of [{...page.blocks[0],id:'page'},{id:'bad',kind:'steps',evidence:page.evidence,entries:[{title:4,description:''}]},{id:'bad',kind:'chart',evidence:page.evidence,chart:'bar',unit:'',values:[{label:'A',value:Infinity},{label:'B',value:2}]}])assert.throws(()=>validateEditableContentPage({...page,blocks:[block]}));});
+test('available images require a resolved asset identity and never retain model URLs',()=>{assert.throws(()=>validateEditableContentPage({...page,blocks:[{id:'image',kind:'image',evidence:page.evidence,sourceId:'source-1',alt:'Screenshot',treatment:'screenshot',status:'available'}]}));});

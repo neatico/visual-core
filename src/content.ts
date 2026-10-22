@@ -154,3 +154,34 @@ export function contentBlockText(block:ContentBlock):string[] {
     case 'image':return [];
   }
 }
+
+/** Validate persisted/editor-authored content without reasserting that user edits came from AI evidence. */
+export function validateEditableContentPage(raw:unknown):ContentPage {
+ const page=object(raw,'page'),ids=new Set<string>();
+ const id=(value:unknown,path:string)=>{const result=identity(value,path);if(ids.has(result))fail('CONTENT_DUPLICATE_ID',path);ids.add(result);return result;};
+ const proof=(value:unknown,path:string):Evidence[]=>list(value,path,1,32).map((raw,index)=>{const item=object(raw,`${path}.${index}`);return {sourceId:text(item.sourceId,path,80),...(item.quote===undefined?{}:{quote:text(item.quote,path,20000)})};});
+ if(!['cover','explain','instruct','compare','evidence','conclude'].includes(String(page.purpose)))fail('CONTENT_INVALID_PURPOSE','page.purpose');
+ const pageId=id(page.id,'page.id');
+ const blocks=list(page.blocks,'page.blocks',1,8).map((raw,index):ContentBlock=>{
+  const path=`page.blocks.${index}`,value=object(raw,path),base={id:id(value.id,`${path}.id`),evidence:proof(value.evidence,`${path}.evidence`)};
+  const field=(name:string,max=1000,empty=false)=>text(value[name],`${path}.${name}`,max,empty);
+  switch(value.kind){
+   case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600)};
+   case 'steps':case 'features':return {...base,kind:value.kind,entries:list(value.entries,path,1,12).map(raw=>{const item=object(raw,path);return {title:text(item.title,path,160),description:text(item.description,path,600,true)};})};
+   case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,path,2,4).map(raw=>{const item=object(raw,path);return {title:text(item.title,path,160),points:list(item.points,path,1,8).map(raw=>text(raw,path,500))};})};
+   case 'code':return {...base,kind:'code',sourceId:field('sourceId',80),language:field('language',40),code:field('code',20000)};
+   case 'parameters':return {...base,kind:'parameters',rows:list(value.rows,path,1,20).map(raw=>{const item=object(raw,path);return {name:text(item.name,path,160),value:text(item.value,path,1000,true),description:text(item.description,path,500,true)};})};
+   case 'quote':return {...base,kind:'quote',text:field('text',1600),attribution:field('attribution',160,true)};
+   case 'chart':{
+    if(!['bar','line'].includes(String(value.chart)))fail('CONTENT_INVALID_CHART',path);
+    return {...base,kind:'chart',chart:value.chart as 'bar'|'line',unit:field('unit',60,true),values:list(value.values,path,2,12).map(raw=>{const item=object(raw,path);if(typeof item.value!=='number'||!Number.isFinite(item.value)||Math.abs(item.value)>1e15)fail('CONTENT_INVALID_VALUE',path);return {label:text(item.label,path,100),value:item.value as number};})};
+   }
+   case 'image':{
+    if(!['screenshot','photograph','diagram'].includes(String(value.treatment))||!['missing','available'].includes(String(value.status)))fail('CONTENT_INVALID_IMAGE','page');
+    return {...base,kind:'image',sourceId:field('sourceId',80),alt:field('alt',300,true),treatment:value.treatment as 'screenshot'|'photograph'|'diagram',status:value.status as 'missing'|'available',...(value.status==='available'?{assetId:field('assetId',200)}:{})};
+   }
+   default:return fail('CONTENT_UNKNOWN_BLOCK',path);
+  }
+ });
+ return {id:pageId,title:text(page.title,'page.title',160),purpose:page.purpose as ContentPage['purpose'],evidence:proof(page.evidence,'page.evidence'),blocks,...(page.caption===undefined?{}:{caption:text(page.caption,'page.caption',2000,true)}),...(page.notes===undefined?{}:{notes:text(page.notes,'page.notes',2000,true)})};
+}
