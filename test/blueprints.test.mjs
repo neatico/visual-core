@@ -15,3 +15,6 @@ test('registries isolate mutations, match content and unregister safely',()=>{
  registry.list()[0].fields.pop();assert.equal(registry.list()[0].fields.length,2);
  assert.throws(()=>registry.register(sample()));remove();assert.deepEqual(registry.list(),[]);
 });
+test('missing identities cannot be coerced into valid registry keys',()=>{
+ const input=sample();delete input.id;assert.throws(()=>validateBlueprint(input));
+});

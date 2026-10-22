@@ -11,7 +11,7 @@ export interface Blueprint {
 }
 export function validateBlueprint(raw: unknown): Blueprint {
   const value=raw as Blueprint;
-  if(!value || value.version!==1 || !/^[a-z][a-z0-9-]{0,79}$/.test(value.id)) throw new Error('Invalid blueprint identity');
+  if(!value || value.version!==1 || typeof value.id!=='string' || !/^[a-z][a-z0-9-]{0,79}$/.test(value.id)) throw new Error('Invalid blueprint identity');
   if(!value.labels || typeof value.labels!=='object' || Array.isArray(value.labels) || !value.labels.en) throw new Error('Missing blueprint labels');
   const labels:Record<string,string>={};
   for(const [locale,label] of Object.entries(value.labels)) {
