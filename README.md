@@ -125,3 +125,12 @@ blueprints in a production catalog, the host must render representative samples
 at every supported ratio with the actual font metrics and check bounds, text
 collisions, readability, and content preservation. The host also owns persistence,
 workspace permissions, review status, and migration between blueprint versions.
+
+## Content-aware layout eligibility (0.6)
+
+`LAYOUT_CONTRACTS` covers all 97 slide and 97 social IDs with semantic intent,
+item capacity, required fields and ratio bounds. `eligibleLayouts` filters the
+catalog, and `layoutCandidates` returns a bounded deterministic shortlist.
+These are structural eligibility checks, not a guarantee that arbitrary copy
+fits. Hosts must measure emitted geometry, verify all source fields remain
+visible and reject or paginate unreadable output. No text is rewritten here.

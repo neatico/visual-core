@@ -459,5 +459,10 @@ export const SOCIAL_LAYOUT_CATALOG = [
     "id": "question-answer-quote",
     "scene": "quote",
     "name": "Question and answer quote card"
-  }
+  },
+  {"id": "usage-breakdown", "scene": "usage-breakdown", "name": "Usage breakdown"},
+  {"id": "organization", "scene": "organization", "name": "Role hierarchy"},
+  {"id": "editorial-quote", "scene": "editorial-quote", "name": "Editorial quote"},
+  {"id": "research-highlight", "scene": "research-highlight", "name": "Research highlight"},
+  {"id": "product-showcase", "scene": "product-showcase", "name": "Product showcase"},
 ] as const;
