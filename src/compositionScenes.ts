@@ -20,6 +20,7 @@ export const COMPOSITION_SCENES:readonly CompositionScene[]=[
  {id:'recruitment-details',kinds:['parameters'],outputs:both},
  {id:'product-demonstration',kinds:['image'],outputs:both,requiresAsset:true},
  {id:'photograph',kinds:['image'],outputs:both,requiresAsset:true},
+ ...['banner-hero','product-showcase','editorial-cover','image-campaign'].map(id=>({id,kinds:['image'] as const,outputs:both,requiresAsset:true})),
 ];
 export const AUTHORED_COMPOSITIONS:readonly {id:string;kind:SemanticKind;min:number;max:number}[]=[
  {id:'feature-focus',kind:'features',min:1,max:1},
@@ -38,6 +39,7 @@ export const AUTHORED_COMPOSITIONS:readonly {id:string;kind:SemanticKind;min:num
 /** Soft art-direction preferences; capacity and measured quality always remain mandatory. */
 export function sceneRecipePreference(scene:string|undefined,recipeId:string):number {
  const preferred:Record<string,readonly string[]>={
+  'banner-hero':['authored-image-banner'],'product-showcase':['authored-image-split'],'editorial-cover':['authored-image-editorial'],'image-campaign':['authored-image-campaign'],
   hero:['cover','semantic-hero-split'],chapter:['section','semantic-hero-editorial'],statement:['statement','semantic-hero-stack'],closing:['closing'],
   'product-launch':['authored-feature-bento'],'feature-spotlight':['authored-feature-focus'],'feature-overview':['authored-feature-bento','three-column'],benefits:['authored-feature-index'],
   comparison:['authored-comparison-panels'],'before-after':['before-after','semantic-comparison-split'],'plan-options':['authored-comparison-panels'],

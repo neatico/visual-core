@@ -78,6 +78,7 @@ export const DESIGN_RECIPES:readonly DesignRecipe[]=[
  ...PRESENTATION_LAYOUT_IDS.map(id=>recipe(id,'presentation')),
  ...SOCIAL_LAYOUT_CATALOG.map(item=>recipe(item.id,'social',item.scene)),
  ...(['presentation','social'] as const).flatMap(kind=>[
+  ...['banner','split','editorial','campaign'].map(style=>({id:`authored-image-${style}`,kind,renderer:'semantic' as const,family:`image-${style}`,accepts:['image'] as SemanticKind[],minEntries:0,maxEntries:0,requiresImage:true})),
   ...AUTHORED_COMPOSITIONS.map(composition=>({id:`authored-${composition.id}`,kind,renderer:'semantic' as const,family:composition.id,accepts:[composition.kind],minEntries:composition.min,maxEntries:composition.max,requiresImage:false})),
   ...(['code','parameters','steps','comparison','features','quote','chart','hero'] as const).flatMap(group=>['split','stack','editorial'].map(variant=>({id:`semantic-${group}-${variant}`,kind,renderer:'semantic' as const,family:`${group}-${variant}`,accepts:accepted(group),minEntries:0,maxEntries:20,requiresImage:false}))),
   {id:'semantic-mixed-stack',kind,renderer:'semantic' as const,family:'mixed-stack',accepts:['paragraph','steps','features','comparison','code','parameters','quote','chart','image'] as SemanticKind[],minEntries:0,maxEntries:20,requiresImage:false},
