@@ -1,3 +1,4 @@
+import {COMPOSITION_SCENES} from './compositionScenes.js';
 /** Source-backed content, independent of layout and editor primitives. */
 export type SourceKind = 'text' | 'code' | 'image-reference';
 export interface SourceSegment { id: string; kind: SourceKind; text: string; start: number; end: number; language?: string }
@@ -17,13 +18,14 @@ export type ContentBlock = BlockBase & (
 );
 export interface ContentPage {
   id:string; title:string; purpose:'cover'|'explain'|'instruct'|'compare'|'evidence'|'conclude';
-  evidence:Evidence[]; blocks:ContentBlock[]; caption?:string; notes?:string;
+  evidence:Evidence[]; blocks:ContentBlock[]; caption?:string; notes?:string; scene?:string;
 }
 export interface ContentPlan { version:1; kind:'presentation'|'social'; title:string; pages:ContentPage[] }
 export class ContentContractError extends Error {
   constructor(public readonly code:string, public readonly path:string) { super(`${code}: ${path}`); }
 }
 const fail=(code:string,path:string):never=>{throw new ContentContractError(code,path);};
+const sceneField=(value:unknown,path:string):{scene?:string}=>{if(value===undefined)return {};if(typeof value!=='string'||!COMPOSITION_SCENES.some(scene=>scene.id===value))return fail('CONTENT_INVALID_SCENE',path);return {scene:value};};
 const object=(raw:unknown,path:string):Record<string,unknown>=>{
   if(!raw||typeof raw!=='object'||Array.isArray(raw))return fail('CONTENT_INVALID_OBJECT',path);
   return raw as Record<string,unknown>;
@@ -135,7 +137,7 @@ export function validateContentPlan(raw:unknown,source:SourceDocument,expectedKi
   const pages=list(root.pages,'pages',1,root.kind==='social'?8:24).map((raw,index):ContentPage=>{
     const path=`pages.${index}`,page=object(raw,path);
     if(!['cover','explain','instruct','compare','evidence','conclude'].includes(String(page.purpose)))fail('CONTENT_INVALID_PURPOSE',path);
-    return {id:unique(page.id,`${path}.id`),title:text(page.title,`${path}.title`,160),purpose:page.purpose as ContentPage['purpose'],evidence:evidence(page.evidence,`${path}.evidence`),blocks:list(page.blocks,`${path}.blocks`,1,8).map((value,i)=>block(value,`${path}.blocks.${i}`)),...(page.caption!==undefined?{caption:text(page.caption,`${path}.caption`,2000,true)}:{}),...(page.notes!==undefined?{notes:text(page.notes,`${path}.notes`,2000,true)}:{})};
+    return {...sceneField(page.scene,`${path}.scene`),id:unique(page.id,`${path}.id`),title:text(page.title,`${path}.title`,160),purpose:page.purpose as ContentPage['purpose'],evidence:evidence(page.evidence,`${path}.evidence`),blocks:list(page.blocks,`${path}.blocks`,1,8).map((value,i)=>block(value,`${path}.blocks.${i}`)),...(page.caption!==undefined?{caption:text(page.caption,`${path}.caption`,2000,true)}:{}),...(page.notes!==undefined?{notes:text(page.notes,`${path}.notes`,2000,true)}:{})};
   });
   if(root.kind==='presentation')for(const segment of source.segments.filter(s=>s.kind==='code'))if(!pages.some(p=>p.blocks.some(b=>b.kind==='code'&&b.sourceId===segment.id)))fail('CONTENT_CODE_OMITTED',segment.id);
   if(root.kind==='social'&&pages.some(page=>!page.caption?.trim()))fail('CONTENT_CAPTION_REQUIRED','pages');
@@ -184,5 +186,5 @@ export function validateEditableContentPage(raw:unknown,{allowIncomplete=false}:
    default:return fail('CONTENT_UNKNOWN_BLOCK',path);
   }
  });
- return {id:pageId,title:draftText(page.title,'page.title',160),purpose:page.purpose as ContentPage['purpose'],evidence:proof(page.evidence,'page.evidence'),blocks,...(page.caption===undefined?{}:{caption:draftText(page.caption,'page.caption',2000,true)}),...(page.notes===undefined?{}:{notes:draftText(page.notes,'page.notes',2000,true)})};
+ return {...sceneField(page.scene,'page.scene'),id:pageId,title:draftText(page.title,'page.title',160),purpose:page.purpose as ContentPage['purpose'],evidence:proof(page.evidence,'page.evidence'),blocks,...(page.caption===undefined?{}:{caption:draftText(page.caption,'page.caption',2000,true)}),...(page.notes===undefined?{}:{notes:draftText(page.notes,'page.notes',2000,true)})};
 }

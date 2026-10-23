@@ -19,3 +19,5 @@ export * from "./content.js";
 export * from "./designSystem.js";
 
 export * from "./designBlueprint.js";
+
+export * from './compositionScenes.js';
