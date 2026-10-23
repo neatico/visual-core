@@ -9,3 +9,12 @@ test('structure fingerprint is scale and source-order invariant',()=>{const a=[{
 test('themes declare complete typography, geometry and color tokens',()=>{for(const theme of DESIGN_THEMES){assert.ok(theme.typography.code);assert.ok(theme.palette.surface);assert.ok(theme.geometry.spacing>0);}});
 
 test('large catalogs cannot starve semantic paragraph compositions before measurement',()=>{const content={...page,blocks:[{id:'copy',kind:'paragraph',text:'First explanation',evidence:page.evidence},{id:'more',kind:'paragraph',text:'Additional context',evidence:page.evidence}]};for(const limit of [2,12,32]){const candidates=designCandidates(content,{kind:'presentation',ratio:16/9,limit});assert.ok(candidates.length<=limit);assert.ok(candidates.some(candidate=>candidate.renderer==='semantic'));assert.ok(candidates.some(candidate=>candidate.renderer==='catalog'));}});
+
+test('plain campaign copy cannot select calendars, travel, prices or simulated product UI',()=>{
+ const paragraph={...page,purpose:'explain',blocks:[{id:'copy',kind:'paragraph',text:'Share API documentation with your team.',evidence:page.evidence}]};
+ const excluded=[];let choices;do{choices=designCandidates(paragraph,{kind:'social',ratio:1,limit:32,excluded});for(const choice of choices){assert.ok(!['time-notice','ticket','itinerary','summary-card-stack','angled-ui-launch','repo-card','research-highlight'].includes(choice.id));excluded.push(choice.id);}}while(choices.length);
+ assert.ok(excluded.length>6);
+ const steps={...page,blocks:[{id:'steps',kind:'steps',entries:[{title:'Import',description:'Paste curl'}],evidence:page.evidence}]};
+ assert.ok(designCandidates(steps,{kind:'social',ratio:1,limit:32}).every(r=>r.id!=='itinerary'&&r.id!=='course-syllabus'));
+ assert.ok(DESIGN_RECIPES.find(r=>r.id==='time-notice'&&r.kind==='social'));
+});

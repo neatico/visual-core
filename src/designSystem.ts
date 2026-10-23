@@ -22,6 +22,8 @@ export function designTheme(id:string):DesignTheme {
 export interface DesignRecipe {
  id:string; renderer:'catalog'|'semantic'; kind:'presentation'|'social'; family:string;
  accepts:readonly SemanticKind[]; minEntries:number; maxEntries:number; requiresImage:boolean;
+ /** Unmodelled domain-specific catalogs remain manual-only until their required evidence is expressible. */
+ automatic?:boolean;
 }
 const family=(id:string,semantic?:string)=>{
  if(/code|terminal/.test(id))return 'code';
@@ -36,9 +38,25 @@ const family=(id:string,semantic?:string)=>{
  return 'features';
 };
 const accepted=(family:string):SemanticKind[]=>({code:['code'],comparison:['comparison'],steps:['steps'],chart:['chart'],quote:['quote'],parameters:['parameters'],image:['image'],hero:['paragraph'],features:['features','paragraph']} as Record<string,SemanticKind[]>)[family];
+// Explicit semantic contracts, not name/scene guesses. A travel itinerary, calendar,
+// price promotion or fake UI cannot be inferred from an arbitrary paragraph.
+const socialContracts:Record<string,readonly SemanticKind[]>={
+ 'news-focus':['paragraph'],manifesto:['paragraph'],editorial:['paragraph'],notice:['paragraph'],
+ 'block-banner':['paragraph'],'definition-card':['paragraph'],'concept-explainer':['paragraph'],
+ 'og-cover':['paragraph'],'gradient-cover':['paragraph'],'bold-diagonal-cover':['paragraph'],'split-cover':['paragraph'],
+ 'article-summary-card':['paragraph'],'paragraph-summary-card':['paragraph'],
+ bento:['features'],spotlight:['features'],report:['features'],checklist:['features'],
+ 'contents-index':['features'],'contents-grid':['features'],'tips-card':['features'],
+ 'digest-card':['features'],'tips-grid':['features'],'feature-chip-hero':['features'],
+ steps:['steps'],'contents-chapters':['steps'],'illustration-process':['steps'],
+ comparison:['comparison'],'before-after':['comparison'],
+ 'code-snippet':['code'],specification:['parameters'],
+ quote:['quote'],'editorial-quote':['quote'],'magazine-pull-quote':['quote'],
+};
 const recipe=(id:string,kind:DesignRecipe['kind'],semantic?:string):DesignRecipe=>{
- const group=family(id,semantic);
- return {id,kind,renderer:'catalog',family:group,accepts:accepted(group),minEntries:group==='comparison'?2:0,maxEntries:group==='hero'?0:kind==='presentation'?4:6,requiresImage:group==='image'};
+ const contract=kind==='social'?socialContracts[id]:undefined;
+ const group=contract?.[0] || family(id,semantic);
+ return {id,kind,renderer:'catalog',automatic:kind!=='social'||Boolean(contract),family:group,accepts:contract||accepted(group),minEntries:group==='comparison'?2:kind==='social'&&(group==='features'||group==='steps'||group==='parameters')?1:0,maxEntries:group==='hero'?0:kind==='presentation'?4:6,requiresImage:group==='image'};
 };
 /** Existing authored catalogs remain first-class candidates, rather than being discarded. */
 export const DESIGN_RECIPES:readonly DesignRecipe[]=[
@@ -60,7 +78,7 @@ export function designCandidates(page:ContentPage,context:CandidateContext):Desi
  const count=pageEntryCount(page),characters=page.blocks.flatMap(contentBlockText).join('').length;
  const available=page.blocks.some(b=>b.kind==='image'&&b.status==='available');
  const exclude=new Set(context.excluded||[]);
- const candidates=DESIGN_RECIPES.filter(r=>r.kind===context.kind&&!exclude.has(r.id)&&count>=r.minEntries&&count<=r.maxEntries&&(!r.requiresImage||available)&&kinds.every(k=>r.accepts.includes(k))&&!(r.renderer==='catalog'&&(primary.length>1||characters>1000)));
+ const candidates=DESIGN_RECIPES.filter(r=>r.kind===context.kind&&r.automatic!==false&&!exclude.has(r.id)&&count>=r.minEntries&&count<=r.maxEntries&&(!r.requiresImage||available)&&kinds.every(k=>r.accepts.includes(k))&&!(r.renderer==='catalog'&&(primary.length>1||characters>1000)));
  const score=(r:DesignRecipe)=>{
    const repeats=(context.previousFamilies||[]).filter(f=>f===r.family).length;
    const intent=page.purpose==='cover'||page.purpose==='conclude'?r.family.startsWith('hero'):page.purpose==='instruct'?r.family.startsWith('steps')||r.family.startsWith('code'):true;
