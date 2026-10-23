@@ -77,7 +77,7 @@ export function parseSource(input:string):SourceDocument {
         escaped=false;
       }
       i=Math.min(j,lines.length-1);
-    }else if(/^(?:!\[[^\]]*\]\([^\n]+\)|[^\s<>]+\.(?:png|jpe?g|webp|gif|svg))$/i.test(trimmed))kind='image-reference';
+    }else if(/^(?:!\[[^\]]*\]\([^\n]+\)|\[[^\]]*\]\(https?:\/\/[^\s)]+\.(?:png|jpe?g|webp|gif|svg)(?:[?#][^\s)]*)?\)|[^\s<>]+\.(?:png|jpe?g|webp|gif|svg))$/i.test(trimmed))kind='image-reference';
     if(end>start)segments.push({id:`source-${segments.length+1}`,kind,text:input.slice(start,end),start,end,...(language?{language}:{})});
   }
   if(segments.length>800)fail('SOURCE_TOO_MANY_SEGMENTS','source');

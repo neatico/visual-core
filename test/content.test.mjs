@@ -42,3 +42,5 @@ test('limits payload sizes and rejects unknown semantic blocks',()=>{
  assert.throws(()=>parseSource('x'.repeat(20001)),/SOURCE_INVALID_LENGTH/);
  const raw=plan();raw.pages[0].blocks[0].kind='script';assert.throws(()=>validateContentPlan(raw,source),/CONTENT_UNKNOWN_BLOCK/);
 });
+
+test('image-file markdown links remain unresolved references, not narrative facts',()=>{const input='[markdown picture](https://img.example.com/flow.svg)\n[Guide](https://example.com/guide)';const source=parseSource(input);assert.equal(source.segments[0].kind,'image-reference');assert.equal(source.segments[0].text,input.split('\n')[0]);assert.equal(source.segments[1].kind,'text');assert.equal(source.text,input);});
