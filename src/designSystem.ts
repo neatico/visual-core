@@ -53,10 +53,24 @@ const socialContracts:Record<string,readonly SemanticKind[]>={
  'code-snippet':['code'],specification:['parameters'],
  quote:['quote'],'editorial-quote':['quote'],'magazine-pull-quote':['quote'],
 };
+// Automatic presentation matching requires an explicit semantic contract too.
+// A feature paragraph must never become a price plan, employee or risk entry.
+const presentationContracts:Record<string,readonly SemanticKind[]>={
+ cover:['paragraph'],section:['paragraph'],statement:['paragraph'],closing:['paragraph'],
+ agenda:['features'],bullets:['features'],'two-column':['features'],
+ 'three-column':['features'],cards:['features'],checklist:['features'],
+ process:['steps'],timeline:['steps'],roadmap:['steps'],'progress-roadmap':['steps'],
+ comparison:['comparison'],'before-after':['comparison'],'problem-solution':['comparison'],
+ metrics:['chart'],'bar-chart':['chart'],'usage-breakdown':['chart'],
+ quote:['quote'],'editorial-quote':['quote'],'magazine-pull-quote':['quote'],
+ table:['parameters'],specification:['parameters'],'code-snippet':['code'],
+ 'image-left':['image'],'image-right':['image'],'image-full':['image'],
+ 'product-showcase':['image'],
+};
 const recipe=(id:string,kind:DesignRecipe['kind'],semantic?:string):DesignRecipe=>{
- const contract=kind==='social'?socialContracts[id]:undefined;
- const group=contract?.[0] || family(id,semantic);
- return {id,kind,renderer:'catalog',automatic:kind!=='social'||Boolean(contract),family:group,accepts:contract||accepted(group),minEntries:group==='comparison'?2:kind==='social'&&(group==='features'||group==='steps'||group==='parameters')?1:0,maxEntries:group==='hero'?0:kind==='presentation'?4:6,requiresImage:group==='image'};
+ const contract=(kind==='social'?socialContracts:presentationContracts)[id];
+ const group:string=contract?.[0] || family(id,semantic);
+ return {id,kind,renderer:'catalog',automatic:Boolean(contract),family:group,accepts:contract||accepted(group),minEntries:group==='comparison'?2:kind==='social'&&(group==='features'||group==='steps'||group==='parameters')?1:0,maxEntries:group==='hero'?0:kind==='presentation'?4:6,requiresImage:group==='image'};
 };
 /** Existing authored catalogs remain first-class candidates, rather than being discarded. */
 export const DESIGN_RECIPES:readonly DesignRecipe[]=[

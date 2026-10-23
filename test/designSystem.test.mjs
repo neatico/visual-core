@@ -18,3 +18,12 @@ test('plain campaign copy cannot select calendars, travel, prices or simulated p
  assert.ok(designCandidates(steps,{kind:'social',ratio:1,limit:32}).every(r=>r.id!=='itinerary'&&r.id!=='course-syllabus'));
  assert.ok(DESIGN_RECIPES.find(r=>r.id==='time-notice'&&r.kind==='social'));
 });
+test('presentation features cannot silently become pricing, people or domain-specific records',()=>{
+ const features={...page,purpose:'explain',blocks:[{id:'features',kind:'features',evidence:page.evidence,entries:[{title:'Capability',description:'Source-backed description'}]}]};
+ const choices=designCandidates(features,{kind:'presentation',ratio:16/9,limit:32});
+ assert.ok(choices.some(choice=>choice.id==='cards'));
+ for(const id of ['pricing','team','organization','swot','risk']){
+  assert.ok(!choices.some(choice=>choice.id===id));
+  assert.ok(DESIGN_RECIPES.some(choice=>choice.kind==='presentation'&&choice.id===id));
+ }
+});
