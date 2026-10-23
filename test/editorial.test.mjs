@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {ensurePresentationBookends,needsEditorialPagination,languageFont,designCandidates} from '../dist/index.js';
+const evidence=[{sourceId:'source-1'}];const page={id:'p',title:'行业认可',purpose:'conclude',evidence,blocks:[{id:'b',kind:'paragraph',text:'客户采用的事实必须保留。',evidence}]};
+test('adds genuine bookends without losing an evidence closing',()=>{const result=ensurePresentationBookends({version:1,kind:'presentation',title:'产品',pages:[page]});assert.equal(result.pages.length,3);assert.equal(result.pages[1].purpose,'evidence');assert.equal(result.pages[2].title,'感谢聆听');assert.deepEqual(ensurePresentationBookends(result),result);});
+test('long readable text requires editorial pagination before overflow',()=>assert.equal(needsEditorialPagination({...page,blocks:[{...page.blocks[0],text:'接口测试'.repeat(55)}]}),true));
+test('language matching distinguishes Japanese and Chinese',()=>{assert.equal(languageFont('これは日本語','Inter'),'Noto Sans JP');assert.equal(languageFont('中文','Georgia'),'Noto Serif SC');});
+test('cover recipes lead genuine presentation covers only',()=>{const cover={...page,purpose:'cover'};assert.match(designCandidates(cover,{kind:'presentation',ratio:16/9})[0].id,/^bookend-cover/);assert.ok(!designCandidates({...page,purpose:'explain'},{kind:'presentation',ratio:16/9}).some(r=>r.id.startsWith('bookend-')));});

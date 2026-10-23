@@ -38,7 +38,7 @@ const family=(id:string,semantic?:string)=>{
  if(semantic==='steps')return 'steps';if(semantic==='comparison')return 'comparison';
  return 'features';
 };
-const accepted=(family:string):SemanticKind[]=>({code:['code'],comparison:['comparison'],steps:['steps'],chart:['chart'],quote:['quote'],parameters:['parameters'],image:['image'],hero:['paragraph'],features:['features','paragraph']} as Record<string,SemanticKind[]>)[family];
+const accepted=(family:string):SemanticKind[]=>({code:['code'],comparison:['comparison'],steps:['steps'],chart:['chart'],quote:['quote'],parameters:['parameters'],image:['image'],hero:['paragraph'],prose:['paragraph'],features:['features','paragraph']} as Record<string,SemanticKind[]>)[family];
 // Explicit semantic contracts, not name/scene guesses. A travel itinerary, calendar,
 // price promotion or fake UI cannot be inferred from an arbitrary paragraph.
 const socialContracts:Record<string,readonly SemanticKind[]>={
@@ -75,12 +75,15 @@ const recipe=(id:string,kind:DesignRecipe['kind'],semantic?:string):DesignRecipe
 };
 /** Existing authored catalogs remain first-class candidates, rather than being discarded. */
 export const DESIGN_RECIPES:readonly DesignRecipe[]=[
+ ...['cover','closing'].flatMap(role=>['editorial','panel','split'].map(style=>({id:`bookend-${role}-${style}`,kind:'presentation' as const,renderer:'semantic' as const,family:`${role}-${style}`,accepts:['paragraph'] as SemanticKind[],minEntries:0,maxEntries:0,requiresImage:false}))),
+ ...(['presentation','social'] as const).map(kind=>({id:'brand-collection-grid',kind,renderer:'semantic' as const,family:'brand-collection',accepts:['features'] as SemanticKind[],minEntries:2,maxEntries:12,requiresImage:false})),
  ...PRESENTATION_LAYOUT_IDS.map(id=>recipe(id,'presentation')),
  ...SOCIAL_LAYOUT_CATALOG.map(item=>recipe(item.id,'social',item.scene)),
  ...(['presentation','social'] as const).flatMap(kind=>[
-  ...['banner','split','editorial','campaign'].map(style=>({id:`authored-image-${style}`,kind,renderer:'semantic' as const,family:`image-${style}`,accepts:['image'] as SemanticKind[],minEntries:0,maxEntries:0,requiresImage:true})),
+  ...['banner','split','editorial','campaign','inset'].map(style=>({id:`authored-image-${style}`,kind,renderer:'semantic' as const,family:`image-${style}`,accepts:['image'] as SemanticKind[],minEntries:0,maxEntries:0,requiresImage:true})),
+  {id:'authored-prose-inset',kind,renderer:'semantic' as const,family:'prose-inset',accepts:['paragraph'] as SemanticKind[],minEntries:0,maxEntries:0,requiresImage:false},
   ...AUTHORED_COMPOSITIONS.map(composition=>({id:`authored-${composition.id}`,kind,renderer:'semantic' as const,family:composition.id,accepts:[composition.kind],minEntries:composition.min,maxEntries:composition.max,requiresImage:false})),
-  ...(['code','parameters','steps','comparison','features','quote','chart','hero'] as const).flatMap(group=>['split','stack','editorial'].map(variant=>({id:`semantic-${group}-${variant}`,kind,renderer:'semantic' as const,family:`${group}-${variant}`,accepts:accepted(group),minEntries:0,maxEntries:20,requiresImage:false}))),
+  ...(['code','parameters','steps','comparison','features','quote','chart','hero','prose'] as const).flatMap(group=>['split','stack','editorial'].map(variant=>({id:`semantic-${group}-${variant}`,kind,renderer:'semantic' as const,family:`${group}-${variant}`,accepts:accepted(group),minEntries:0,maxEntries:20,requiresImage:false}))),
   {id:'semantic-mixed-stack',kind,renderer:'semantic' as const,family:'mixed-stack',accepts:['paragraph','steps','features','comparison','code','parameters','quote','chart','image'] as SemanticKind[],minEntries:0,maxEntries:20,requiresImage:false},
  ]),
 ];
@@ -95,11 +98,11 @@ export function designCandidates(page:ContentPage,context:CandidateContext):Desi
  const count=pageEntryCount(page),characters=page.blocks.flatMap(contentBlockText).join('').length;
  const available=page.blocks.some(b=>b.kind==='image'&&b.status==='available');
  const exclude=new Set(context.excluded||[]);
- const candidates=DESIGN_RECIPES.filter(r=>r.kind===context.kind&&r.automatic!==false&&!exclude.has(r.id)&&count>=r.minEntries&&count<=r.maxEntries&&(!r.requiresImage||available)&&kinds.every(k=>r.accepts.includes(k))&&!(r.renderer==='catalog'&&(primary.length>1||characters>1000)));
+ const candidates=DESIGN_RECIPES.filter(r=>r.kind===context.kind&&r.automatic!==false&&(!(r.family.startsWith('hero')&&page.purpose!=='cover'&&page.purpose!=='conclude'&&characters>120))&&(!r.id.startsWith('bookend-')||(page.purpose==='cover'?r.id.startsWith('bookend-cover-'):page.purpose==='conclude'&&r.id.startsWith('bookend-closing-')))&&(r.id!=='brand-collection-grid'||page.scene==='brand-collection')&&!exclude.has(r.id)&&count>=r.minEntries&&count<=r.maxEntries&&(!r.requiresImage||available)&&kinds.every(k=>r.accepts.includes(k))&&!(r.renderer==='catalog'&&(primary.length>1||characters>1000)));
  const score=(r:DesignRecipe)=>{
    const repeats=(context.previousFamilies||[]).filter(f=>f===r.family).length;
    const intent=page.purpose==='cover'||page.purpose==='conclude'?r.family.startsWith('hero'):page.purpose==='instruct'?r.family.startsWith('steps')||r.family.startsWith('code'):true;
-   return sceneRecipePreference(page.scene,r.id)+(intent?30:0)+(r.renderer==='catalog'?8:0)-(r.id.includes('mixed')?20:0)-repeats*18+(context.ratio<1&&r.id.endsWith('stack')?6:0);
+   return (r.id.startsWith('bookend-')?80:0)+(page.scene==='brand-collection'&&r.id==='brand-collection-grid'?80:0)+sceneRecipePreference(page.scene,r.id)+(intent?30:0)+(r.renderer==='catalog'?8:0)-(r.id.includes('mixed')?20:0)-repeats*18+(context.ratio<1&&r.id.endsWith('stack')?6:0);
  };
  const ranked=candidates.map((r,index)=>({r,index,score:score(r)})).sort((a,b)=>b.score-a.score||a.index-b.index).map(e=>e.r);
  const limit=Math.max(1,Math.min(32,context.limit??12));

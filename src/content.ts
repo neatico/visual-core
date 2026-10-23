@@ -7,7 +7,7 @@ export interface Evidence { sourceId: string; quote?: string }
 export type SemanticKind = 'paragraph' | 'steps' | 'features' | 'comparison' | 'code' | 'parameters' | 'quote' | 'chart' | 'image';
 interface BlockBase { id: string; evidence: Evidence[] }
 export type ContentBlock = BlockBase & (
-  | { kind:'paragraph'; text:string }
+  | { kind:'paragraph'; text:string; heading?:string; level?:2|3 }
   | { kind:'steps'|'features'; entries:{title:string;description:string}[] }
   | { kind:'comparison'; columns:{title:string;points:string[]}[] }
   | { kind:'code'; sourceId:string; language:string; code:string }
@@ -102,7 +102,7 @@ export function validateContentPlan(raw:unknown,source:SourceDocument,expectedKi
     const value=object(raw,path),base={id:unique(value.id,`${path}.id`),evidence:evidence(value.evidence,`${path}.evidence`)};
     const field=(key:string,max=1000,empty=false)=>text(value[key],`${path}.${key}`,max,empty);
     switch(value.kind){
-      case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600)};
+      case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600),...(value.heading===undefined?{}:{heading:field('heading',160),level:value.level===3?3:2})};
       case 'steps':case 'features':return {...base,kind:value.kind,entries:list(value.entries,`${path}.entries`,1,12).map((raw,i)=>{const item=object(raw,`${path}.entries.${i}`);return {title:text(item.title,path,160),description:text(item.description,path,600,true)};})};
       case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,`${path}.columns`,2,4).map(raw=>{const col=object(raw,path);return {title:text(col.title,path,160),points:list(col.points,path,1,8).map(raw=>text(raw,path,500))};})};
       case 'code':{
@@ -146,7 +146,7 @@ export function validateContentPlan(raw:unknown,source:SourceDocument,expectedKi
 
 export function contentBlockText(block:ContentBlock):string[] {
   switch(block.kind){
-    case 'paragraph':return [block.text];
+    case 'paragraph':return [...(block.heading?[block.heading]:[]),block.text];
     case 'steps':case 'features':return block.entries.flatMap(e=>[e.title,e.description]);
     case 'comparison':return block.columns.flatMap(c=>[c.title,...c.points]);
     case 'code':return [block.code];
@@ -169,7 +169,7 @@ export function validateEditableContentPage(raw:unknown,{allowIncomplete=false}:
   const path=`page.blocks.${index}`,value=object(raw,path),base={id:id(value.id,`${path}.id`),evidence:proof(value.evidence,`${path}.evidence`)};
   const field=(name:string,max=1000,empty=false)=>draftText(value[name],`${path}.${name}`,max,empty);
   switch(value.kind){
-   case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600)};
+   case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600),...(value.heading===undefined?{}:{heading:field('heading',160),level:value.level===3?3:2})};
    case 'steps':case 'features':return {...base,kind:value.kind,entries:list(value.entries,path,1,12).map(raw=>{const item=object(raw,path);return {title:draftText(item.title,path,160),description:draftText(item.description,path,600,true)};})};
    case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,path,2,4).map(raw=>{const item=object(raw,path);return {title:draftText(item.title,path,160),points:list(item.points,path,1,8).map(raw=>draftText(raw,path,500))};})};
    case 'code':return {...base,kind:'code',sourceId:field('sourceId',80),language:field('language',40),code:field('code',20000)};

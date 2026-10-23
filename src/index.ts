@@ -21,3 +21,5 @@ export * from "./designSystem.js";
 export * from "./designBlueprint.js";
 
 export * from './compositionScenes.js';
+export * from './editorial.js';
+export * from './fontCatalog.js';
