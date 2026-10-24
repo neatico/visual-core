@@ -1,8 +1,8 @@
 # @neatico/visual-core
 
-Framework-independent building blocks for editable visual products, extracted from [Neatico](https://www.neatico.app/?utm_source=github&utm_medium=readme&utm_campaign=visual-core).
+Framework-independent building blocks for editable visual products, extracted from [Neatico](https://www.neatico.com/?utm_source=github&utm_medium=readme&utm_campaign=visual-core).
 
-Create visuals with AI at **[neatico.app](https://www.neatico.app/?utm_source=npm&utm_medium=readme&utm_campaign=visual-core)**, or use this package to build your own editor, layout pipeline, or scene extension.
+Create visuals with AI at **[neatico.com](https://www.neatico.com/?utm_source=npm&utm_medium=readme&utm_campaign=visual-core)**, or use this package to build your own editor, layout pipeline, or scene extension.
 
 ## Install
 
