@@ -1,6 +1,6 @@
 {
   "name": "@neatico/visual-core",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "description": "Framework-independent geometry, measured text wrapping, and extensible scene registries for visual editors.",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -31,7 +31,7 @@
     "type": "git",
     "url": "git+https://github.com/neatico/visual-core.git"
   },
-  "homepage": "https://www.neatico.com/?utm_source=npm&utm_medium=package&utm_campaign=visual-core",
+  "homepage": "https://www.neatico.com",
   "bugs": {
     "url": "https://github.com/neatico/visual-core/issues"
   },
