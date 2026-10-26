@@ -5,3 +5,7 @@ test('adds genuine bookends without losing an evidence closing',()=>{const resul
 test('long readable text requires editorial pagination before overflow',()=>assert.equal(needsEditorialPagination({...page,blocks:[{...page.blocks[0],text:'接口测试'.repeat(55)}]}),true));
 test('language matching distinguishes Japanese and Chinese',()=>{assert.equal(languageFont('これは日本語','Inter'),'Noto Sans JP');assert.equal(languageFont('中文','Georgia'),'Noto Serif SC');});
 test('cover recipes lead genuine presentation covers only',()=>{const cover={...page,purpose:'cover'};assert.match(designCandidates(cover,{kind:'presentation',ratio:16/9})[0].id,/^bookend-cover/);assert.ok(!designCandidates({...page,purpose:'explain'},{kind:'presentation',ratio:16/9}).some(r=>r.id.startsWith('bookend-')));});
+
+test('explicit brand families and compatible Google families are preserved',()=>{assert.equal(languageFont('中文','Brand Custom'),'Brand Custom');assert.equal(languageFont('日本語','Noto Sans JP','ja'),'Noto Sans JP');});
+
+test("closing has dedicated candidates instead of aliasing cover",()=>{assert.match(designCandidates({...page,purpose:"conclude"},{kind:"presentation",ratio:16/9})[0].id,/^bookend-closing/);});

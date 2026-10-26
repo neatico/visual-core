@@ -44,3 +44,8 @@ test('limits payload sizes and rejects unknown semantic blocks',()=>{
 });
 
 test('image-file markdown links remain unresolved references, not narrative facts',()=>{const input='[markdown picture](https://img.example.com/flow.svg)\n[Guide](https://example.com/guide)';const source=parseSource(input);assert.equal(source.segments[0].kind,'image-reference');assert.equal(source.segments[0].text,input.split('\n')[0]);assert.equal(source.segments[1].kind,'text');assert.equal(source.text,input);});
+test('AI emphasis accepts exact title phrases and rejects invented or nested ranges',()=>{
+ const good=plan();good.pages[0].titleEmphasis=['导入'];
+ assert.deepEqual(validateContentPlan(good,source,'presentation').pages[0].titleEmphasis,['导入']);
+ for(const bad of [['不存在'],['导入','导入请求'],[''],['导入','导入']]){good.pages[0].titleEmphasis=bad;assert.throws(()=>validateContentPlan(good,source,'presentation'),/CONTENT_INVALID_EMPHASIS/);}
+});

@@ -15,12 +15,15 @@ export const GOOGLE_FONT_CATALOG:readonly FontFamily[]=[
 export function contentScript(text:string,locale='en'):string {
  if(/[\u3040-\u30ff]/u.test(text))return 'ja';if(/[\uac00-\ud7af]/u.test(text))return 'ko';
  if(/[\u0600-\u06ff]/u.test(text))return 'ar';if(/[\u0900-\u097f]/u.test(text))return 'hi';
- if(/[\u3400-\u9fff]/u.test(text))return /TW|HK|Hant/i.test(locale)?'zh-Hant':'zh';
+ if(/[\u3400-\u9fff]/u.test(text))return /^ja/i.test(locale)?'ja':/^ko/i.test(locale)?'ko':/TW|HK|Hant/i.test(locale)?'zh-Hant':'zh';
  if(/^zh/i.test(locale))return /TW|HK|Hant/i.test(locale)?'zh-Hant':'zh';return /^(ja|ko|ar|hi)/.exec(locale)?.[1]||'latin';
 }
 export function recommendedFonts(locale:string,text=''):FontFamily[]{const script=contentScript(text,locale);return [...GOOGLE_FONT_CATALOG].sort((a,b)=>Number(b.scripts.includes(script))-Number(a.scripts.includes(script)));}
 export function languageFont(text:string,preferred:string,locale='en'):string {
  const script=contentScript(text,locale);if(script==='latin')return preferred;
+ const selected=GOOGLE_FONT_CATALOG.find(font=>font.family===preferred);
+ if(selected?.scripts.includes(script))return preferred;
+ if(!selected&&!['Arial','Helvetica','Georgia','Times New Roman','Courier New','sans-serif','serif','monospace'].includes(preferred))return preferred;
  const serif=/serif|Georgia|Lora|Baskerville|Merriweather|Playfair/i.test(preferred)&&!/sans/i.test(preferred);
  return GOOGLE_FONT_CATALOG.find(f=>f.scripts.includes(script)&&f.category===(serif?'serif':'sans'))?.family||preferred;
 }

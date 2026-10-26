@@ -5,6 +5,8 @@ import type {SemanticKind} from './content.js';
 export interface CompositionScene {id:string; kinds:readonly SemanticKind[]; outputs:readonly ('presentation'|'social')[]; requiresAsset?:boolean}
 const both=['presentation','social'] as const;
 export const COMPOSITION_SCENES:readonly CompositionScene[]=[
+ {id:'menu-details',kinds:['parameters'],outputs:both},{id:'travel-details',kinds:['parameters'],outputs:both},{id:'offer-details',kinds:['parameters'],outputs:both},
+ {id:'questions',kinds:['features'],outputs:both},{id:'case-study',kinds:['features'],outputs:both},
  {id:'brand-collection',kinds:['features'],outputs:both},
  {id:'hero',kinds:['paragraph'],outputs:both},{id:'chapter',kinds:['paragraph'],outputs:['presentation']},
  {id:'statement',kinds:['paragraph'],outputs:both},{id:'closing',kinds:['paragraph'],outputs:both},

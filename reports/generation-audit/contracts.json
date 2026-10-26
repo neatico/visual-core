@@ -1,0 +1,2312 @@
+{
+  "date": "2026-10-25",
+  "version": "0.14.18",
+  "count": 116,
+  "rows": [
+    {
+      "id": "bookend-cover-editorial",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "cover-editorial",
+      "automatic": true,
+      "canonical": "bookend-cover-editorial",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "bookend-cover-panel",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "cover-panel",
+      "automatic": true,
+      "canonical": "bookend-cover-panel",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "bookend-cover-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "cover-split",
+      "automatic": true,
+      "canonical": "bookend-cover-split",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "bookend-closing-editorial",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "closing-editorial",
+      "automatic": true,
+      "canonical": "bookend-closing-editorial",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "bookend-closing-panel",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "closing-panel",
+      "automatic": true,
+      "canonical": "bookend-closing-panel",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "bookend-closing-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "closing-split",
+      "automatic": true,
+      "canonical": "bookend-closing-split",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "brand-collection-grid",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "brand-collection",
+      "automatic": true,
+      "canonical": "brand-collection-grid",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 12
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "brand-collection-grid",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "brand-collection",
+      "automatic": true,
+      "canonical": "brand-collection-grid",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 12
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "time-notice",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-time-notice",
+      "automatic": true,
+      "canonical": "time-notice",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "event-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires a dedicated event time field; generic prose cannot safely fill it.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "news-focus",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "paragraph",
+      "automatic": true,
+      "canonical": "news-focus",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "manifesto",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "paragraph",
+      "automatic": true,
+      "canonical": "manifesto",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "launch",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": false,
+      "canonical": "launch",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Legacy artwork simulates product UI; use authored-launch-hero/stage with real assets.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "bento",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": true,
+      "canonical": "bento",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "spotlight",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": true,
+      "canonical": "spotlight",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "ticket",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-ticket",
+      "automatic": true,
+      "canonical": "ticket",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "event-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires structured event date, venue and admission fields.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "webinar",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-webinar",
+      "automatic": true,
+      "canonical": "webinar",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "event-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires structured event format, schedule and host fields.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "quote",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "quote",
+      "automatic": true,
+      "canonical": "quote",
+      "accepts": [
+        "quote"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "testimonial",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "quote",
+      "automatic": true,
+      "canonical": "testimonial",
+      "accepts": [
+        "quote"
+      ],
+      "scenes": [
+        "testimonial"
+      ],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "metric",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "chart",
+      "automatic": false,
+      "canonical": "metric",
+      "accepts": [
+        "chart"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Legacy value slot lacks a chart-to-value binding; use typed chart compositions.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "report",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": true,
+      "canonical": "report",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "checklist",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": true,
+      "canonical": "checklist",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "steps",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "steps",
+      "automatic": true,
+      "canonical": "steps",
+      "accepts": [
+        "steps"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "comparison",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "comparison",
+      "automatic": true,
+      "canonical": "comparison",
+      "accepts": [
+        "comparison"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "myth",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "comparison",
+      "automatic": false,
+      "canonical": "myth",
+      "accepts": [
+        "comparison"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Fixed wrong/right semantics cannot be inferred from ordinary comparison columns.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "pricing",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-pricing",
+      "automatic": true,
+      "canonical": "pricing",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "pricing-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Legacy headline price requires a dedicated plan binding; use typed comparison prices/statuses.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "offer",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-offer",
+      "automatic": true,
+      "canonical": "offer",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "offer-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires explicit offer terms and a real product image.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "editorial",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "paragraph",
+      "automatic": true,
+      "canonical": "editorial",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "story",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": false,
+      "canonical": "story",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Legacy artwork is illustrative; use authored-image-editorial with a resolved image.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "hiring",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-hiring",
+      "automatic": true,
+      "canonical": "hiring",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "recruitment-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires a typed vacancy rather than arbitrary feature entries.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "team",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": false,
+      "canonical": "team",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires typed people and corresponding portrait assets.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "course",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "steps",
+      "automatic": true,
+      "canonical": "course",
+      "accepts": [
+        "steps"
+      ],
+      "scenes": [
+        "tutorial",
+        "roadmap"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "case-study",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": true,
+      "canonical": "case-study",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [
+        "case-study"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "notice",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "paragraph",
+      "automatic": true,
+      "canonical": "notice",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "community",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-community",
+      "automatic": true,
+      "canonical": "community",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "event-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires structured event participation details.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "menu",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-menu",
+      "automatic": true,
+      "canonical": "menu",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "menu-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires typed menu prices and units.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "specification",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "parameters",
+      "automatic": true,
+      "canonical": "specification",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "itinerary",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-itinerary",
+      "automatic": true,
+      "canonical": "itinerary",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "travel-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires typed destinations and dates.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "schedule",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "domain-schedule",
+      "automatic": true,
+      "canonical": "schedule",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [
+        "event-details"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires typed start/end time slots.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "safety",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": true,
+      "canonical": "safety",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [
+        "checklist"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "faq",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": true,
+      "canonical": "faq",
+      "accepts": [
+        "features"
+      ],
+      "scenes": [
+        "questions"
+      ],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "split-bar-compare",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "comparison",
+      "automatic": false,
+      "canonical": "split-bar-compare",
+      "accepts": [
+        "comparison"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires paired measured series; generic comparison text is insufficient.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "benchmark-bars",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": false,
+      "canonical": "benchmark-bars",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires explicit benchmark values, not invented percentages.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "usage-breakdown",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "chart",
+      "automatic": false,
+      "canonical": "usage-breakdown",
+      "accepts": [
+        "chart"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Use authored share charts with validated numeric parts and total.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "organization",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": false,
+      "canonical": "organization",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires an explicit parent/child relationship contract.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "editorial-quote",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "quote",
+      "automatic": true,
+      "canonical": "editorial-quote",
+      "accepts": [
+        "quote"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "research-highlight",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": false,
+      "canonical": "research-highlight",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Requires methodology and limitations mapped independently.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "product-showcase",
+      "output": "social",
+      "renderer": "catalog",
+      "family": "features",
+      "automatic": false,
+      "canonical": "product-showcase",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": "Use authored-image-split/campaign with a resolved image, not legacy fake UI.",
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-banner",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "image-banner",
+      "automatic": true,
+      "canonical": "authored-image-banner",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "image-split",
+      "automatic": true,
+      "canonical": "authored-image-split",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-editorial",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "image-editorial",
+      "automatic": true,
+      "canonical": "authored-image-editorial",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-campaign",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "image-campaign",
+      "automatic": true,
+      "canonical": "authored-image-campaign",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-inset",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "image-inset",
+      "automatic": true,
+      "canonical": "authored-image-inset",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-prose-inset",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "prose-inset",
+      "automatic": true,
+      "canonical": "authored-prose-inset",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-feature-focus",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "feature-focus",
+      "automatic": true,
+      "canonical": "authored-feature-focus",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 1
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-feature-bento",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "feature-bento",
+      "automatic": true,
+      "canonical": "authored-feature-bento",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-feature-index",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "feature-index",
+      "automatic": true,
+      "canonical": "authored-feature-index",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-steps-journey",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "steps-journey",
+      "automatic": true,
+      "canonical": "authored-steps-journey",
+      "accepts": [
+        "steps",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-steps-ribbon",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "steps-ribbon",
+      "automatic": true,
+      "canonical": "authored-steps-ribbon",
+      "accepts": [
+        "steps",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 4
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-comparison-panels",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "comparison-panels",
+      "automatic": true,
+      "canonical": "authored-comparison-panels",
+      "accepts": [
+        "comparison",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 3
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-quote-editorial",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "quote-editorial",
+      "automatic": true,
+      "canonical": "authored-quote-editorial",
+      "accepts": [
+        "quote",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-quote-poster",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "quote-poster",
+      "automatic": true,
+      "canonical": "authored-quote-poster",
+      "accepts": [
+        "quote",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-code-editorial",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "code-editorial",
+      "automatic": true,
+      "canonical": "authored-code-editorial",
+      "accepts": [
+        "code",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-parameter-ledger",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "parameter-ledger",
+      "automatic": true,
+      "canonical": "authored-parameter-ledger",
+      "accepts": [
+        "parameters",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 8
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-parameter-cards",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "parameter-cards",
+      "automatic": true,
+      "canonical": "authored-parameter-cards",
+      "accepts": [
+        "parameters",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 4
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-code-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "code-split",
+      "automatic": true,
+      "canonical": "semantic-code-split",
+      "accepts": [
+        "code"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-parameters-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "parameters-split",
+      "automatic": true,
+      "canonical": "semantic-parameters-split",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-parameters-stack",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "parameters-stack",
+      "automatic": true,
+      "canonical": "semantic-parameters-stack",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-steps-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "steps-split",
+      "automatic": true,
+      "canonical": "semantic-steps-split",
+      "accepts": [
+        "steps"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-steps-stack",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "steps-stack",
+      "automatic": true,
+      "canonical": "semantic-steps-stack",
+      "accepts": [
+        "steps"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-steps-editorial",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "steps-editorial",
+      "automatic": true,
+      "canonical": "semantic-steps-editorial",
+      "accepts": [
+        "steps"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-comparison-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "comparison-split",
+      "automatic": true,
+      "canonical": "semantic-comparison-split",
+      "accepts": [
+        "comparison"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-features-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "features-split",
+      "automatic": true,
+      "canonical": "semantic-features-split",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-features-stack",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "features-stack",
+      "automatic": true,
+      "canonical": "semantic-features-stack",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-features-editorial",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "features-editorial",
+      "automatic": true,
+      "canonical": "semantic-features-editorial",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-quote-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "quote-split",
+      "automatic": true,
+      "canonical": "semantic-quote-split",
+      "accepts": [
+        "quote"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-chart-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "chart-split",
+      "automatic": true,
+      "canonical": "semantic-chart-split",
+      "accepts": [
+        "chart"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-chart-stack",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "chart-stack",
+      "automatic": true,
+      "canonical": "semantic-chart-stack",
+      "accepts": [
+        "chart"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-prose-split",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "prose-split",
+      "automatic": true,
+      "canonical": "semantic-prose-split",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-prose-stack",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "prose-stack",
+      "automatic": true,
+      "canonical": "semantic-prose-stack",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-prose-editorial",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "prose-editorial",
+      "automatic": true,
+      "canonical": "semantic-prose-editorial",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-mixed-stack",
+      "output": "presentation",
+      "renderer": "semantic",
+      "family": "mixed-stack",
+      "automatic": true,
+      "canonical": "semantic-mixed-stack",
+      "accepts": [
+        "paragraph",
+        "steps",
+        "features",
+        "comparison",
+        "code",
+        "parameters",
+        "quote",
+        "chart",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-banner",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "image-banner",
+      "automatic": true,
+      "canonical": "authored-image-banner",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "image-split",
+      "automatic": true,
+      "canonical": "authored-image-split",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-editorial",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "image-editorial",
+      "automatic": true,
+      "canonical": "authored-image-editorial",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-campaign",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "image-campaign",
+      "automatic": true,
+      "canonical": "authored-image-campaign",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-image-inset",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "image-inset",
+      "automatic": true,
+      "canonical": "authored-image-inset",
+      "accepts": [
+        "image",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": true,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-prose-inset",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "prose-inset",
+      "automatic": true,
+      "canonical": "authored-prose-inset",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-feature-focus",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "feature-focus",
+      "automatic": true,
+      "canonical": "authored-feature-focus",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 1
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-feature-bento",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "feature-bento",
+      "automatic": true,
+      "canonical": "authored-feature-bento",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-feature-index",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "feature-index",
+      "automatic": true,
+      "canonical": "authored-feature-index",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-steps-journey",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "steps-journey",
+      "automatic": true,
+      "canonical": "authored-steps-journey",
+      "accepts": [
+        "steps",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 6
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-steps-ribbon",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "steps-ribbon",
+      "automatic": true,
+      "canonical": "authored-steps-ribbon",
+      "accepts": [
+        "steps",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 4
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-comparison-panels",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "comparison-panels",
+      "automatic": true,
+      "canonical": "authored-comparison-panels",
+      "accepts": [
+        "comparison",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 2,
+        "maximum": 3
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-quote-editorial",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "quote-editorial",
+      "automatic": true,
+      "canonical": "authored-quote-editorial",
+      "accepts": [
+        "quote",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-quote-poster",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "quote-poster",
+      "automatic": true,
+      "canonical": "authored-quote-poster",
+      "accepts": [
+        "quote",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-code-editorial",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "code-editorial",
+      "automatic": true,
+      "canonical": "authored-code-editorial",
+      "accepts": [
+        "code",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-parameter-ledger",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "parameter-ledger",
+      "automatic": true,
+      "canonical": "authored-parameter-ledger",
+      "accepts": [
+        "parameters",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 8
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "authored-parameter-cards",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "parameter-cards",
+      "automatic": true,
+      "canonical": "authored-parameter-cards",
+      "accepts": [
+        "parameters",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 1,
+        "maximum": 4
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-code-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "code-split",
+      "automatic": true,
+      "canonical": "semantic-code-split",
+      "accepts": [
+        "code"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-parameters-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "parameters-split",
+      "automatic": true,
+      "canonical": "semantic-parameters-split",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-parameters-stack",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "parameters-stack",
+      "automatic": true,
+      "canonical": "semantic-parameters-stack",
+      "accepts": [
+        "parameters"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-steps-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "steps-split",
+      "automatic": true,
+      "canonical": "semantic-steps-split",
+      "accepts": [
+        "steps"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-steps-stack",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "steps-stack",
+      "automatic": true,
+      "canonical": "semantic-steps-stack",
+      "accepts": [
+        "steps"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-steps-editorial",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "steps-editorial",
+      "automatic": true,
+      "canonical": "semantic-steps-editorial",
+      "accepts": [
+        "steps"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-comparison-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "comparison-split",
+      "automatic": true,
+      "canonical": "semantic-comparison-split",
+      "accepts": [
+        "comparison"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-features-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "features-split",
+      "automatic": true,
+      "canonical": "semantic-features-split",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-features-stack",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "features-stack",
+      "automatic": true,
+      "canonical": "semantic-features-stack",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-features-editorial",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "features-editorial",
+      "automatic": true,
+      "canonical": "semantic-features-editorial",
+      "accepts": [
+        "features",
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-quote-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "quote-split",
+      "automatic": true,
+      "canonical": "semantic-quote-split",
+      "accepts": [
+        "quote"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-chart-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "chart-split",
+      "automatic": true,
+      "canonical": "semantic-chart-split",
+      "accepts": [
+        "chart"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-chart-stack",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "chart-stack",
+      "automatic": true,
+      "canonical": "semantic-chart-stack",
+      "accepts": [
+        "chart"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-hero-editorial",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "hero-editorial",
+      "automatic": true,
+      "canonical": "semantic-hero-editorial",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-prose-split",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "prose-split",
+      "automatic": true,
+      "canonical": "semantic-prose-split",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-prose-stack",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "prose-stack",
+      "automatic": true,
+      "canonical": "semantic-prose-stack",
+      "accepts": [
+        "paragraph"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-prose-editorial",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "prose-editorial",
+      "automatic": true,
+      "canonical": "semantic-prose-editorial",
+      "accepts": [
+        "paragraph",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    },
+    {
+      "id": "semantic-mixed-stack",
+      "output": "social",
+      "renderer": "semantic",
+      "family": "mixed-stack",
+      "automatic": true,
+      "canonical": "semantic-mixed-stack",
+      "accepts": [
+        "paragraph",
+        "steps",
+        "features",
+        "comparison",
+        "code",
+        "parameters",
+        "quote",
+        "chart",
+        "image"
+      ],
+      "scenes": [],
+      "entries": {
+        "minimum": 0,
+        "maximum": 20
+      },
+      "requiresImage": false,
+      "reason": null,
+      "visualReview": "pending"
+    }
+  ]
+}

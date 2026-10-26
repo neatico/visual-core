@@ -1,0 +1,215 @@
+{
+  "date": "2026-10-25",
+  "status": "in-progress",
+  "sample": {
+    "designId": "CQiMiO0hxerALGrID5GL",
+    "url": "http://localhost:3002/designs/5I39c8jMpn9PdpDhuuVr/CQiMiO0hxerALGrID5GL",
+    "method": "Actual AI generation, editable saved deck, each page opened individually in Present mode",
+    "pages": [
+      {
+        "page": 1,
+        "purpose": "cover",
+        "manualReview": "performed",
+        "findings": "Identity collapsed into long subtitle; no bookend slots returned; date word breaks awkwardly.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 2,
+        "purpose": "problem",
+        "manualReview": "performed",
+        "findings": "Readable image/text split; copy is still a long sentence rather than concise findings.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 3,
+        "purpose": "features",
+        "manualReview": "performed",
+        "findings": "No clipping; third card description starts higher because headings have differing line counts.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 4,
+        "purpose": "steps",
+        "manualReview": "performed",
+        "findings": "No clipping; reference palette overrides chosen editorial theme.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 5,
+        "purpose": "comparison",
+        "manualReview": "performed",
+        "findings": "Price duplicated in header and row; inappropriate availability ticks for numeric values; reference palette overrides theme.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 6,
+        "purpose": "qualification",
+        "manualReview": "performed",
+        "findings": "Single short qualification unnecessarily split onto a separate hero page; white title over bright photo lacks contrast.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 7,
+        "purpose": "chart",
+        "manualReview": "performed",
+        "findings": "Values and units visible; reference palette overrides suite theme.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 8,
+        "purpose": "quote",
+        "manualReview": "performed",
+        "findings": "Quote and attribution visible; no supplied portrait, so no invented identity image. Quote text remains exact.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 9,
+        "purpose": "code",
+        "manualReview": "performed",
+        "findings": "Exact code retained; syntax colors legible; source line wraps but no clipping.",
+        "retest": "pending fresh generation"
+      },
+      {
+        "page": 10,
+        "purpose": "closing",
+        "manualReview": "performed",
+        "findings": "Too similar to a generic cover; no identity or image visible in this saved first-run result.",
+        "retest": "pending fresh generation"
+      }
+    ]
+  },
+  "fixes": [
+    "Explicit bookend contract and source-backed identity validation",
+    "Stable image asset bindings and serialized provider image jobs",
+    "Generation reference theme override",
+    "Same-page comparison notes",
+    "Photo text-zone scrim strengthened",
+    "Prompt avoids duplicate price rows and unsupported availability statuses",
+    "Multi-page deck bookend purpose gate",
+    "Code-formatting directions excluded narrowly from mandatory prose coverage and rejected in visible copy",
+    "Generic thank-you headline rejected for semantic repair"
+  ],
+  "secondSample": {
+    "url": "http://localhost:3002/designs/4FR5NFlOzJBaqGarG0FF/y97Mf39FR6JCAfkBb9kr",
+    "method": "Each of 11 pages individually inspected at large size in Chrome Present mode",
+    "pages": [
+      {
+        "page": 1,
+        "manualReview": "performed",
+        "findings": "Cover identity now visible and separated; topic and subtitle fit. Subtitle still describes the test rather than a reader outcome.",
+        "retest": "pending next generation"
+      },
+      {
+        "page": 2,
+        "manualReview": "performed",
+        "findings": "Image/text split readable; prose remains close to source and generic heading needs synthesis.",
+        "retest": "pending next generation"
+      },
+      {
+        "page": 3,
+        "manualReview": "performed",
+        "findings": "All four capabilities retained. Four card body baselines align. Dense workspace restriction needs concise copy.",
+        "retest": "visual fix verified in second generation"
+      },
+      {
+        "page": 4,
+        "manualReview": "performed",
+        "findings": "Four steps fit; selected editorial theme now consistent.",
+        "retest": "visual fix verified in second generation"
+      },
+      {
+        "page": 5,
+        "manualReview": "performed",
+        "findings": "Prices and availability separated correctly; no duplicate price row. Qualification is not visible on this page and needs same-page handling.",
+        "retest": "pending next generation"
+      },
+      {
+        "page": 6,
+        "manualReview": "performed",
+        "findings": "Numeric series buried in prose/photo page instead of chart. Scrim and text contrast now readable.",
+        "retest": "pending next generation"
+      },
+      {
+        "page": 7,
+        "manualReview": "performed",
+        "findings": "Exact quote and attribution visible; supplied role not surfaced. No fabricated portrait.",
+        "retest": "pending next generation"
+      },
+      {
+        "page": 8,
+        "manualReview": "performed",
+        "findings": "Formatting instruction leaked into visible prose on redundant introduction page; repeated abstract image.",
+        "retest": "pending next generation"
+      },
+      {
+        "page": 9,
+        "manualReview": "performed",
+        "findings": "Exact JavaScript readable with syntax colors; long line wraps without clipping.",
+        "retest": "visual fix verified in second generation"
+      },
+      {
+        "page": 10,
+        "manualReview": "performed",
+        "findings": "Next action readable but needs to become the closing rather than adding another filler slide.",
+        "retest": "pending next generation"
+      },
+      {
+        "page": 11,
+        "manualReview": "performed",
+        "findings": "Generic thank-you page incorrectly accepted without closing identity; no source-backed next action.",
+        "retest": "pending next generation"
+      }
+    ]
+  },
+  "thirdSample": {
+    "workspaceId": "M7soYRtWs4tCoXuBcamI",
+    "pageCount": 9,
+    "largePagesReviewed": [
+      5,
+      9
+    ],
+    "status": "needs-retest",
+    "findings": [
+      {
+        "page": 5,
+        "issue": "Comparison contains labels and prices but omits quotas and availability values. Confirmed in large browser preview and exported editable PPTX text.",
+        "fix": "Source quantity validation and aligned pagination of values/statuses.",
+        "retest": "pending"
+      },
+      {
+        "page": 9,
+        "result": "Dedicated closing with organization, action, presenter, role and date; legible with no overlap."
+      },
+      {
+        "page": 2,
+        "inspection": "outline/export text only",
+        "issue": "Long source paragraph remains verbatim.",
+        "fix": "Long literal paragraph detection with exact quote/restriction exemptions.",
+        "retest": "pending"
+      },
+      {
+        "page": 6,
+        "inspection": "outline/export text only",
+        "issue": "Explicit monthly numbers remain prose instead of chart.",
+        "fix": "Require a chart for explicit repeated-unit monthly measurement series.",
+        "retest": "pending"
+      }
+    ],
+    "export": {
+      "path": "/private/tmp/generation-third-export.pptx",
+      "slides": 9,
+      "editableTextVerified": true,
+      "complexImageFallbackReported": 1,
+      "powerPointVisualReview": "pending"
+    }
+  },
+  "repairRegression": {
+    "checksPassed": 50,
+    "fixes": [
+      "Page-local checks no longer fail when code belongs to another page.",
+      "Distinct repair progress may use five calls; repeated same issue stops after three; original deadline retained.",
+      "Presentation limitations must occur in visible content, not only caption."
+    ],
+    "actualGenerationRetest": "running"
+  }
+}

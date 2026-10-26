@@ -7,7 +7,7 @@ test('common scenes have stable unique IDs and declared material/output requirem
 test('every authored composition is available to both outputs through the same contract',()=>{
  for(const composition of AUTHORED_COMPOSITIONS)for(const kind of ['presentation','social']){
   const recipe=DESIGN_RECIPES.find(recipe=>recipe.id===`authored-${composition.id}`&&recipe.kind===kind);
-  assert.ok(recipe);assert.equal(recipe.renderer,'semantic');assert.deepEqual(recipe.accepts,[composition.kind]);assert.equal(recipe.maxEntries,composition.max);
+  assert.ok(recipe);assert.equal(recipe.renderer,'semantic');assert.deepEqual(recipe.accepts,[composition.kind,'paragraph']);assert.equal(recipe.maxEntries,composition.max);
  }
 });
 

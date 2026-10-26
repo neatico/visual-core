@@ -5,26 +5,40 @@ export interface SourceSegment { id: string; kind: SourceKind; text: string; sta
 export interface SourceDocument { version: 1; text: string; segments: SourceSegment[] }
 export interface Evidence { sourceId: string; quote?: string }
 export type SemanticKind = 'paragraph' | 'steps' | 'features' | 'comparison' | 'code' | 'parameters' | 'quote' | 'chart' | 'image';
+export interface ComparisonColumn { title:string; points:string[]; price?:string; values?:string[]; statuses?:('included'|'excluded'|'partial'|'unknown')[] }
 interface BlockBase { id: string; evidence: Evidence[] }
 export type ContentBlock = BlockBase & (
   | { kind:'paragraph'; text:string; heading?:string; level?:2|3 }
   | { kind:'steps'|'features'; entries:{title:string;description:string}[] }
-  | { kind:'comparison'; columns:{title:string;points:string[]}[] }
+  | { kind:'comparison'; columns:ComparisonColumn[] }
   | { kind:'code'; sourceId:string; language:string; code:string }
   | { kind:'parameters'; rows:{name:string;value:string;description:string}[] }
-  | { kind:'quote'; text:string; attribution:string }
+  | { kind:'quote'; text:string; attribution:string; avatarAssetId?:string; role?:string }
   | { kind:'chart'; chart:'bar'|'line'; unit:string; values:{label:string;value:number}[] }
   | { kind:'image'; sourceId:string; alt:string; treatment:'screenshot'|'photograph'|'diagram'; status:'missing'|'available'; assetId?:string }
 );
+export interface PublicationInfo { tags?:string[]; author?:{name:string;role?:string;avatarAssetId?:string}; metrics?:{label:string;value:string}[]; date?:string; source?:string }
+export interface BookendInfo { organization?:string; presenter?:string; role?:string; date?:string; contact?:string; logoAssetId?:string }
 export interface ContentPage {
-  id:string; title:string; purpose:'cover'|'explain'|'instruct'|'compare'|'evidence'|'conclude';
-  evidence:Evidence[]; blocks:ContentBlock[]; caption?:string; notes?:string; scene?:string;
+  id:string; title:string; titleEmphasis?:string[]; purpose:'cover'|'explain'|'instruct'|'compare'|'evidence'|'conclude';
+  evidence:Evidence[]; blocks:ContentBlock[]; publication?:PublicationInfo; bookend?:BookendInfo; caption?:string; notes?:string; scene?:string;
 }
 export interface ContentPlan { version:1; kind:'presentation'|'social'; title:string; pages:ContentPage[] }
 export class ContentContractError extends Error {
   constructor(public readonly code:string, public readonly path:string) { super(`${code}: ${path}`); }
 }
 const fail=(code:string,path:string):never=>{throw new ContentContractError(code,path);};
+/** AI-selected exact title phrases; no positional or last-words heuristic. */
+const titleEmphasis=(value:unknown,title:unknown,path:string):{titleEmphasis?:string[]}=>{
+ if(value===undefined)return {};
+ if(!Array.isArray(value)||value.length>3||typeof title!=="string")return fail('CONTENT_INVALID_EMPHASIS',path);
+ const phrases:string[]=[];
+ for(const phrase of value){
+  if(typeof phrase!=="string"||!phrase.trim()||phrase!==phrase.trim()||phrase.length>80||!title.includes(phrase)||phrases.some(p=>p.includes(phrase)||phrase.includes(p)))return fail('CONTENT_INVALID_EMPHASIS',path);
+  phrases.push(phrase);
+ }
+ return {titleEmphasis:phrases};
+};
 const sceneField=(value:unknown,path:string):{scene?:string}=>{if(value===undefined)return {};if(typeof value!=='string'||!COMPOSITION_SCENES.some(scene=>scene.id===value))return fail('CONTENT_INVALID_SCENE',path);return {scene:value};};
 const object=(raw:unknown,path:string):Record<string,unknown>=>{
   if(!raw||typeof raw!=='object'||Array.isArray(raw))return fail('CONTENT_INVALID_OBJECT',path);
@@ -41,6 +55,53 @@ const list=(raw:unknown,path:string,min:number,max:number):unknown[]=>{
 const identity=(raw:unknown,path:string)=>{
   const id=text(raw,path,80);if(!/^[a-z][a-z0-9-]*$/.test(id))fail('CONTENT_INVALID_ID',path);return id;
 };
+
+/** Publication metadata is optional and source-backed; never infer engagement figures. */
+function publication(raw:unknown,path:string,sourceText?:string):{publication?:PublicationInfo} {
+ if(raw===undefined)return {};
+ const v=object(raw,path);
+ const field=(value:unknown,key:string,max=100)=>{
+  const result=text(value,`${path}.${key}`,max);
+  if(sourceText!==undefined&&!sourceText.includes(result))fail('CONTENT_UNSUPPORTED_PUBLICATION',`${path}.${key}`);
+  return result;
+ };
+ const result:PublicationInfo={};
+ if(v.tags!==undefined)result.tags=list(v.tags,`${path}.tags`,0,3).map((tag,i)=>field(tag,`tags.${i}`,32));
+ if(v.date!==undefined)result.date=field(v.date,'date',40);
+ if(v.source!==undefined)result.source=field(v.source,'source',120);
+ if(v.metrics!==undefined)result.metrics=list(v.metrics,`${path}.metrics`,0,3).map((raw,i)=>{const m=object(raw,`${path}.metrics.${i}`);return {label:field(m.label,`metrics.${i}.label`,24),value:field(m.value,`metrics.${i}.value`,24)};});
+ if(v.author!==undefined){const a=object(v.author,`${path}.author`);result.author={name:field(a.name,'author.name',60),...(a.role===undefined?{}:{role:field(a.role,'author.role',80)}),...(a.avatarAssetId===undefined?{}:{avatarAssetId:identity(a.avatarAssetId,`${path}.author.avatarAssetId`)})};}
+ return {publication:result};
+}
+
+/** Identity copy is source-backed; asset IDs are editor-owned, never AI URLs. */
+function bookend(raw:unknown,path:string,sourceText?:string):{bookend?:BookendInfo} {
+ if(raw===undefined)return {};
+ const v=object(raw,path), result:BookendInfo={};
+ for(const key of ['organization','presenter','role','date','contact'] as const){
+  if(v[key]===undefined)continue;
+  const value=text(v[key],`${path}.${key}`,key==='contact'?160:80);
+  if(sourceText!==undefined&&!sourceText.includes(value))fail('CONTENT_UNSUPPORTED_IDENTITY',`${path}.${key}`);
+  result[key]=value;
+ }
+ if(v.logoAssetId!==undefined){
+  if(sourceText!==undefined)fail('CONTENT_UNSUPPORTED_ASSET',`${path}.logoAssetId`);
+  result.logoAssetId=identity(v.logoAssetId,`${path}.logoAssetId`);
+ }
+ return {bookend:result};
+}
+
+/** Optional comparison facts stay aligned to their rows. Values/prices are source-verbatim. */
+function comparisonColumn(raw:unknown,path:string,sourceText?:string,allowIncomplete=false):ComparisonColumn {
+ const draft=(value:unknown,key:string,max:number,empty=false)=>text(value,key,allowIncomplete?20000:max,empty||allowIncomplete);
+ const col=object(raw,path), points=list(col.points,`${path}.points`,1,8).map((v,i)=>draft(v,`${path}.points.${i}`,500));
+ const fact=(v:unknown,p:string)=>{const result=draft(v,p,80,true);if(sourceText!==undefined&&result&&!sourceText.includes(result))fail('CONTENT_UNSUPPORTED_COMPARISON',p);return result;};
+ const result:ComparisonColumn={title:draft(col.title,`${path}.title`,160),points};
+ if(col.price!==undefined)result.price=fact(col.price,`${path}.price`);
+ if(col.values!==undefined)result.values=list(col.values,`${path}.values`,points.length,points.length).map((v,i)=>fact(v,`${path}.values.${i}`));
+ if(col.statuses!==undefined)result.statuses=list(col.statuses,`${path}.statuses`,points.length,points.length).map((v,i)=>{if(!['included','excluded','partial','unknown'].includes(String(v)))fail('CONTENT_INVALID_COMPARISON_STATUS',`${path}.statuses.${i}`);return v as NonNullable<ComparisonColumn['statuses']>[number];});
+ return result;
+}
 
 /** Lossless ranges. File-name placeholders are references, never fabricated assets. */
 export function parseSource(input:string):SourceDocument {
@@ -104,7 +165,7 @@ export function validateContentPlan(raw:unknown,source:SourceDocument,expectedKi
     switch(value.kind){
       case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600),...(value.heading===undefined?{}:{heading:field('heading',160),level:value.level===3?3:2})};
       case 'steps':case 'features':return {...base,kind:value.kind,entries:list(value.entries,`${path}.entries`,1,12).map((raw,i)=>{const item=object(raw,`${path}.entries.${i}`);return {title:text(item.title,path,160),description:text(item.description,path,600,true)};})};
-      case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,`${path}.columns`,2,4).map(raw=>{const col=object(raw,path);return {title:text(col.title,path,160),points:list(col.points,path,1,8).map(raw=>text(raw,path,500))};})};
+      case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,`${path}.columns`,2,4).map((raw,i)=>comparisonColumn(raw,`${path}.columns.${i}`,base.evidence.map(e=>sources.get(e.sourceId)!.text).join('\n')))};
       case 'code':{
         const sourceId=field('sourceId',80),segment=sources.get(sourceId);
         if(segment?.kind!=='code'||!base.evidence.some(e=>e.sourceId===sourceId))return fail('CONTENT_INVALID_CODE_SOURCE',path);
@@ -115,7 +176,9 @@ export function validateContentPlan(raw:unknown,source:SourceDocument,expectedKi
       case 'quote':{
         const copy=field('text',1600);if(!base.evidence.some(e=>sources.get(e.sourceId)!.text.includes(copy)))fail('CONTENT_UNSUPPORTED_QUOTE',path);
         const attribution=field('attribution',160,true);if(attribution&&!base.evidence.some(e=>sources.get(e.sourceId)!.text.includes(attribution)))fail('CONTENT_UNSUPPORTED_ATTRIBUTION',path);
-        return {...base,kind:'quote',text:copy,attribution};
+        const role=value.role===undefined?undefined:field('role',160,true);
+        if(role&&!base.evidence.some(e=>sources.get(e.sourceId)!.text.includes(role)))fail('CONTENT_UNSUPPORTED_ATTRIBUTION',path);
+        return {...base,kind:'quote',text:copy,attribution,...(role===undefined?{}:{role}),...(value.avatarAssetId===undefined?{}:{avatarAssetId:identity(value.avatarAssetId,`${path}.avatarAssetId`)})};
       }
       case 'chart':{
         if(!['bar','line'].includes(String(value.chart)))fail('CONTENT_INVALID_CHART',path);
@@ -137,7 +200,7 @@ export function validateContentPlan(raw:unknown,source:SourceDocument,expectedKi
   const pages=list(root.pages,'pages',1,root.kind==='social'?8:24).map((raw,index):ContentPage=>{
     const path=`pages.${index}`,page=object(raw,path);
     if(!['cover','explain','instruct','compare','evidence','conclude'].includes(String(page.purpose)))fail('CONTENT_INVALID_PURPOSE',path);
-    return {...sceneField(page.scene,`${path}.scene`),id:unique(page.id,`${path}.id`),title:text(page.title,`${path}.title`,160),purpose:page.purpose as ContentPage['purpose'],evidence:evidence(page.evidence,`${path}.evidence`),blocks:list(page.blocks,`${path}.blocks`,1,8).map((value,i)=>block(value,`${path}.blocks.${i}`)),...(page.caption!==undefined?{caption:text(page.caption,`${path}.caption`,2000,true)}:{}),...(page.notes!==undefined?{notes:text(page.notes,`${path}.notes`,2000,true)}:{})};
+    return {...titleEmphasis(page.titleEmphasis,page.title,`${path}.titleEmphasis`),...publication(page.publication,`${path}.publication`,source.text),...bookend(page.bookend,`${path}.bookend`,source.text),...sceneField(page.scene,`${path}.scene`),id:unique(page.id,`${path}.id`),title:text(page.title,`${path}.title`,160),purpose:page.purpose as ContentPage['purpose'],evidence:evidence(page.evidence,`${path}.evidence`),blocks:list(page.blocks,`${path}.blocks`,1,8).map((value,i)=>block(value,`${path}.blocks.${i}`)),...(page.caption!==undefined?{caption:text(page.caption,`${path}.caption`,2000,true)}:{}),...(page.notes!==undefined?{notes:text(page.notes,`${path}.notes`,2000,true)}:{})};
   });
   if(root.kind==='presentation')for(const segment of source.segments.filter(s=>s.kind==='code'))if(!pages.some(p=>p.blocks.some(b=>b.kind==='code'&&b.sourceId===segment.id)))fail('CONTENT_CODE_OMITTED',segment.id);
   if(root.kind==='social'&&pages.some(page=>!page.caption?.trim()))fail('CONTENT_CAPTION_REQUIRED','pages');
@@ -148,7 +211,7 @@ export function contentBlockText(block:ContentBlock):string[] {
   switch(block.kind){
     case 'paragraph':return [...(block.heading?[block.heading]:[]),block.text];
     case 'steps':case 'features':return block.entries.flatMap(e=>[e.title,e.description]);
-    case 'comparison':return block.columns.flatMap(c=>[c.title,...c.points]);
+    case 'comparison':return block.columns.flatMap(c=>[c.title,...c.points,...(c.price?[c.price]:[]),...(c.values||[])]);
     case 'code':return [block.code];
     case 'parameters':return block.rows.flatMap(r=>[r.name,r.value,r.description]);
     case 'quote':return [block.text,block.attribution];
@@ -171,10 +234,10 @@ export function validateEditableContentPage(raw:unknown,{allowIncomplete=false}:
   switch(value.kind){
    case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600),...(value.heading===undefined?{}:{heading:field('heading',160),level:value.level===3?3:2})};
    case 'steps':case 'features':return {...base,kind:value.kind,entries:list(value.entries,path,1,12).map(raw=>{const item=object(raw,path);return {title:draftText(item.title,path,160),description:draftText(item.description,path,600,true)};})};
-   case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,path,2,4).map(raw=>{const item=object(raw,path);return {title:draftText(item.title,path,160),points:list(item.points,path,1,8).map(raw=>draftText(raw,path,500))};})};
+   case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,path,2,4).map((raw,i)=>comparisonColumn(raw,`${path}.columns.${i}`,undefined,allowIncomplete))};
    case 'code':return {...base,kind:'code',sourceId:field('sourceId',80),language:field('language',40),code:field('code',20000)};
    case 'parameters':return {...base,kind:'parameters',rows:list(value.rows,path,1,20).map(raw=>{const item=object(raw,path);return {name:draftText(item.name,path,160),value:draftText(item.value,path,1000,true),description:draftText(item.description,path,500,true)};})};
-   case 'quote':return {...base,kind:'quote',text:field('text',1600),attribution:field('attribution',160,true)};
+   case 'quote':return {...base,kind:'quote',text:field('text',1600),attribution:field('attribution',160,true),...(value.role===undefined?{}:{role:field('role',160,true)}),...(value.avatarAssetId===undefined?{}:{avatarAssetId:identity(value.avatarAssetId,`${path}.avatarAssetId`)})};
    case 'chart':{
     if(!['bar','line'].includes(String(value.chart)))fail('CONTENT_INVALID_CHART',path);
     return {...base,kind:'chart',chart:value.chart as 'bar'|'line',unit:field('unit',60,true),values:list(value.values,path,2,12).map(raw=>{const item=object(raw,path);if(typeof item.value!=='number'||(!(allowIncomplete&&Number.isNaN(item.value))&&(!Number.isFinite(item.value)||Math.abs(item.value)>1e15)))fail('CONTENT_INVALID_VALUE',path);return {label:draftText(item.label,path,100),value:item.value as number};})};
@@ -186,5 +249,5 @@ export function validateEditableContentPage(raw:unknown,{allowIncomplete=false}:
    default:return fail('CONTENT_UNKNOWN_BLOCK',path);
   }
  });
- return {...sceneField(page.scene,'page.scene'),id:pageId,title:draftText(page.title,'page.title',160),purpose:page.purpose as ContentPage['purpose'],evidence:proof(page.evidence,'page.evidence'),blocks,...(page.caption===undefined?{}:{caption:draftText(page.caption,'page.caption',2000,true)}),...(page.notes===undefined?{}:{notes:draftText(page.notes,'page.notes',2000,true)})};
+ return {...titleEmphasis(page.titleEmphasis,page.title,'page.titleEmphasis'),...publication(page.publication,'page.publication'),...bookend(page.bookend,'page.bookend'),...sceneField(page.scene,'page.scene'),id:pageId,title:draftText(page.title,'page.title',160),purpose:page.purpose as ContentPage['purpose'],evidence:proof(page.evidence,'page.evidence'),blocks,...(page.caption===undefined?{}:{caption:draftText(page.caption,'page.caption',2000,true)}),...(page.notes===undefined?{}:{notes:draftText(page.notes,'page.notes',2000,true)})};
 }
