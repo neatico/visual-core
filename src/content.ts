@@ -1,253 +1,894 @@
-import {COMPOSITION_SCENES} from './compositionScenes.js';
+import { COMPOSITION_SCENES } from "./compositionScenes.js";
 /** Source-backed content, independent of layout and editor primitives. */
-export type SourceKind = 'text' | 'code' | 'image-reference';
-export interface SourceSegment { id: string; kind: SourceKind; text: string; start: number; end: number; language?: string }
-export interface SourceDocument { version: 1; text: string; segments: SourceSegment[] }
-export interface Evidence { sourceId: string; quote?: string }
-export type SemanticKind = 'paragraph' | 'steps' | 'features' | 'comparison' | 'code' | 'parameters' | 'quote' | 'chart' | 'image';
-export interface ComparisonColumn { title:string; points:string[]; price?:string; values?:string[]; statuses?:('included'|'excluded'|'partial'|'unknown')[] }
-interface BlockBase { id: string; evidence: Evidence[] }
-export type ContentBlock = BlockBase & (
-  | { kind:'paragraph'; text:string; heading?:string; level?:2|3 }
-  | { kind:'steps'|'features'; entries:{title:string;description:string}[] }
-  | { kind:'comparison'; columns:ComparisonColumn[] }
-  | { kind:'code'; sourceId:string; language:string; code:string }
-  | { kind:'parameters'; rows:{name:string;value:string;description:string}[] }
-  | { kind:'quote'; text:string; attribution:string; avatarAssetId?:string; role?:string }
-  | { kind:'chart'; chart:'bar'|'line'; unit:string; values:{label:string;value:number}[] }
-  | { kind:'image'; sourceId:string; alt:string; treatment:'screenshot'|'photograph'|'diagram'; status:'missing'|'available'; assetId?:string }
-);
-export interface PublicationInfo { tags?:string[]; author?:{name:string;role?:string;avatarAssetId?:string}; metrics?:{label:string;value:string}[]; date?:string; source?:string }
-export interface BookendInfo { organization?:string; presenter?:string; role?:string; date?:string; contact?:string; logoAssetId?:string }
+export type SourceKind = "text" | "code" | "image-reference";
+export interface SourceSegment {
+  id: string;
+  kind: SourceKind;
+  text: string;
+  start: number;
+  end: number;
+  language?: string;
+}
+export interface SourceDocument {
+  version: 1;
+  text: string;
+  segments: SourceSegment[];
+}
+export interface Evidence {
+  sourceId: string;
+  quote?: string;
+}
+export type SemanticKind =
+  | "paragraph"
+  | "steps"
+  | "features"
+  | "comparison"
+  | "code"
+  | "parameters"
+  | "quote"
+  | "chart"
+  | "image";
+export interface ComparisonColumn {
+  title: string;
+  points: string[];
+  price?: string;
+  values?: string[];
+  statuses?: ("included" | "excluded" | "partial" | "unknown")[];
+}
+interface BlockBase {
+  id: string;
+  evidence: Evidence[];
+}
+export type ContentBlock = BlockBase &
+  (
+    | { kind: "paragraph"; text: string; heading?: string; level?: 2 | 3 }
+    | {
+        kind: "steps" | "features";
+        entries: { title: string; description: string }[];
+      }
+    | { kind: "comparison"; columns: ComparisonColumn[] }
+    | { kind: "code"; sourceId: string; language: string; code: string }
+    | {
+        kind: "parameters";
+        rows: { name: string; value: string; description: string }[];
+      }
+    | {
+        kind: "quote";
+        text: string;
+        attribution: string;
+        avatarAssetId?: string;
+        role?: string;
+      }
+    | {
+        kind: "chart";
+        chart: "bar" | "line";
+        unit: string;
+        values: { label: string; value: number }[];
+      }
+    | {
+        kind: "image";
+        sourceId: string;
+        alt: string;
+        treatment: "screenshot" | "photograph" | "diagram";
+        status: "missing" | "available";
+        assetId?: string;
+      }
+  );
+export interface PublicationInfo {
+  tags?: string[];
+  author?: { name: string; role?: string; avatarAssetId?: string };
+  metrics?: { label: string; value: string }[];
+  date?: string;
+  source?: string;
+}
+export interface BookendInfo {
+  organization?: string;
+  presenter?: string;
+  role?: string;
+  date?: string;
+  contact?: string;
+  logoAssetId?: string;
+}
 export interface ContentPage {
-  id:string; title:string; titleEmphasis?:string[]; purpose:'cover'|'explain'|'instruct'|'compare'|'evidence'|'conclude';
-  evidence:Evidence[]; blocks:ContentBlock[]; publication?:PublicationInfo; bookend?:BookendInfo; caption?:string; notes?:string; scene?:string;
+  id: string;
+  title: string;
+  titleEmphasis?: string[];
+  purpose:
+    | "cover"
+    | "explain"
+    | "instruct"
+    | "compare"
+    | "evidence"
+    | "conclude";
+  evidence: Evidence[];
+  blocks: ContentBlock[];
+  publication?: PublicationInfo;
+  bookend?: BookendInfo;
+  caption?: string;
+  notes?: string;
+  scene?: string;
 }
-export interface ContentPlan { version:1; kind:'presentation'|'social'; title:string; pages:ContentPage[] }
+export interface ContentPlan {
+  version: 1;
+  kind: "presentation" | "social";
+  title: string;
+  pages: ContentPage[];
+}
 export class ContentContractError extends Error {
-  constructor(public readonly code:string, public readonly path:string) { super(`${code}: ${path}`); }
+  constructor(
+    public readonly code: string,
+    public readonly path: string,
+  ) {
+    super(`${code}: ${path}`);
+  }
 }
-const fail=(code:string,path:string):never=>{throw new ContentContractError(code,path);};
+const fail = (code: string, path: string): never => {
+  throw new ContentContractError(code, path);
+};
 /** AI-selected exact title phrases; no positional or last-words heuristic. */
-const titleEmphasis=(value:unknown,title:unknown,path:string):{titleEmphasis?:string[]}=>{
- if(value===undefined)return {};
- if(!Array.isArray(value)||value.length>3||typeof title!=="string")return fail('CONTENT_INVALID_EMPHASIS',path);
- const phrases:string[]=[];
- for(const phrase of value){
-  if(typeof phrase!=="string"||!phrase.trim()||phrase!==phrase.trim()||phrase.length>80||!title.includes(phrase)||phrases.some(p=>p.includes(phrase)||phrase.includes(p)))return fail('CONTENT_INVALID_EMPHASIS',path);
-  phrases.push(phrase);
- }
- return {titleEmphasis:phrases};
+const titleEmphasis = (
+  value: unknown,
+  title: unknown,
+  path: string,
+): { titleEmphasis?: string[] } => {
+  if (value === undefined) return {};
+  if (!Array.isArray(value) || value.length > 3 || typeof title !== "string")
+    return fail("CONTENT_INVALID_EMPHASIS", path);
+  const phrases: string[] = [];
+  for (const phrase of value) {
+    if (
+      typeof phrase !== "string" ||
+      !phrase.trim() ||
+      phrase !== phrase.trim() ||
+      phrase.length > 80 ||
+      !title.includes(phrase) ||
+      phrases.some((p) => p.includes(phrase) || phrase.includes(p))
+    )
+      return fail("CONTENT_INVALID_EMPHASIS", path);
+    phrases.push(phrase);
+  }
+  return { titleEmphasis: phrases };
 };
-const sceneField=(value:unknown,path:string):{scene?:string}=>{if(value===undefined)return {};if(typeof value!=='string'||!COMPOSITION_SCENES.some(scene=>scene.id===value))return fail('CONTENT_INVALID_SCENE',path);return {scene:value};};
-const object=(raw:unknown,path:string):Record<string,unknown>=>{
-  if(!raw||typeof raw!=='object'||Array.isArray(raw))return fail('CONTENT_INVALID_OBJECT',path);
-  return raw as Record<string,unknown>;
+const sceneField = (value: unknown, path: string): { scene?: string } => {
+  if (value === undefined) return {};
+  if (
+    typeof value !== "string" ||
+    !COMPOSITION_SCENES.some((scene) => scene.id === value)
+  )
+    return fail("CONTENT_INVALID_SCENE", path);
+  return { scene: value };
 };
-const text=(raw:unknown,path:string,max=1000,empty=false):string=>{
-  if(typeof raw!=='string'||raw.length>max||(!empty&&!raw.trim()))return fail('CONTENT_INVALID_TEXT',path);
+const object = (raw: unknown, path: string): Record<string, unknown> => {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw))
+    return fail("CONTENT_INVALID_OBJECT", path);
+  return raw as Record<string, unknown>;
+};
+const text = (
+  raw: unknown,
+  path: string,
+  max = 1000,
+  empty = false,
+): string => {
+  if (typeof raw !== "string" || raw.length > max || (!empty && !raw.trim()))
+    return fail("CONTENT_INVALID_TEXT", path);
   return raw;
 };
-const list=(raw:unknown,path:string,min:number,max:number):unknown[]=>{
-  if(!Array.isArray(raw)||raw.length<min||raw.length>max)return fail('CONTENT_INVALID_LIST',path);
+const list = (
+  raw: unknown,
+  path: string,
+  min: number,
+  max: number,
+): unknown[] => {
+  if (!Array.isArray(raw) || raw.length < min || raw.length > max)
+    return fail("CONTENT_INVALID_LIST", path);
   return raw;
 };
-const identity=(raw:unknown,path:string)=>{
-  const id=text(raw,path,80);if(!/^[a-z][a-z0-9-]*$/.test(id))fail('CONTENT_INVALID_ID',path);return id;
+const identity = (raw: unknown, path: string) => {
+  const id = text(raw, path, 80);
+  if (!/^[a-z][a-z0-9-]*$/.test(id)) fail("CONTENT_INVALID_ID", path);
+  return id;
 };
 
 /** Publication metadata is optional and source-backed; never infer engagement figures. */
-function publication(raw:unknown,path:string,sourceText?:string):{publication?:PublicationInfo} {
- if(raw===undefined)return {};
- const v=object(raw,path);
- const field=(value:unknown,key:string,max=100)=>{
-  const result=text(value,`${path}.${key}`,max);
-  if(sourceText!==undefined&&!sourceText.includes(result))fail('CONTENT_UNSUPPORTED_PUBLICATION',`${path}.${key}`);
-  return result;
- };
- const result:PublicationInfo={};
- if(v.tags!==undefined)result.tags=list(v.tags,`${path}.tags`,0,3).map((tag,i)=>field(tag,`tags.${i}`,32));
- if(v.date!==undefined)result.date=field(v.date,'date',40);
- if(v.source!==undefined)result.source=field(v.source,'source',120);
- if(v.metrics!==undefined)result.metrics=list(v.metrics,`${path}.metrics`,0,3).map((raw,i)=>{const m=object(raw,`${path}.metrics.${i}`);return {label:field(m.label,`metrics.${i}.label`,24),value:field(m.value,`metrics.${i}.value`,24)};});
- if(v.author!==undefined){const a=object(v.author,`${path}.author`);result.author={name:field(a.name,'author.name',60),...(a.role===undefined?{}:{role:field(a.role,'author.role',80)}),...(a.avatarAssetId===undefined?{}:{avatarAssetId:identity(a.avatarAssetId,`${path}.author.avatarAssetId`)})};}
- return {publication:result};
+function publication(
+  raw: unknown,
+  path: string,
+  sourceText?: string,
+): { publication?: PublicationInfo } {
+  if (raw === undefined) return {};
+  const v = object(raw, path);
+  const field = (value: unknown, key: string, max = 100) => {
+    const result = text(value, `${path}.${key}`, max);
+    if (sourceText !== undefined && !sourceText.includes(result))
+      fail("CONTENT_UNSUPPORTED_PUBLICATION", `${path}.${key}`);
+    return result;
+  };
+  const result: PublicationInfo = {};
+  if (v.tags !== undefined)
+    result.tags = list(v.tags, `${path}.tags`, 0, 3).map((tag, i) =>
+      field(tag, `tags.${i}`, 32),
+    );
+  if (v.date !== undefined) result.date = field(v.date, "date", 40);
+  if (v.source !== undefined) result.source = field(v.source, "source", 120);
+  if (v.metrics !== undefined)
+    result.metrics = list(v.metrics, `${path}.metrics`, 0, 3).map((raw, i) => {
+      const m = object(raw, `${path}.metrics.${i}`);
+      return {
+        label: field(m.label, `metrics.${i}.label`, 24),
+        value: field(m.value, `metrics.${i}.value`, 24),
+      };
+    });
+  if (v.author !== undefined) {
+    const a = object(v.author, `${path}.author`);
+    result.author = {
+      name: field(a.name, "author.name", 60),
+      ...(a.role === undefined
+        ? {}
+        : { role: field(a.role, "author.role", 80) }),
+      ...(a.avatarAssetId === undefined
+        ? {}
+        : {
+            avatarAssetId: identity(
+              a.avatarAssetId,
+              `${path}.author.avatarAssetId`,
+            ),
+          }),
+    };
+  }
+  return { publication: result };
 }
 
 /** Identity copy is source-backed; asset IDs are editor-owned, never AI URLs. */
-function bookend(raw:unknown,path:string,sourceText?:string):{bookend?:BookendInfo} {
- if(raw===undefined)return {};
- const v=object(raw,path), result:BookendInfo={};
- for(const key of ['organization','presenter','role','date','contact'] as const){
-  if(v[key]===undefined)continue;
-  const value=text(v[key],`${path}.${key}`,key==='contact'?160:80);
-  if(sourceText!==undefined&&!sourceText.includes(value))fail('CONTENT_UNSUPPORTED_IDENTITY',`${path}.${key}`);
-  result[key]=value;
- }
- if(v.logoAssetId!==undefined){
-  if(sourceText!==undefined)fail('CONTENT_UNSUPPORTED_ASSET',`${path}.logoAssetId`);
-  result.logoAssetId=identity(v.logoAssetId,`${path}.logoAssetId`);
- }
- return {bookend:result};
+function bookend(
+  raw: unknown,
+  path: string,
+  sourceText?: string,
+): { bookend?: BookendInfo } {
+  if (raw === undefined) return {};
+  const v = object(raw, path),
+    result: BookendInfo = {};
+  for (const key of [
+    "organization",
+    "presenter",
+    "role",
+    "date",
+    "contact",
+  ] as const) {
+    if (v[key] === undefined) continue;
+    const value = text(v[key], `${path}.${key}`, key === "contact" ? 160 : 80);
+    if (sourceText !== undefined && !sourceText.includes(value))
+      fail("CONTENT_UNSUPPORTED_IDENTITY", `${path}.${key}`);
+    result[key] = value;
+  }
+  if (v.logoAssetId !== undefined) {
+    if (sourceText !== undefined)
+      fail("CONTENT_UNSUPPORTED_ASSET", `${path}.logoAssetId`);
+    result.logoAssetId = identity(v.logoAssetId, `${path}.logoAssetId`);
+  }
+  return { bookend: result };
 }
 
 /** Optional comparison facts stay aligned to their rows. Values/prices are source-verbatim. */
-function comparisonColumn(raw:unknown,path:string,sourceText?:string,allowIncomplete=false):ComparisonColumn {
- const draft=(value:unknown,key:string,max:number,empty=false)=>text(value,key,allowIncomplete?20000:max,empty||allowIncomplete);
- const col=object(raw,path), points=list(col.points,`${path}.points`,1,8).map((v,i)=>draft(v,`${path}.points.${i}`,500));
- const fact=(v:unknown,p:string)=>{const result=draft(v,p,80,true);if(sourceText!==undefined&&result&&!sourceText.includes(result))fail('CONTENT_UNSUPPORTED_COMPARISON',p);return result;};
- const result:ComparisonColumn={title:draft(col.title,`${path}.title`,160),points};
- if(col.price!==undefined)result.price=fact(col.price,`${path}.price`);
- if(col.values!==undefined)result.values=list(col.values,`${path}.values`,points.length,points.length).map((v,i)=>fact(v,`${path}.values.${i}`));
- if(col.statuses!==undefined)result.statuses=list(col.statuses,`${path}.statuses`,points.length,points.length).map((v,i)=>{if(!['included','excluded','partial','unknown'].includes(String(v)))fail('CONTENT_INVALID_COMPARISON_STATUS',`${path}.statuses.${i}`);return v as NonNullable<ComparisonColumn['statuses']>[number];});
- return result;
+function comparisonColumn(
+  raw: unknown,
+  path: string,
+  sourceText?: string,
+  allowIncomplete = false,
+): ComparisonColumn {
+  const draft = (value: unknown, key: string, max: number, empty = false) =>
+    text(value, key, allowIncomplete ? 20000 : max, empty || allowIncomplete);
+  const col = object(raw, path),
+    points = list(col.points, `${path}.points`, 1, 8).map((v, i) =>
+      draft(v, `${path}.points.${i}`, 500),
+    );
+  const fact = (v: unknown, p: string) => {
+    const result = draft(v, p, 80, true);
+    if (sourceText !== undefined && result && !sourceText.includes(result))
+      fail("CONTENT_UNSUPPORTED_COMPARISON", p);
+    return result;
+  };
+  const result: ComparisonColumn = {
+    title: draft(col.title, `${path}.title`, 160),
+    points,
+  };
+  if (col.price !== undefined) result.price = fact(col.price, `${path}.price`);
+  if (col.values !== undefined)
+    result.values = list(
+      col.values,
+      `${path}.values`,
+      points.length,
+      points.length,
+    ).map((v, i) => fact(v, `${path}.values.${i}`));
+  if (col.statuses !== undefined)
+    result.statuses = list(
+      col.statuses,
+      `${path}.statuses`,
+      points.length,
+      points.length,
+    ).map((v, i) => {
+      if (!["included", "excluded", "partial", "unknown"].includes(String(v)))
+        fail("CONTENT_INVALID_COMPARISON_STATUS", `${path}.statuses.${i}`);
+      return v as NonNullable<ComparisonColumn["statuses"]>[number];
+    });
+  return result;
 }
 
 /** Lossless ranges. File-name placeholders are references, never fabricated assets. */
-export function parseSource(input:string):SourceDocument {
-  if(typeof input!=='string'||!input.trim()||input.length>20000)fail('SOURCE_INVALID_LENGTH','source');
-  const segments:SourceSegment[]=[];
-  const lines=[...input.matchAll(/[^\n]*(?:\n|$)/g)].filter(match=>match[0].length);
-  for(let i=0;i<lines.length;i++){
-    const line=lines[i],raw=line[0],trimmed=raw.trim();
-    if(!trimmed)continue;
-    let start=line.index!,end=start+raw.replace(/\r?\n$/,'').length,kind:SourceKind='text',language:string|undefined;
-    const fence=trimmed.match(/^(`{3,}|~{3,})([\w+-]*)\s*$/);
-    if(fence){
-      kind='code';language=fence[2]||'text';start=line.index!+raw.length;
-      let j=i+1;
-      for(;j<lines.length;j++)if(lines[j][0].trim()===fence[1])break;
-      end=j<lines.length?lines[j].index!:input.length;
-      if(input.slice(start,end).endsWith('\n'))end--;
-      if(input.slice(start,end).endsWith('\r'))end--;
-      i=j<lines.length?j:lines.length-1;
-    }else if(/^curl(?:\s|$)/i.test(trimmed)){
-      kind='code';language='bash';
+export function parseSource(input: string): SourceDocument {
+  if (typeof input !== "string" || !input.trim() || input.length > 20000)
+    fail("SOURCE_INVALID_LENGTH", "source");
+  const segments: SourceSegment[] = [];
+  const lines = [...input.matchAll(/[^\n]*(?:\n|$)/g)].filter(
+    (match) => match[0].length,
+  );
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i],
+      raw = line[0],
+      trimmed = raw.trim();
+    if (!trimmed) continue;
+    let start = line.index!,
+      end = start + raw.replace(/\r?\n$/, "").length,
+      kind: SourceKind = "text",
+      language: string | undefined;
+    const fence = trimmed.match(/^(`{3,}|~{3,})([\w+-]*)\s*$/);
+    if (fence) {
+      kind = "code";
+      language = fence[2] || "text";
+      start = line.index! + raw.length;
+      let j = i + 1;
+      for (; j < lines.length; j++) if (lines[j][0].trim() === fence[1]) break;
+      end = j < lines.length ? lines[j].index! : input.length;
+      if (input.slice(start, end).endsWith("\n")) end--;
+      if (input.slice(start, end).endsWith("\r")) end--;
+      i = j < lines.length ? j : lines.length - 1;
+    } else if (/^curl(?:\s|$)/i.test(trimmed)) {
+      kind = "code";
+      language = "bash";
       // Track multiline quoted arguments and escaped physical newlines without executing code.
-      let quote='',escaped=false,j=i;
-      for(;j<lines.length;j++){
-        const current=lines[j][0];
-        for(const char of current){
-          if(escaped){escaped=false;continue;}
-          if(char==='\\'&&quote!=="'"){escaped=true;continue;}
-          if(quote){if(char===quote)quote='';}
-          else if(char==='"'||char==="'")quote=char;
+      let quote = "",
+        escaped = false,
+        j = i;
+      for (; j < lines.length; j++) {
+        const current = lines[j][0];
+        for (const char of current) {
+          if (escaped) {
+            escaped = false;
+            continue;
+          }
+          if (char === "\\" && quote !== "'") {
+            escaped = true;
+            continue;
+          }
+          if (quote) {
+            if (char === quote) quote = "";
+          } else if (char === '"' || char === "'") quote = char;
         }
-        end=lines[j].index!+current.replace(/\r?\n$/,'').length;
-        if(!quote&&!/\\\s*(?:\r?\n)?$/.test(current))break;
-        escaped=false;
+        end = lines[j].index! + current.replace(/\r?\n$/, "").length;
+        if (!quote && !/\\\s*(?:\r?\n)?$/.test(current)) break;
+        escaped = false;
       }
-      i=Math.min(j,lines.length-1);
-    }else if(/^(?:!\[[^\]]*\]\([^\n]+\)|\[[^\]]*\]\(https?:\/\/[^\s)]+\.(?:png|jpe?g|webp|gif|svg)(?:[?#][^\s)]*)?\)|[^\s<>]+\.(?:png|jpe?g|webp|gif|svg))$/i.test(trimmed))kind='image-reference';
-    if(end>start)segments.push({id:`source-${segments.length+1}`,kind,text:input.slice(start,end),start,end,...(language?{language}:{})});
+      i = Math.min(j, lines.length - 1);
+    } else if (
+      /^(?:!\[[^\]]*\]\([^\n]+\)|\[[^\]]*\]\(https?:\/\/[^\s)]+\.(?:png|jpe?g|webp|gif|svg)(?:[?#][^\s)]*)?\)|[^\s<>]+\.(?:png|jpe?g|webp|gif|svg))$/i.test(
+        trimmed,
+      )
+    )
+      kind = "image-reference";
+    if (end > start)
+      segments.push({
+        id: `source-${segments.length + 1}`,
+        kind,
+        text: input.slice(start, end),
+        start,
+        end,
+        ...(language ? { language } : {}),
+      });
   }
-  if(segments.length>800)fail('SOURCE_TOO_MANY_SEGMENTS','source');
-  return {version:1,text:input,segments};
+  if (segments.length > 800) fail("SOURCE_TOO_MANY_SEGMENTS", "source");
+  return { version: 1, text: input, segments };
 }
 
 /** Validate untrusted AI output; strip unknown properties and never trust generated code or asset URLs. */
-export function validateContentPlan(raw:unknown,source:SourceDocument,expectedKind?:ContentPlan['kind']):ContentPlan {
-  const root=object(raw,'plan');
-  if(root.version!==1||!['presentation','social'].includes(String(root.kind))||(expectedKind&&root.kind!==expectedKind))fail('CONTENT_INVALID_VERSION','plan');
-  const sources=new Map(source.segments.map(segment=>[segment.id,segment]));
-  const evidence=(raw:unknown,path:string):Evidence[]=>list(raw,path,1,32).map((entry,index)=>{
-    const item=object(entry,`${path}.${index}`),sourceId=text(item.sourceId,`${path}.${index}.sourceId`,80);
-    const segment=sources.get(sourceId);if(!segment)fail('CONTENT_UNKNOWN_SOURCE',path);
-    const quote=item.quote===undefined?undefined:text(item.quote,`${path}.${index}.quote`,20000);
-    if(quote&&!segment!.text.includes(quote))fail('CONTENT_UNSUPPORTED_QUOTE',path);
-    return {sourceId,...(quote?{quote}:{})};
-  });
-  const ids=new Set<string>();
-  const unique=(raw:unknown,path:string)=>{const id=identity(raw,path);if(ids.has(id))fail('CONTENT_DUPLICATE_ID',path);ids.add(id);return id;};
-  const block=(raw:unknown,path:string):ContentBlock=>{
-    const value=object(raw,path),base={id:unique(value.id,`${path}.id`),evidence:evidence(value.evidence,`${path}.evidence`)};
-    const field=(key:string,max=1000,empty=false)=>text(value[key],`${path}.${key}`,max,empty);
-    switch(value.kind){
-      case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600),...(value.heading===undefined?{}:{heading:field('heading',160),level:value.level===3?3:2})};
-      case 'steps':case 'features':return {...base,kind:value.kind,entries:list(value.entries,`${path}.entries`,1,12).map((raw,i)=>{const item=object(raw,`${path}.entries.${i}`);return {title:text(item.title,path,160),description:text(item.description,path,600,true)};})};
-      case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,`${path}.columns`,2,4).map((raw,i)=>comparisonColumn(raw,`${path}.columns.${i}`,base.evidence.map(e=>sources.get(e.sourceId)!.text).join('\n')))};
-      case 'code':{
-        const sourceId=field('sourceId',80),segment=sources.get(sourceId);
-        if(segment?.kind!=='code'||!base.evidence.some(e=>e.sourceId===sourceId))return fail('CONTENT_INVALID_CODE_SOURCE',path);
-        if(value.code!==undefined&&value.code!==segment.text)fail('CONTENT_CODE_CHANGED',path);
-        return {...base,kind:'code',sourceId,language:segment.language||'text',code:segment.text};
+export function validateContentPlan(
+  raw: unknown,
+  source: SourceDocument,
+  expectedKind?: ContentPlan["kind"],
+): ContentPlan {
+  const root = object(raw, "plan");
+  if (
+    root.version !== 1 ||
+    !["presentation", "social"].includes(String(root.kind)) ||
+    (expectedKind && root.kind !== expectedKind)
+  )
+    fail("CONTENT_INVALID_VERSION", "plan");
+  const sources = new Map(
+    source.segments.map((segment) => [segment.id, segment]),
+  );
+  const evidence = (raw: unknown, path: string): Evidence[] =>
+    list(raw, path, 1, 32).map((entry, index) => {
+      const item = object(entry, `${path}.${index}`),
+        sourceId = text(item.sourceId, `${path}.${index}.sourceId`, 80);
+      const segment = sources.get(sourceId);
+      if (!segment) fail("CONTENT_UNKNOWN_SOURCE", path);
+      const quote =
+        item.quote === undefined
+          ? undefined
+          : text(item.quote, `${path}.${index}.quote`, 20000);
+      if (quote && !segment!.text.includes(quote))
+        fail("CONTENT_UNSUPPORTED_QUOTE", path);
+      return { sourceId, ...(quote ? { quote } : {}) };
+    });
+  const ids = new Set<string>();
+  const unique = (raw: unknown, path: string) => {
+    const id = identity(raw, path);
+    if (ids.has(id)) fail("CONTENT_DUPLICATE_ID", path);
+    ids.add(id);
+    return id;
+  };
+  const block = (raw: unknown, path: string): ContentBlock => {
+    const value = object(raw, path),
+      base = {
+        id: unique(value.id, `${path}.id`),
+        evidence: evidence(value.evidence, `${path}.evidence`),
+      };
+    const field = (key: string, max = 1000, empty = false) =>
+      text(value[key], `${path}.${key}`, max, empty);
+    switch (value.kind) {
+      case "paragraph":
+        return {
+          ...base,
+          kind: "paragraph",
+          text: field("text", 1600),
+          ...(value.heading === undefined
+            ? {}
+            : {
+                heading: field("heading", 160),
+                level: value.level === 3 ? 3 : 2,
+              }),
+        };
+      case "steps":
+      case "features":
+        return {
+          ...base,
+          kind: value.kind,
+          entries: list(value.entries, `${path}.entries`, 1, 12).map(
+            (raw, i) => {
+              const item = object(raw, `${path}.entries.${i}`);
+              return {
+                title: text(item.title, path, 160),
+                description: text(item.description, path, 600, true),
+              };
+            },
+          ),
+        };
+      case "comparison":
+        return {
+          ...base,
+          kind: "comparison",
+          columns: list(value.columns, `${path}.columns`, 2, 4).map((raw, i) =>
+            comparisonColumn(
+              raw,
+              `${path}.columns.${i}`,
+              base.evidence
+                .map((e) => sources.get(e.sourceId)!.text)
+                .join("\n"),
+            ),
+          ),
+        };
+      case "code": {
+        const sourceId = field("sourceId", 80),
+          segment = sources.get(sourceId);
+        if (
+          segment?.kind !== "code" ||
+          !base.evidence.some((e) => e.sourceId === sourceId)
+        )
+          return fail("CONTENT_INVALID_CODE_SOURCE", path);
+        if (value.code !== undefined && value.code !== segment.text)
+          fail("CONTENT_CODE_CHANGED", path);
+        return {
+          ...base,
+          kind: "code",
+          sourceId,
+          language: segment.language || "text",
+          code: segment.text,
+        };
       }
-      case 'parameters':return {...base,kind:'parameters',rows:list(value.rows,`${path}.rows`,1,20).map(raw=>{const row=object(raw,path);return {name:text(row.name,path,160),value:text(row.value,path,1000,true),description:text(row.description,path,500,true)};})};
-      case 'quote':{
-        const copy=field('text',1600);if(!base.evidence.some(e=>sources.get(e.sourceId)!.text.includes(copy)))fail('CONTENT_UNSUPPORTED_QUOTE',path);
-        const attribution=field('attribution',160,true);if(attribution&&!base.evidence.some(e=>sources.get(e.sourceId)!.text.includes(attribution)))fail('CONTENT_UNSUPPORTED_ATTRIBUTION',path);
-        const role=value.role===undefined?undefined:field('role',160,true);
-        if(role&&!base.evidence.some(e=>sources.get(e.sourceId)!.text.includes(role)))fail('CONTENT_UNSUPPORTED_ATTRIBUTION',path);
-        return {...base,kind:'quote',text:copy,attribution,...(role===undefined?{}:{role}),...(value.avatarAssetId===undefined?{}:{avatarAssetId:identity(value.avatarAssetId,`${path}.avatarAssetId`)})};
+      case "parameters":
+        return {
+          ...base,
+          kind: "parameters",
+          rows: list(value.rows, `${path}.rows`, 1, 20).map((raw) => {
+            const row = object(raw, path);
+            return {
+              name: text(row.name, path, 160),
+              value: text(row.value, path, 1000, true),
+              description: text(row.description, path, 500, true),
+            };
+          }),
+        };
+      case "quote": {
+        const copy = field("text", 1600);
+        if (
+          !base.evidence.some((e) =>
+            sources.get(e.sourceId)!.text.includes(copy),
+          )
+        )
+          fail("CONTENT_UNSUPPORTED_QUOTE", path);
+        const attribution = field("attribution", 160, true);
+        if (
+          attribution &&
+          !base.evidence.some((e) =>
+            sources.get(e.sourceId)!.text.includes(attribution),
+          )
+        )
+          fail("CONTENT_UNSUPPORTED_ATTRIBUTION", path);
+        const role =
+          value.role === undefined ? undefined : field("role", 160, true);
+        if (
+          role &&
+          !base.evidence.some((e) =>
+            sources.get(e.sourceId)!.text.includes(role),
+          )
+        )
+          fail("CONTENT_UNSUPPORTED_ATTRIBUTION", path);
+        return {
+          ...base,
+          kind: "quote",
+          text: copy,
+          attribution,
+          ...(role === undefined ? {} : { role }),
+          ...(value.avatarAssetId === undefined
+            ? {}
+            : {
+                avatarAssetId: identity(
+                  value.avatarAssetId,
+                  `${path}.avatarAssetId`,
+                ),
+              }),
+        };
       }
-      case 'chart':{
-        if(!['bar','line'].includes(String(value.chart)))fail('CONTENT_INVALID_CHART',path);
-        const proof=base.evidence.map(e=>sources.get(e.sourceId)!.text).join('\n');
-        const unit=field('unit',60,true);if(unit&&!proof.includes(unit))fail('CONTENT_UNSUPPORTED_UNIT',path);
-        const numbers=new Set(proof.match(/-?\d+(?:\.\d+)?/g)?.map(Number)||[]);
-        return {...base,kind:'chart',chart:value.chart as 'bar'|'line',unit,values:list(value.values,path,2,12).map(raw=>{const entry=object(raw,path);if(typeof entry.value!=='number'||!Number.isFinite(entry.value)||!numbers.has(entry.value))fail('CONTENT_UNSUPPORTED_VALUE',path);const label=text(entry.label,path,100);if(!proof.includes(label))fail('CONTENT_UNSUPPORTED_LABEL',path);return {label,value:entry.value as number};})};
+      case "chart": {
+        if (!["bar", "line"].includes(String(value.chart)))
+          fail("CONTENT_INVALID_CHART", path);
+        const proof = base.evidence
+          .map((e) => sources.get(e.sourceId)!.text)
+          .join("\n");
+        const unit = field("unit", 60, true);
+        if (unit && !proof.includes(unit))
+          fail("CONTENT_UNSUPPORTED_UNIT", path);
+        const numbers = new Set(
+          proof.match(/-?\d+(?:\.\d+)?/g)?.map(Number) || [],
+        );
+        return {
+          ...base,
+          kind: "chart",
+          chart: value.chart as "bar" | "line",
+          unit,
+          values: list(value.values, path, 2, 12).map((raw) => {
+            const entry = object(raw, path);
+            if (
+              typeof entry.value !== "number" ||
+              !Number.isFinite(entry.value) ||
+              !numbers.has(entry.value)
+            )
+              fail("CONTENT_UNSUPPORTED_VALUE", path);
+            const label = text(entry.label, path, 100);
+            if (!proof.includes(label)) fail("CONTENT_UNSUPPORTED_LABEL", path);
+            return { label, value: entry.value as number };
+          }),
+        };
       }
-      case 'image':{
-        const sourceId=field('sourceId',80),segment=sources.get(sourceId);
-        if(segment?.kind!=='image-reference'||!base.evidence.some(e=>e.sourceId===sourceId))return fail('CONTENT_INVALID_IMAGE_SOURCE',path);
-        if(!['screenshot','photograph','diagram'].includes(String(value.treatment)))fail('CONTENT_INVALID_IMAGE_TREATMENT',path);
+      case "image": {
+        const sourceId = field("sourceId", 80),
+          segment = sources.get(sourceId);
+        if (
+          segment?.kind !== "image-reference" ||
+          !base.evidence.some((e) => e.sourceId === sourceId)
+        )
+          return fail("CONTENT_INVALID_IMAGE_SOURCE", path);
+        if (
+          !["screenshot", "photograph", "diagram"].includes(
+            String(value.treatment),
+          )
+        )
+          fail("CONTENT_INVALID_IMAGE_TREATMENT", path);
         // Availability is resolved from the authenticated asset store later, never asserted by the model.
-        return {...base,kind:'image',sourceId,alt:field('alt',300,true),treatment:value.treatment as 'screenshot'|'photograph'|'diagram',status:'missing'};
+        return {
+          ...base,
+          kind: "image",
+          sourceId,
+          alt: field("alt", 300, true),
+          treatment: value.treatment as "screenshot" | "photograph" | "diagram",
+          status: "missing",
+        };
       }
-      default:return fail('CONTENT_UNKNOWN_BLOCK',path);
+      default:
+        return fail("CONTENT_UNKNOWN_BLOCK", path);
     }
   };
-  const pages=list(root.pages,'pages',1,root.kind==='social'?8:24).map((raw,index):ContentPage=>{
-    const path=`pages.${index}`,page=object(raw,path);
-    if(!['cover','explain','instruct','compare','evidence','conclude'].includes(String(page.purpose)))fail('CONTENT_INVALID_PURPOSE',path);
-    return {...titleEmphasis(page.titleEmphasis,page.title,`${path}.titleEmphasis`),...publication(page.publication,`${path}.publication`,source.text),...bookend(page.bookend,`${path}.bookend`,source.text),...sceneField(page.scene,`${path}.scene`),id:unique(page.id,`${path}.id`),title:text(page.title,`${path}.title`,160),purpose:page.purpose as ContentPage['purpose'],evidence:evidence(page.evidence,`${path}.evidence`),blocks:list(page.blocks,`${path}.blocks`,1,8).map((value,i)=>block(value,`${path}.blocks.${i}`)),...(page.caption!==undefined?{caption:text(page.caption,`${path}.caption`,2000,true)}:{}),...(page.notes!==undefined?{notes:text(page.notes,`${path}.notes`,2000,true)}:{})};
+  const pages = list(
+    root.pages,
+    "pages",
+    1,
+    root.kind === "social" ? 8 : 24,
+  ).map((raw, index): ContentPage => {
+    const path = `pages.${index}`,
+      page = object(raw, path);
+    if (
+      ![
+        "cover",
+        "explain",
+        "instruct",
+        "compare",
+        "evidence",
+        "conclude",
+      ].includes(String(page.purpose))
+    )
+      fail("CONTENT_INVALID_PURPOSE", path);
+    return {
+      ...titleEmphasis(page.titleEmphasis, page.title, `${path}.titleEmphasis`),
+      ...publication(page.publication, `${path}.publication`, source.text),
+      ...bookend(page.bookend, `${path}.bookend`, source.text),
+      ...sceneField(page.scene, `${path}.scene`),
+      id: unique(page.id, `${path}.id`),
+      title: text(page.title, `${path}.title`, 160),
+      purpose: page.purpose as ContentPage["purpose"],
+      evidence: evidence(page.evidence, `${path}.evidence`),
+      blocks: list(page.blocks, `${path}.blocks`, 1, 8).map((value, i) =>
+        block(value, `${path}.blocks.${i}`),
+      ),
+      ...(page.caption !== undefined
+        ? { caption: text(page.caption, `${path}.caption`, 2000, true) }
+        : {}),
+      ...(page.notes !== undefined
+        ? { notes: text(page.notes, `${path}.notes`, 2000, true) }
+        : {}),
+    };
   });
-  if(root.kind==='presentation')for(const segment of source.segments.filter(s=>s.kind==='code'))if(!pages.some(p=>p.blocks.some(b=>b.kind==='code'&&b.sourceId===segment.id)))fail('CONTENT_CODE_OMITTED',segment.id);
-  if(root.kind==='social'&&pages.some(page=>!page.caption?.trim()))fail('CONTENT_CAPTION_REQUIRED','pages');
-  return {version:1,kind:root.kind as ContentPlan['kind'],title:text(root.title,'title',160),pages};
+  if (root.kind === "presentation")
+    for (const segment of source.segments.filter((s) => s.kind === "code"))
+      if (
+        !pages.some((p) =>
+          p.blocks.some((b) => b.kind === "code" && b.sourceId === segment.id),
+        )
+      )
+        fail("CONTENT_CODE_OMITTED", segment.id);
+  if (root.kind === "social" && pages.some((page) => !page.caption?.trim()))
+    fail("CONTENT_CAPTION_REQUIRED", "pages");
+  return {
+    version: 1,
+    kind: root.kind as ContentPlan["kind"],
+    title: text(root.title, "title", 160),
+    pages,
+  };
 }
 
-export function contentBlockText(block:ContentBlock):string[] {
-  switch(block.kind){
-    case 'paragraph':return [...(block.heading?[block.heading]:[]),block.text];
-    case 'steps':case 'features':return block.entries.flatMap(e=>[e.title,e.description]);
-    case 'comparison':return block.columns.flatMap(c=>[c.title,...c.points,...(c.price?[c.price]:[]),...(c.values||[])]);
-    case 'code':return [block.code];
-    case 'parameters':return block.rows.flatMap(r=>[r.name,r.value,r.description]);
-    case 'quote':return [block.text,block.attribution];
-    case 'chart':return [block.unit,...block.values.flatMap(v=>[v.label,String(v.value)])];
-    case 'image':return [];
+export function contentBlockText(block: ContentBlock): string[] {
+  switch (block.kind) {
+    case "paragraph":
+      return [...(block.heading ? [block.heading] : []), block.text];
+    case "steps":
+    case "features":
+      return block.entries.flatMap((e) => [e.title, e.description]);
+    case "comparison":
+      return block.columns.flatMap((c) => [
+        c.title,
+        ...c.points,
+        ...(c.price ? [c.price] : []),
+        ...(c.values || []),
+      ]);
+    case "code":
+      return [block.code];
+    case "parameters":
+      return block.rows.flatMap((r) => [r.name, r.value, r.description]);
+    case "quote":
+      return [block.text, block.attribution];
+    case "chart":
+      return [
+        block.unit,
+        ...block.values.flatMap((v) => [v.label, String(v.value)]),
+      ];
+    case "image":
+      return [];
   }
 }
 
 /** Validate persisted/editor-authored content without reasserting that user edits came from AI evidence. */
-export function validateEditableContentPage(raw:unknown,{allowIncomplete=false}:{allowIncomplete?:boolean}={}):ContentPage {
- const draftText=(value:unknown,path:string,max=1000,empty=false)=>text(value,path,allowIncomplete?Math.max(max,20000):max,empty||allowIncomplete);
- const page=object(raw,'page'),ids=new Set<string>();
- const id=(value:unknown,path:string)=>{const result=identity(value,path);if(ids.has(result))fail('CONTENT_DUPLICATE_ID',path);ids.add(result);return result;};
- const proof=(value:unknown,path:string):Evidence[]=>list(value,path,1,32).map((raw,index)=>{const item=object(raw,`${path}.${index}`);return {sourceId:text(item.sourceId,path,80),...(item.quote===undefined?{}:{quote:text(item.quote,path,20000)})};});
- if(!['cover','explain','instruct','compare','evidence','conclude'].includes(String(page.purpose)))fail('CONTENT_INVALID_PURPOSE','page.purpose');
- const pageId=id(page.id,'page.id');
- const blocks=list(page.blocks,'page.blocks',1,8).map((raw,index):ContentBlock=>{
-  const path=`page.blocks.${index}`,value=object(raw,path),base={id:id(value.id,`${path}.id`),evidence:proof(value.evidence,`${path}.evidence`)};
-  const field=(name:string,max=1000,empty=false)=>draftText(value[name],`${path}.${name}`,max,empty);
-  switch(value.kind){
-   case 'paragraph':return {...base,kind:'paragraph',text:field('text',1600),...(value.heading===undefined?{}:{heading:field('heading',160),level:value.level===3?3:2})};
-   case 'steps':case 'features':return {...base,kind:value.kind,entries:list(value.entries,path,1,12).map(raw=>{const item=object(raw,path);return {title:draftText(item.title,path,160),description:draftText(item.description,path,600,true)};})};
-   case 'comparison':return {...base,kind:'comparison',columns:list(value.columns,path,2,4).map((raw,i)=>comparisonColumn(raw,`${path}.columns.${i}`,undefined,allowIncomplete))};
-   case 'code':return {...base,kind:'code',sourceId:field('sourceId',80),language:field('language',40),code:field('code',20000)};
-   case 'parameters':return {...base,kind:'parameters',rows:list(value.rows,path,1,20).map(raw=>{const item=object(raw,path);return {name:draftText(item.name,path,160),value:draftText(item.value,path,1000,true),description:draftText(item.description,path,500,true)};})};
-   case 'quote':return {...base,kind:'quote',text:field('text',1600),attribution:field('attribution',160,true),...(value.role===undefined?{}:{role:field('role',160,true)}),...(value.avatarAssetId===undefined?{}:{avatarAssetId:identity(value.avatarAssetId,`${path}.avatarAssetId`)})};
-   case 'chart':{
-    if(!['bar','line'].includes(String(value.chart)))fail('CONTENT_INVALID_CHART',path);
-    return {...base,kind:'chart',chart:value.chart as 'bar'|'line',unit:field('unit',60,true),values:list(value.values,path,2,12).map(raw=>{const item=object(raw,path);if(typeof item.value!=='number'||(!(allowIncomplete&&Number.isNaN(item.value))&&(!Number.isFinite(item.value)||Math.abs(item.value)>1e15)))fail('CONTENT_INVALID_VALUE',path);return {label:draftText(item.label,path,100),value:item.value as number};})};
-   }
-   case 'image':{
-    if(!['screenshot','photograph','diagram'].includes(String(value.treatment))||!['missing','available'].includes(String(value.status)))fail('CONTENT_INVALID_IMAGE','page');
-    return {...base,kind:'image',sourceId:field('sourceId',80),alt:field('alt',300,true),treatment:value.treatment as 'screenshot'|'photograph'|'diagram',status:value.status as 'missing'|'available',...(value.status==='available'?{assetId:field('assetId',200)}:{})};
-   }
-   default:return fail('CONTENT_UNKNOWN_BLOCK',path);
-  }
- });
- return {...titleEmphasis(page.titleEmphasis,page.title,'page.titleEmphasis'),...publication(page.publication,'page.publication'),...bookend(page.bookend,'page.bookend'),...sceneField(page.scene,'page.scene'),id:pageId,title:draftText(page.title,'page.title',160),purpose:page.purpose as ContentPage['purpose'],evidence:proof(page.evidence,'page.evidence'),blocks,...(page.caption===undefined?{}:{caption:draftText(page.caption,'page.caption',2000,true)}),...(page.notes===undefined?{}:{notes:draftText(page.notes,'page.notes',2000,true)})};
+export function validateEditableContentPage(
+  raw: unknown,
+  { allowIncomplete = false }: { allowIncomplete?: boolean } = {},
+): ContentPage {
+  const draftText = (value: unknown, path: string, max = 1000, empty = false) =>
+    text(
+      value,
+      path,
+      allowIncomplete ? Math.max(max, 20000) : max,
+      empty || allowIncomplete,
+    );
+  const page = object(raw, "page"),
+    ids = new Set<string>();
+  const id = (value: unknown, path: string) => {
+    const result = identity(value, path);
+    if (ids.has(result)) fail("CONTENT_DUPLICATE_ID", path);
+    ids.add(result);
+    return result;
+  };
+  const proof = (value: unknown, path: string): Evidence[] =>
+    list(value, path, 1, 32).map((raw, index) => {
+      const item = object(raw, `${path}.${index}`);
+      return {
+        sourceId: text(item.sourceId, path, 80),
+        ...(item.quote === undefined
+          ? {}
+          : { quote: text(item.quote, path, 20000) }),
+      };
+    });
+  if (
+    ![
+      "cover",
+      "explain",
+      "instruct",
+      "compare",
+      "evidence",
+      "conclude",
+    ].includes(String(page.purpose))
+  )
+    fail("CONTENT_INVALID_PURPOSE", "page.purpose");
+  const pageId = id(page.id, "page.id");
+  const blocks = list(page.blocks, "page.blocks", 1, 8).map(
+    (raw, index): ContentBlock => {
+      const path = `page.blocks.${index}`,
+        value = object(raw, path),
+        base = {
+          id: id(value.id, `${path}.id`),
+          evidence: proof(value.evidence, `${path}.evidence`),
+        };
+      const field = (name: string, max = 1000, empty = false) =>
+        draftText(value[name], `${path}.${name}`, max, empty);
+      switch (value.kind) {
+        case "paragraph":
+          return {
+            ...base,
+            kind: "paragraph",
+            text: field("text", 1600),
+            ...(value.heading === undefined
+              ? {}
+              : {
+                  heading: field("heading", 160),
+                  level: value.level === 3 ? 3 : 2,
+                }),
+          };
+        case "steps":
+        case "features":
+          return {
+            ...base,
+            kind: value.kind,
+            entries: list(value.entries, path, 1, 12).map((raw) => {
+              const item = object(raw, path);
+              return {
+                title: draftText(item.title, path, 160),
+                description: draftText(item.description, path, 600, true),
+              };
+            }),
+          };
+        case "comparison":
+          return {
+            ...base,
+            kind: "comparison",
+            columns: list(value.columns, path, 2, 4).map((raw, i) =>
+              comparisonColumn(
+                raw,
+                `${path}.columns.${i}`,
+                undefined,
+                allowIncomplete,
+              ),
+            ),
+          };
+        case "code":
+          return {
+            ...base,
+            kind: "code",
+            sourceId: field("sourceId", 80),
+            language: field("language", 40),
+            code: field("code", 20000),
+          };
+        case "parameters":
+          return {
+            ...base,
+            kind: "parameters",
+            rows: list(value.rows, path, 1, 20).map((raw) => {
+              const item = object(raw, path);
+              return {
+                name: draftText(item.name, path, 160),
+                value: draftText(item.value, path, 1000, true),
+                description: draftText(item.description, path, 500, true),
+              };
+            }),
+          };
+        case "quote":
+          return {
+            ...base,
+            kind: "quote",
+            text: field("text", 1600),
+            attribution: field("attribution", 160, true),
+            ...(value.role === undefined
+              ? {}
+              : { role: field("role", 160, true) }),
+            ...(value.avatarAssetId === undefined
+              ? {}
+              : {
+                  avatarAssetId: identity(
+                    value.avatarAssetId,
+                    `${path}.avatarAssetId`,
+                  ),
+                }),
+          };
+        case "chart": {
+          if (!["bar", "line"].includes(String(value.chart)))
+            fail("CONTENT_INVALID_CHART", path);
+          return {
+            ...base,
+            kind: "chart",
+            chart: value.chart as "bar" | "line",
+            unit: field("unit", 60, true),
+            values: list(value.values, path, 2, 12).map((raw) => {
+              const item = object(raw, path);
+              if (
+                typeof item.value !== "number" ||
+                (!(allowIncomplete && Number.isNaN(item.value)) &&
+                  (!Number.isFinite(item.value) || Math.abs(item.value) > 1e15))
+              )
+                fail("CONTENT_INVALID_VALUE", path);
+              return {
+                label: draftText(item.label, path, 100),
+                value: item.value as number,
+              };
+            }),
+          };
+        }
+        case "image": {
+          if (
+            !["screenshot", "photograph", "diagram"].includes(
+              String(value.treatment),
+            ) ||
+            !["missing", "available"].includes(String(value.status))
+          )
+            fail("CONTENT_INVALID_IMAGE", "page");
+          return {
+            ...base,
+            kind: "image",
+            sourceId: field("sourceId", 80),
+            alt: field("alt", 300, true),
+            treatment: value.treatment as
+              | "screenshot"
+              | "photograph"
+              | "diagram",
+            status: value.status as "missing" | "available",
+            ...(value.status === "available"
+              ? { assetId: field("assetId", 200) }
+              : {}),
+          };
+        }
+        default:
+          return fail("CONTENT_UNKNOWN_BLOCK", path);
+      }
+    },
+  );
+  return {
+    ...titleEmphasis(page.titleEmphasis, page.title, "page.titleEmphasis"),
+    ...publication(page.publication, "page.publication"),
+    ...bookend(page.bookend, "page.bookend"),
+    ...sceneField(page.scene, "page.scene"),
+    id: pageId,
+    title: draftText(page.title, "page.title", 160),
+    purpose: page.purpose as ContentPage["purpose"],
+    evidence: proof(page.evidence, "page.evidence"),
+    blocks,
+    ...(page.caption === undefined
+      ? {}
+      : { caption: draftText(page.caption, "page.caption", 2000, true) }),
+    ...(page.notes === undefined
+      ? {}
+      : { notes: draftText(page.notes, "page.notes", 2000, true) }),
+  };
 }

@@ -69,8 +69,7 @@ export function flattenGroupLayout<T extends Layout>(
   const det = a * d - b * c;
   let outScaleX = scaleX;
   let outScaleY = det / scaleX;
-  let skewX =
-    (Math.atan((a * c + b * d) / (scaleX * scaleX)) * 180) / Math.PI;
+  let skewX = (Math.atan((a * c + b * d) / (scaleX * scaleX)) * 180) / Math.PI;
   let skewY = 0;
   let flipX = false;
   let flipY = false;
