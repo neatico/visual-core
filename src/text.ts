@@ -16,7 +16,7 @@ export function wrapCopy(text:string,width:number,size:number,bold:boolean,measu
   }
   const ranges=options.keepWords&&typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'word'}).segment(paragraph)].filter(part=>part.isWordLike).map(part=>({start:part.index,end:part.index+part.segment.length,text:part.segment})):[];
   // Keep a fitting URL/API token whole even where UAX permits a slash break.
-  for(const match of paragraph.matchAll(/[A-Za-z0-9]+(?:[._/@+\-][A-Za-z0-9]+)+/g))ranges.push({start:match.index!,end:match.index!+match[0].length,text:match[0]});
+  for(const match of paragraph.matchAll(/[A-Za-z0-9]+(?:[.:_/@+\-][A-Za-z0-9]+)+/g))ranges.push({start:match.index!,end:match.index!+match[0].length,text:match[0]});
   const wrapAt=(available:number)=>{
    const breaker=new LineBreaker(paragraph),tokens:string[]=[];
    let last=0,point;
@@ -30,7 +30,16 @@ export function wrapCopy(text:string,width:number,size:number,bold:boolean,measu
     if(measured(line+token.trimEnd())<=available){line+=token;continue;}
     if(line.trim()){output.push(line.trim());line='';}
     if(measured(token.trim())<=available){line=token.trimStart();continue;}
-    const glyphs=typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(token)].map(part=>part.segment):Array.from(token);
+    const graphemes=(value:string)=>typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(value)].map(part=>part.segment):Array.from(value);
+    // A range may be wider than a column, but a fitting clock must stay intact.
+    // Keep each clock as an atomic fallback unit instead of splitting its minutes.
+    const glyphs:string[]=[];let cursor=0;
+    for(const match of token.matchAll(/\d{1,2}:\d{2}(?::\d{2})?/g)){
+     glyphs.push(...graphemes(token.slice(cursor,match.index)));
+     glyphs.push(...(measured(match[0])<=available?[match[0]]:graphemes(match[0])));
+     cursor=match.index!+match[0].length;
+    }
+    glyphs.push(...graphemes(token.slice(cursor)));
     for(const glyph of glyphs){
      if(glyph.trim()&&measured(glyph)>available)throw new RangeError('A character exceeds the available width');
      if(line&&measured(line+glyph)>available){output.push(line.trim());line='';}

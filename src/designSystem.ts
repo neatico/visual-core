@@ -81,7 +81,7 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
       line: "#DED2C1",
     },
     typography: {
-      heading: "Manrope",
+      heading: "Lora",
       body: "Inter",
       code: "monospace",
       headingWeight: 700,

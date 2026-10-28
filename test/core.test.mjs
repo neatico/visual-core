@@ -219,3 +219,16 @@ test('title wrapping respects fitting CJK words and emergency wrapping keeps gra
 });
 
 test('heading clause breaks keep a topic prefix separate when a title wraps',()=>{const measure=text=>Array.from(text).length;const text='Apipost快速上手：调试接口与生成文档';const lines=wrapCopy(text,13,12,true,measure,{keepWords:true,preferClauseBreaks:true});assert.equal(lines[0],'Apipost快速上手：');assert.equal(lines.join(''),text);});
+
+ test("clock ranges stay whole when they fit the line", () => {
+ const lines=wrapCopy("户外活动 09:30-12:00 集合", 12, 12, false, text=>Array.from(text).length,{balance:false});
+ assert.ok(lines.some(line=>line.includes("09:30-12:00")));
+ assert.equal(lines.join("").replaceAll(" ",""),"户外活动09:30-12:00集合");
+ });
+
+test("narrow columns split clock ranges between clocks, never inside minutes",()=>{
+ const lines=wrapCopy("09:30-12:00户外活动",8,12,false,text=>Array.from(text).length,{balance:false});
+ assert.ok(lines.some(line=>line.includes("09:30")));
+ assert.ok(lines.some(line=>line.includes("12:00")));
+ assert.equal(lines.join(""),"09:30-12:00户外活动");
+});
