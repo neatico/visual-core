@@ -35,6 +35,12 @@ export interface DesignTheme {
 /** Complete, deterministic token sets; decorative geometry belongs to individual compositions. */
 export const DESIGN_THEMES: readonly DesignTheme[] = [
   {
+    id: "neatico",
+    palette: { background: "#FAF9F6", surface: "#FFFFFF", ink: "#202124", muted: "#62646B", accent: "#F4CE36", line: "#E4E1D9" },
+    typography: { heading: "Inter", body: "Inter", code: "monospace", headingWeight: 700 },
+    geometry: { radius: 12, spacing: 1, rule: "accent" },
+  },
+  {
     id: "studio",
     palette: {
       background: "#F5F3EE",
@@ -127,7 +133,6 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
 ];
 export function designTheme(id: string): DesignTheme {
   const alias: Record<string, string> = {
-    neatico: "electric",
     paper: "studio",
     midnight: "ink",
     ocean: "ink",
@@ -185,6 +190,7 @@ const accepted = (family: string): SemanticKind[] =>
 // Explicit semantic contracts, not name/scene guesses. A travel itinerary, calendar,
 // price promotion or fake UI cannot be inferred from an arbitrary paragraph.
 const socialContracts: Record<string, readonly SemanticKind[]> = {
+ "note-question":["paragraph"],"note-marker":["paragraph"],"note-editorial":["paragraph"],"note-news":["paragraph"],"note-checklist":["features","steps","paragraph"],"note-photo":["image","paragraph"],
   "news-focus": ["paragraph"],
   manifesto: ["paragraph"],
   editorial: ["paragraph"],

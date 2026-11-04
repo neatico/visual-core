@@ -1,5 +1,16 @@
 /** Stable authored social layouts and their semantic scenes. */
 export const SOCIAL_LAYOUT_CATALOG = [
+  {id:"note-question",scene:"editorial",name:"Emoji question"},
+  {id:"note-marker",scene:"editorial",name:"Marker statement"},
+  {id:"note-editorial",scene:"editorial",name:"Warm editorial note"},
+  {id:"note-checklist",scene:"features",name:"Saveable checklist"},
+  {id:"note-photo",scene:"launch",name:"Photo headline"},
+  {id:"note-news",scene:"editorial",name:"News number"},
+  {id:"chat-messenger",scene:"features",name:"Green messenger"},
+  {id:"chat-imessage",scene:"features",name:"Blue messages"},
+  {id:"chat-telegram",scene:"features",name:"Cloud messenger"},
+  {id:"chat-workplace",scene:"features",name:"Team conversation"},
+
   {
     id: "time-notice",
     scene: "event",

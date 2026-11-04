@@ -44,7 +44,7 @@ export type ContentBlock = BlockBase &
     | { kind: "paragraph"; text: string; heading?: string; level?: 2 | 3 }
     | {
         kind: "steps" | "features";
-        entries: { title: string; description: string }[];
+        entries: { title: string; description: string; icon?: string; illustration?: string }[];
       }
     | { kind: "comparison"; columns: ComparisonColumn[] }
     | { kind: "code"; sourceId: string; language: string; code: string }
@@ -89,7 +89,14 @@ export interface BookendInfo {
   contact?: string;
   logoAssetId?: string;
 }
+function emojiField(value:unknown,path:string):{emoji?:string}{
+ if(value===undefined||value==='')return {};
+ if(typeof value!=='string'||Array.from(value).length>16||!/^[\p{Extended_Pictographic}\p{Emoji_Component}\u200d\uFE0F]+$/u.test(value)||!/\p{Extended_Pictographic}/u.test(value))return fail('CONTENT_INVALID_EMOJI',path);
+ return {emoji:value};
+}
 export interface ContentPage {
+  /** Optional decorative Unicode emoji chosen explicitly by the author/model. */
+  emoji?: string;
   id: string;
   title: string;
   titleEmphasis?: string[];
@@ -457,6 +464,7 @@ export function validateContentPlan(
               return {
                 title: text(item.title, path, 160),
                 description: text(item.description, path, 600, true),
+                ...visualDescriptor(item),
               };
             },
           ),
@@ -627,6 +635,7 @@ export function validateContentPlan(
       fail("CONTENT_INVALID_PURPOSE", path);
     return {
       ...titleEmphasis(page.titleEmphasis, page.title, `${path}.titleEmphasis`),
+      ...emojiField(page.emoji,`${path}.emoji`),
       ...publication(page.publication, `${path}.publication`, source.text),
       ...bookend(page.bookend, `${path}.bookend`, source.text),
       ...sceneField(page.scene, `${path}.scene`),
@@ -768,6 +777,7 @@ export function validateEditableContentPage(
               return {
                 title: draftText(item.title, path, 160),
                 description: draftText(item.description, path, 600, true),
+                ...visualDescriptor(item),
               };
             }),
           };
@@ -876,6 +886,7 @@ export function validateEditableContentPage(
   );
   return {
     ...titleEmphasis(page.titleEmphasis, page.title, "page.titleEmphasis"),
+    ...emojiField(page.emoji,"page.emoji"),
     ...publication(page.publication, "page.publication"),
     ...bookend(page.bookend, "page.bookend"),
     ...sceneField(page.scene, "page.scene"),
@@ -891,4 +902,12 @@ export function validateEditableContentPage(
       ? {}
       : { notes: draftText(page.notes, "page.notes", 2000, true) }),
   };
+}
+
+function visualDescriptor(item: Record<string,unknown>): {icon?:string;illustration?:string} {
+ const icons=new Set(['BsJournalText','BsPersonCheck','BsShare','BsPeople','BsSearch','BsShieldCheck','BsBarChart','BsCodeSlash','BsSignpostSplit','BsCheck2Circle','BsFolder2Open','BsGrid1X2']);
+ const illustrations=new Set(['document','collaboration','review','feedback','symbol']);
+ if(item.icon!=null && (typeof item.icon!=='string'||!icons.has(item.icon)))throw new Error('Invalid semantic icon');
+ if(item.illustration!=null && (typeof item.illustration!=='string'||!illustrations.has(item.illustration)))throw new Error('Invalid semantic illustration');
+ return {...(typeof item.icon==='string'?{icon:item.icon}:{}),...(typeof item.illustration==='string'?{illustration:item.illustration}:{})};
 }
