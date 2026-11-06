@@ -1,3 +1,11 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import {splitCopy,splitContent} from '../dist/index.js';
 test('splitting preserves every character and does not invent claims',()=>{for(const text of ['Registration required. Capacity is 12 people.','需要报名。仅限12人。','Anmeldung erforderlich. Nur 12 Personen.','申し込みが必要です。定員12人。']){const parts=splitCopy(text);assert.equal(parts.join(''),text);assert.ok(parts.every(Boolean));}assert.equal(splitCopy('12.5'),undefined);assert.equal(splitCopy('https://example.com/path'),undefined);});
 test('items and body are distributed once while stale composition is removed',()=>{const items=[{title:'A',description:'One'},{title:'B',description:'Two'},{title:'C',description:'Three'}];const parts=splitContent({title:'Facts',body:'Draft only.',items,composition:{}});assert.deepEqual(parts.flatMap(p=>p.items),items);assert.equal(parts.map(p=>p.body).join(''),'Draft only.');assert.ok(parts.every(p=>!p.composition&&p.title==='Facts'));});
+
+test('equidistant boundaries keep the earlier split and large drafts retain all copy',()=>{
+ assert.deepEqual(splitCopy('a b cd'),['a ','b cd']);
+ const draft='A complete sentence. '.repeat(50000);
+ const parts=splitCopy(draft);
+ assert.equal(parts.join(''),draft);
+ assert.ok(Math.abs(parts[0].length-parts[1].length)<30);
+});

@@ -906,7 +906,7 @@ export function validateEditableContentPage(
 
 function visualDescriptor(item: Record<string,unknown>): {icon?:string;illustration?:string} {
  const icons=new Set(['BsJournalText','BsPersonCheck','BsShare','BsPeople','BsSearch','BsShieldCheck','BsBarChart','BsCodeSlash','BsSignpostSplit','BsCheck2Circle','BsFolder2Open','BsGrid1X2']);
- const illustrations=new Set(['document','collaboration','review','feedback','symbol']);
+ const illustrations=new Set(['document','collaboration','review','feedback','symbol','sequence','comparison','structure']);
  if(item.icon!=null && (typeof item.icon!=='string'||!icons.has(item.icon)))throw new Error('Invalid semantic icon');
  if(item.illustration!=null && (typeof item.illustration!=='string'||!illustrations.has(item.illustration)))throw new Error('Invalid semantic illustration');
  return {...(typeof item.icon==='string'?{icon:item.icon}:{}),...(typeof item.illustration==='string'?{illustration:item.illustration}:{})};

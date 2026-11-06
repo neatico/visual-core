@@ -6,13 +6,19 @@ export interface PaginatedContent {
 /** Split only at explicit word/sentence boundaries. Never cut identifiers,
  * decimal values, or unbroken URLs to force them onto a smaller canvas. */
 export function splitCopy(copy: string): [string, string] | undefined {
-  const breaks = [...copy.matchAll(/\s+|[。！？；]|[.!?;](?=\s|$)/gu)]
-    .map((match) => match.index! + match[0].length)
-    .filter((index) => index > 0 && index < copy.length);
-  if (!breaks.length) return;
-  const at = breaks.sort(
-    (a, b) => Math.abs(a - copy.length / 2) - Math.abs(b - copy.length / 2),
-  )[0];
+  let at: number | undefined;
+  let distance = Infinity;
+  const midpoint = copy.length / 2;
+  for (const match of copy.matchAll(/\s+|[。！？；]|[.!?;](?=\s|$)/gu)) {
+    const index = match.index! + match[0].length;
+    if (index <= 0 || index >= copy.length) continue;
+    const candidateDistance = Math.abs(index - midpoint);
+    if (candidateDistance < distance) {
+      at = index;
+      distance = candidateDistance;
+    }
+  }
+  if (at === undefined) return;
   return [copy.slice(0, at), copy.slice(at)];
 }
 /** No paraphrasing, invented continuation labels or removed constraints. The

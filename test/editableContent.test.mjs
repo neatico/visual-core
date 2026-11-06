@@ -6,3 +6,11 @@ test('retains explicit user edits and strips unknown nested properties',()=>{con
 test('rejects malformed nested arrays, duplicate identities and non-finite values',()=>{for(const block of [{...page.blocks[0],id:'page'},{id:'bad',kind:'steps',evidence:page.evidence,entries:[{title:4,description:''}]},{id:'bad',kind:'chart',evidence:page.evidence,chart:'bar',unit:'',values:[{label:'A',value:Infinity},{label:'B',value:2}]}])assert.throws(()=>validateEditableContentPage({...page,blocks:[block]}));});
 test('available images require a resolved asset identity and never retain model URLs',()=>{assert.throws(()=>validateEditableContentPage({...page,blocks:[{id:'image',kind:'image',evidence:page.evidence,sourceId:'source-1',alt:'Screenshot',treatment:'screenshot',status:'available'}]}));});
 test('in-progress editing can restore empty copy and invalid numeric drafts without weakening output validation',()=>{const draft={...page,title:'',blocks:[{id:'chart',kind:'chart',evidence:page.evidence,chart:'bar',unit:'',values:[{label:'',value:NaN},{label:'B',value:2}]}]};assert.throws(()=>validateEditableContentPage(draft));const restored=validateEditableContentPage(draft,{allowIncomplete:true});assert.equal(restored.title,'');assert.ok(Number.isNaN(restored.blocks[0].values[0].value));assert.throws(()=>validateEditableContentPage({...draft,purpose:'unknown'},{allowIncomplete:true}));});
+
+test('literal explanatory visual descriptors survive editing without changing source facts',()=>{
+ for(const illustration of ['sequence','comparison','structure']){
+  const block={id:'method',kind:'features',evidence:page.evidence,entries:[{title:'Source method',description:'Source explanation.',illustration}]};
+  assert.deepEqual(validateEditableContentPage({...page,blocks:[block]}).blocks,[block]);
+ }
+ assert.throws(()=>validateEditableContentPage({...page,blocks:[{id:'method',kind:'features',evidence:page.evidence,entries:[{title:'Method',description:'Explanation.',illustration:'invented-scene'}]}]}),/Invalid semantic illustration/);
+});
