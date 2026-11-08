@@ -33,6 +33,7 @@ export const GOOGLE_FONT_CATALOG: readonly FontFamily[] = [
     "Playfair Display",
     "PT Serif",
   ].map((f) => entry(f, "serif")),
+  entry("Instrument Serif", "serif", ["latin"], [400]),
   ...["Space Grotesk", "Oswald", "Bebas Neue"].map((f) =>
     entry(f, "display", ["latin"], f === "Bebas Neue" ? [400] : [400, 700]),
   ),
@@ -52,12 +53,16 @@ export const GOOGLE_FONT_CATALOG: readonly FontFamily[] = [
   entry("Noto Serif KR", "serif", ["ko"]),
   entry("Noto Sans Arabic", "sans", ["ar"]),
   entry("Noto Sans Devanagari", "sans", ["hi"]),
+  entry("Noto Serif Devanagari", "serif", ["hi"]),
+  entry("Noto Sans Thai", "sans", ["th"]),
+  entry("Noto Serif Thai", "serif", ["th"]),
 ];
 export function contentScript(text: string, locale = "en"): string {
   if (/[\u3040-\u30ff]/u.test(text)) return "ja";
   if (/[\uac00-\ud7af]/u.test(text)) return "ko";
   if (/[\u0600-\u06ff]/u.test(text)) return "ar";
   if (/[\u0900-\u097f]/u.test(text)) return "hi";
+  if (/[\u0e00-\u0e7f]/u.test(text)) return "th";
   if (/[\u3400-\u9fff]/u.test(text))
     return /^ja/i.test(locale)
       ? "ja"
@@ -67,7 +72,7 @@ export function contentScript(text: string, locale = "en"): string {
           ? "zh-Hant"
           : "zh";
   if (/^zh/i.test(locale)) return /TW|HK|Hant/i.test(locale) ? "zh-Hant" : "zh";
-  return /^(ja|ko|ar|hi)/.exec(locale)?.[1] || "latin";
+  return /^(ja|ko|ar|hi|th)/.exec(locale)?.[1] || "latin";
 }
 export function recommendedFonts(locale: string, text = ""): FontFamily[] {
   const script = contentScript(text, locale);

@@ -9,3 +9,17 @@ test('cover recipes lead genuine presentation covers only',()=>{const cover={...
 test('explicit brand families and compatible Google families are preserved',()=>{assert.equal(languageFont('中文','Brand Custom'),'Brand Custom');assert.equal(languageFont('日本語','Noto Sans JP','ja'),'Noto Sans JP');});
 
 test("closing has dedicated candidates instead of aliasing cover",()=>{assert.match(designCandidates({...page,purpose:"conclude"},{kind:"presentation",ratio:16/9})[0].id,/^bookend-closing/);});
+
+
+test('archive typography preserves language coverage and its genuine display weight',async()=>{
+ const {createStyleManifest,GOOGLE_FONT_CATALOG,contentScript}=await import('../dist/index.js');
+ const english=createStyleManifest('archive','Shared knowledge');
+ assert.equal(english.fonts.heading,'Instrument Serif');
+ assert.equal(english.fonts.body,'DM Sans');
+ assert.equal(english.theme.typography.headingWeight,400);
+ assert.deepEqual(GOOGLE_FONT_CATALOG.find(font=>font.family==='Instrument Serif').weights,[400]);
+ assert.equal(languageFont('\u77e5\u8bc6','Instrument Serif'),'Noto Serif SC');
+ assert.equal(languageFont('\u0e04\u0e27\u0e32\u0e21\u0e23\u0e39\u0e49','Instrument Serif'),'Noto Serif Thai');
+ assert.equal(languageFont('\u091c\u094d\u091e\u093e\u0928','Instrument Serif'),'Noto Serif Devanagari');
+ assert.equal(contentScript('', 'th-TH'),'th');
+});

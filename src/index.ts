@@ -23,3 +23,17 @@ export * from "./designBlueprint.js";
 export * from './compositionScenes.js';
 export * from './editorial.js';
 export * from './fontCatalog.js';
+export * from './candidateRanking.js';
+export * from './styleManifest.js';
+export * from './recipeParameters.js';
+export * from './formalCompositions.js';
+export * from './contentBrief.js';
+
+export * from "./nativeSocialParameters.js";
+
+export * from "./compositionUseCases.js";
+
+export {compositionParameterDefaults} from './parameterDefaults.js';
+
+export {SOCIAL_DISPLAY_NUMBERS} from './compositionNumbers.js';
+export * from './textPresentation.js';

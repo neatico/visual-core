@@ -37,8 +37,80 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
   {
     id: "neatico",
     palette: { background: "#FAF9F6", surface: "#FFFFFF", ink: "#202124", muted: "#62646B", accent: "#F4CE36", line: "#E4E1D9" },
-    typography: { heading: "Inter", body: "Inter", code: "monospace", headingWeight: 700 },
+    typography: { heading: "Manrope", body: "Inter", code: "monospace", headingWeight: 700 },
     geometry: { radius: 12, spacing: 1, rule: "accent" },
+  },
+  {
+    id: "archive",
+    palette: { background: "#F6F1E7", surface: "#FFFCF5", ink: "#19382E", muted: "#59665B", accent: "#C17A35", line: "#D7CEBC" },
+    typography: { heading: "Instrument Serif", body: "DM Sans", code: "JetBrains Mono", headingWeight: 400 },
+    geometry: { radius: 4, spacing: 1.1, rule: "hairline" },
+  },
+  {
+    "id": "bloom",
+    "palette": {
+      "background": "#FFF1F6",
+      "surface": "#FFFFFF",
+      "ink": "#341838",
+      "muted": "#70536D",
+      "accent": "#CC1D61",
+      "line": "#F3BED5"
+    },
+    "typography": {
+      "heading": "Montserrat",
+      "body": "Nunito Sans",
+      "code": "JetBrains Mono",
+      "headingWeight": 800
+    },
+    "geometry": {
+      "radius": 20,
+      "spacing": 1,
+      "rule": "accent"
+    }
+  },
+  {
+    "id": "splash",
+    "palette": {
+      "background": "#E9FAFF",
+      "surface": "#FFFFFF",
+      "ink": "#162E60",
+      "muted": "#4D637E",
+      "accent": "#2454E6",
+      "line": "#B8DEFA"
+    },
+    "typography": {
+      "heading": "Space Grotesk",
+      "body": "DM Sans",
+      "code": "JetBrains Mono",
+      "headingWeight": 700
+    },
+    "geometry": {
+      "radius": 20,
+      "spacing": 1,
+      "rule": "accent"
+    }
+  },
+  {
+    "id": "candy",
+    "palette": {
+      "background": "#F3EDFF",
+      "surface": "#FFFFFF",
+      "ink": "#35205C",
+      "muted": "#69557F",
+      "accent": "#7841D5",
+      "line": "#DCCAF6"
+    },
+    "typography": {
+      "heading": "Manrope",
+      "body": "Nunito Sans",
+      "code": "JetBrains Mono",
+      "headingWeight": 800
+    },
+    "geometry": {
+      "radius": 20,
+      "spacing": 1,
+      "rule": "accent"
+    }
   },
   {
     id: "studio",
@@ -51,8 +123,8 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
       line: "#D7DED3",
     },
     typography: {
-      heading: "Inter",
-      body: "Inter",
+      heading: "DM Sans",
+      body: "Source Sans 3",
       code: "monospace",
       headingWeight: 700,
     },
@@ -69,7 +141,7 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
       line: "#3D526C",
     },
     typography: {
-      heading: "Inter",
+      heading: "Space Grotesk",
       body: "Inter",
       code: "monospace",
       headingWeight: 700,
@@ -88,7 +160,7 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
     },
     typography: {
       heading: "Lora",
-      body: "Inter",
+      body: "Source Sans 3",
       code: "monospace",
       headingWeight: 700,
     },
@@ -105,8 +177,8 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
       line: "#DAD5F2",
     },
     typography: {
-      heading: "Inter",
-      body: "Inter",
+      heading: "Space Grotesk",
+      body: "DM Sans",
       code: "monospace",
       headingWeight: 800,
     },
@@ -123,7 +195,7 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
       line: "#B8A233",
     },
     typography: {
-      heading: "Inter",
+      heading: "Oswald",
       body: "Inter",
       code: "monospace",
       headingWeight: 800,
