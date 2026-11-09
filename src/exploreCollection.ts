@@ -2,7 +2,7 @@ import type { DesignRecipe, DesignTheme } from "./designSystem.js";
 import type { ContentPage, SemanticKind } from "./content.js";
 
 export const DEFAULT_PRESENTATION_THEME = "explore-teal";
-/** The proven Explore editorial colorways, plus eight complementary directions. */
+/** Explore's editorial colorways, including light and solid-background variants. */
 const colors = [
   ["teal", "#214B4A", "#E1EEEB", "#F7FAF9", "#1C3533"],
   ["slate", "#3F5477", "#E6EAF1", "#F9FAFC", "#1D283B"],
@@ -14,6 +14,7 @@ const colors = [
   ["sand", "#6D5140", "#EFE4D8", "#FCFAF7", "#392C23"],
   ["indigo", "#43387D", "#EAE5F6", "#FAF9FD", "#292444"],
   ["olive", "#4F633A", "#E8EEDC", "#FBFCF8", "#2D3824"],
+  ["olive-classic", "#E8EEDC", "#607447", "#4F6339", "#FFFFFF"],
   ["rose", "#9B3E61", "#F6E2EB", "#FFFAFC", "#402332"],
   ["wine", "#7A3048", "#EFDEE5", "#FCF8FA", "#39202C"],
   ["sunflower", "#8A5D12", "#F7EBC6", "#FFFDF5", "#392F1D"],
