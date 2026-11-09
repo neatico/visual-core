@@ -1,3 +1,4 @@
+import {EXPLORE_THEMES, EXPLORE_RECIPES, exploreCompositionFits} from './exploreCollection.js';
 import {
   AUTHORED_COMPOSITIONS,
   sceneRecipePreference,
@@ -34,6 +35,7 @@ export interface DesignTheme {
 }
 /** Complete, deterministic token sets; decorative geometry belongs to individual compositions. */
 export const DESIGN_THEMES: readonly DesignTheme[] = [
+  ...EXPLORE_THEMES,
   {
     id: "neatico",
     palette: { background: "#FAF9F6", surface: "#FFFFFF", ink: "#202124", muted: "#62646B", accent: "#F4CE36", line: "#E4E1D9" },
@@ -212,7 +214,7 @@ export function designTheme(id: string): DesignTheme {
   };
   return (
     DESIGN_THEMES.find((theme) => theme.id === (alias[id] || id)) ||
-    DESIGN_THEMES[0]
+    DESIGN_THEMES.find(theme=>theme.id==="neatico")!
   );
 }
 export interface DesignRecipe {
@@ -419,6 +421,7 @@ export function canonicalRecipeId(
 }
 /** Existing authored catalogs remain first-class candidates, rather than being discarded. */
 const ALL_DESIGN_RECIPES: readonly DesignRecipe[] = [
+  ...EXPLORE_RECIPES,
   ...["cover", "closing"].flatMap((role) =>
     ["editorial", "panel", "split"].map((style) => ({
       id: `bookend-${role}-${style}`,
@@ -598,6 +601,7 @@ export function designCandidates(
   const candidates = DESIGN_RECIPES.filter(
     (r) =>
       r.kind === context.kind &&
+      (!r.id.startsWith("authored-explore-") || (context.ratio >= 1.4 && context.ratio <= 2 && exploreCompositionFits(page,r.id))) &&
       r.automatic !== false &&
       (!r.scenes || Boolean(page.scene && r.scenes.includes(page.scene))) &&
       !(
@@ -634,6 +638,7 @@ export function designCandidates(
           : true;
     return (
       (r.id.startsWith("bookend-") ? 80 : 0) +
+      (r.id.startsWith("authored-explore-") ? 110 : 0) +
       (page.scene === "brand-collection" && r.id === "brand-collection-grid"
         ? 80
         : 0) +

@@ -8,7 +8,7 @@ test('every shared recipe has a unique complete data-only parameter contract',()
     assert.equal(contract.schemaVersion,1);
     assert.deepEqual(contract.parameterSchema.required,['title','blocks']);
     assert.ok(Array.isArray(contract.parameterSchema.properties.blocks.items));
-    assert.equal(contract.parameterSchema.properties.blocks.minItems,contract.parameterSchema.properties.blocks.items.length);
+    assert.equal(contract.parameterSchema.properties.blocks.minItems,contract.id==='authored-explore-cover'?1:contract.parameterSchema.properties.blocks.items.length);
     assert.equal(contract.parameterSchema.properties.blocks.maxItems,contract.parameterSchema.properties.blocks.items.length);
     assert.deepEqual([...contract.supportedKinds].sort(),DESIGN_RECIPES.filter(recipe=>recipe.id===contract.id).map(recipe=>recipe.kind).sort());
     assert.equal(contract.importance.title+contract.importance.blocks,10);

@@ -1,3 +1,4 @@
+import {EXPLORE_LAYOUTS} from './exploreCollection.js';
 import {compositionUseCase} from './compositionUseCases.js';
 import {nativeSocialParameterContract} from './nativeSocialParameters.js';
 import {DESIGN_RECIPES,type DesignRecipe} from './designSystem.js';
@@ -14,7 +15,7 @@ export interface FormalComposition extends RecipeParameterContract {
 const both=['presentation','social'] as const;
 const semantic=(id:string,accepts:readonly SemanticKind[],minEntries=0,maxEntries=12,requiresImage=false):DesignRecipe=>({id,renderer:'semantic',kind:'social',family:id,accepts,minEntries,maxEntries,requiresImage});
 function define(recipe:DesignRecipe,kinds:readonly CompositionKind[],id:string,displayNumber:string,min=.25,max=4):FormalComposition {
-  return {...recipeParameterContract(recipe,kinds),semanticDescription:compositionUseCase(recipe.id),id,displayNumber,aspectRatios:{min,max},recipe};
+  return {...recipeParameterContract(recipe,kinds),semanticDescription:EXPLORE_LAYOUTS.find(item=>recipe.id===`authored-explore-${item[0]}`)?.[4]||compositionUseCase(recipe.id),id,displayNumber,aspectRatios:{min,max},recipe};
 }
 
 /** Structural reference contracts shared with the product's existing renderers.
@@ -106,7 +107,7 @@ export const FORMAL_COMPOSITIONS:readonly FormalComposition[]=[
     const recipe=DESIGN_RECIPES.find(item=>item.id===preset.id&&item.kind==='social')!;
     return {...define({...recipe,renderer:'catalog'},['social'],`social:${preset.id}`,SOCIAL_DISPLAY_NUMBERS[preset.id],.5,2.4),...nativeSocialParameterContract(preset.id)};
   }),
-  ...uniqueSemantic.map(recipe=>define(recipe,semanticRecipes.filter(other=>other.id===recipe.id).map(other=>other.kind),`semantic:${recipe.kind}:${recipe.id}`,SEMANTIC_DISPLAY_NUMBERS[`semantic:${recipe.kind}:${recipe.id}`])),
+  ...uniqueSemantic.map(recipe=>define(recipe,semanticRecipes.filter(other=>other.id===recipe.id).map(other=>other.kind),`semantic:${recipe.kind}:${recipe.id}`,recipe.id.startsWith("authored-explore-")?`X${String(EXPLORE_LAYOUTS.findIndex(item=>recipe.id===`authored-explore-${item[0]}`)+1).padStart(2,"0")}`:SEMANTIC_DISPLAY_NUMBERS[`semantic:${recipe.kind}:${recipe.id}`],recipe.id.startsWith("authored-explore-")?1.4:.25,recipe.id.startsWith("authored-explore-")?2:4)),
   ...founderDefinitions.map(([id,accepts,min,max],index)=>define(semantic(id,accepts,min,max),['social'],`semantic:social:${id}`,`F${index+1}`,1.3)),
   ...[0,1,2].flatMap(variant=>[article(`article-cover-${variant}`,'cover',variant),...articleKinds.map(kind=>article(`article-${kind}-${variant}`,kind,variant))]),
   ...[3,4,5,6,7,8,9,10].map(variant=>article(`article-features-${variant}`,'features',variant)),

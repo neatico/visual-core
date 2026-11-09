@@ -37,3 +37,5 @@ export {compositionParameterDefaults} from './parameterDefaults.js';
 
 export {SOCIAL_DISPLAY_NUMBERS} from './compositionNumbers.js';
 export * from './textPresentation.js';
+
+export * from './exploreCollection.js';

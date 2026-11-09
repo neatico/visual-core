@@ -1,5 +1,5 @@
 import { COMPOSITION_ILLUSTRATIONS } from "./nativeSocialParameters.js";
-import {textPresentationSchema} from './textPresentation.js';
+import { textPresentationSchema } from "./textPresentation.js";
 import { DESIGN_RECIPES, type DesignRecipe } from "./designSystem.js";
 import type { SemanticKind } from "./content.js";
 
@@ -249,18 +249,28 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
 function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
   const id = recipe.id;
   let kinds: SemanticKind[];
-  if (id.endsWith("ledger-chart")) kinds = ["parameters", "chart"];
+  if (["authored-explore-cover", "authored-explore-photo-story"].includes(id))
+    kinds = ["paragraph", "image"];
+  else if (id.endsWith("ledger-chart")) kinds = ["parameters", "chart"];
   else if (id.endsWith("detail-sidebar")) kinds = ["paragraph", "parameters"];
   else if (id.endsWith("technical-log")) kinds = ["paragraph", "code"];
   else if (id.endsWith("architecture-stack")) kinds = ["steps", "paragraph"];
-  else if (["authored-mechanism-flow", "authored-reference-capability-map"].includes(id)) kinds = ["features", "paragraph"];
+  else if (
+    ["authored-mechanism-flow", "authored-reference-capability-map"].includes(
+      id,
+    )
+  )
+    kinds = ["features", "paragraph"];
   else if (id === "authored-founder-timeline") kinds = ["steps", "paragraph"];
-  else if (id === "authored-founder-comparison") kinds = ["comparison", "paragraph"];
-  else if (id === "semantic-hero-editorial") kinds = ["paragraph", "paragraph", "paragraph", "image"];
+  else if (id === "authored-founder-comparison")
+    kinds = ["comparison", "paragraph"];
+  else if (id === "semantic-hero-editorial")
+    kinds = ["paragraph", "paragraph", "paragraph", "image"];
   else if (id.endsWith("speaker-lineup"))
     kinds = ["parameters", "quote", "quote", "quote"];
   else if (id.endsWith("speaker-spotlight")) kinds = ["parameters", "quote"];
-  else if (id === "authored-reference-story") kinds = ["image", "paragraph", "features"];
+  else if (id === "authored-reference-story")
+    kinds = ["image", "paragraph", "features"];
   else if (id === "authored-reference-photo") kinds = ["paragraph", "image"];
   else if (id === "authored-image-triptych")
     kinds = ["paragraph", "features", "paragraph", "image"];
@@ -283,21 +293,45 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       recipe.minEntries || 1,
       Math.min(3, recipe.maxEntries || 3),
     );
-    if (kind === "paragraph") fields.text.maxLength =
-      ["authored-reference-detail-sidebar", "authored-reference-diagonal", "authored-prose-inset"].includes(id) ? 160 : 120;
+    if (kind === "paragraph")
+      fields.text.maxLength = [
+        "authored-reference-detail-sidebar",
+        "authored-reference-diagonal",
+        "authored-prose-inset",
+      ].includes(id)
+        ? 160
+        : 120;
     if (kind === "features" || kind === "steps") {
       const entries = fields.entries;
       entries.minItems = id === "authored-reference-story" ? 2 : count;
       entries.maxItems = count;
       entries.items.properties.illustration = {
         type: "string",
-        enum: [...COMPOSITION_ILLUSTRATIONS,"symbol"],
+        enum: [...COMPOSITION_ILLUSTRATIONS, "symbol"],
         default: "structure",
         description:
           "Editable native illustration for the item. Choose the visual concept that explains its meaning. This field controls a graphic, not prose.",
       };
       entries.items.required.push("illustration");
-      entries.items.properties.icon = {type:"string", enum:["BsJournalText","BsPersonCheck","BsShare","BsPeople","BsSearch","BsShieldCheck","BsBarChart","BsCodeSlash","BsSignpostSplit","BsCheck2Circle","BsFolder2Open","BsGrid1X2"], description:"Optional authored icon variant; illustration remains the primary visual concept."};
+      entries.items.properties.icon = {
+        type: "string",
+        enum: [
+          "BsJournalText",
+          "BsPersonCheck",
+          "BsShare",
+          "BsPeople",
+          "BsSearch",
+          "BsShieldCheck",
+          "BsBarChart",
+          "BsCodeSlash",
+          "BsSignpostSplit",
+          "BsCheck2Circle",
+          "BsFolder2Open",
+          "BsGrid1X2",
+        ],
+        description:
+          "Optional authored icon variant; illustration remains the primary visual concept.",
+      };
       entries.items.properties.title.maxLength = 28;
       entries.items.properties.description.maxLength =
         id === "authored-feature-focus" ? 160 : 48;
@@ -311,7 +345,11 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
         id.includes("speaker-")
           ? 2
           : count;
-      fields.rows.minItems = id.endsWith("speaker-lineup") ? 1 : id === "pricing" ? 2 : rows;
+      fields.rows.minItems = id.endsWith("speaker-lineup")
+        ? 1
+        : id === "pricing"
+          ? 2
+          : rows;
       fields.rows.maxItems = rows;
       fields.rows.items.properties.name.maxLength = 20;
       fields.rows.items.properties.value.maxLength = 24;
@@ -326,7 +364,8 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       column.title.maxLength = 20;
       column.points.minItems = id === "authored-founder-comparison" ? 1 : 2;
       column.points.maxItems = 3;
-      column.points.items.maxLength = id === "authored-founder-comparison" ? 64 : 40;
+      column.points.items.maxLength =
+        id === "authored-founder-comparison" ? 64 : 40;
       column.values.maxItems = 3;
       column.values.items.maxLength = 16;
       column.values.minItems = 0;
@@ -352,7 +391,7 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
     if (kind === "image") fields.alt.maxLength = 80;
     if (kind === "chart") {
       const count = id.endsWith("ledger-chart") ? 3 : 4;
-      fields.values.minItems = Math.min(3,count);
+      fields.values.minItems = Math.min(3, count);
       fields.values.maxItems = count;
       fields.values.items.properties.label.maxLength = 20;
       fields.unit.maxLength = 24;
@@ -360,11 +399,56 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       if (/bars|ledger-chart/.test(id)) fields.chart = { const: "bar" };
       if (/donut|reference-share|reference-metrics/.test(id)) {
         fields.chart = { const: "bar" };
-        fields.unit = { type: "string", maxLength:24, pattern:"%", description:"Percentage unit, optionally qualified as illustrative or simulated." };
+        fields.unit = {
+          type: "string",
+          maxLength: 24,
+          pattern: "%",
+          description:
+            "Percentage unit, optionally qualified as illustrative or simulated.",
+        };
         fields.values.description =
           "Nonnegative shares totaling exactly 100. Use labeled illustrative shares when the input has no comparable numbers.";
         fields.values.items.properties.value.minimum = 0;
         fields.values.items.properties.value.maximum = 100;
+      }
+    }
+    if (id.startsWith("authored-explore-")) {
+      if (kind === "paragraph") {
+        fields.text.maxLength = 220;
+        if (id !== "authored-explore-focus") {
+          delete fields.heading;
+          delete fields.level;
+        }
+      }
+      if (kind === "features" || kind === "steps") {
+        fields.entries.minItems = Math.max(2, recipe.minEntries);
+        fields.entries.maxItems = recipe.maxEntries;
+        fields.entries.items.properties.title.maxLength = 44;
+        fields.entries.items.properties.description.maxLength = 120;
+        delete fields.entries.items.properties.illustration;
+        delete fields.entries.items.properties.icon;
+        fields.entries.items.required = fields.entries.items.required.filter(
+          (key: string) => !["illustration", "icon"].includes(key),
+        );
+      }
+      if (kind === "parameters") {
+        fields.rows.minItems = recipe.minEntries;
+        fields.rows.maxItems = recipe.maxEntries;
+        fields.rows.items.properties.name.maxLength = 36;
+        fields.rows.items.properties.value.maxLength = 120;
+        fields.rows.items.properties.description.maxLength = 60;
+      }
+      if (kind === "comparison") {
+        fields.columns.items.properties.points.maxItems = 3;
+        fields.columns.items.properties.points.items.maxLength = 100;
+        for (const key of ["price", "values", "statuses"])
+          delete fields.columns.items.properties[key];
+      }
+      if (kind === "chart") {
+        fields.chart = { const: "bar" };
+        fields.values.minItems = 2;
+        fields.values.maxItems = 6;
+        fields.values.items.properties.value.minimum = 0;
       }
     }
     return schema;
@@ -372,7 +456,7 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
   return {
     type: "array",
     items,
-    minItems: items.length,
+    minItems: id === "authored-explore-cover" ? 1 : items.length,
     maxItems: items.length,
     additionalItems: false,
     description:
