@@ -206,4 +206,6 @@ export const SOCIAL_LAYOUT_CATALOG = [
     scene: "product-showcase",
     name: "Product showcase",
   },
+  {id: "price-increase", scene: "pricing", name: "Event price increase"},
+  {id: "dark-promo", scene: "pricing", name: "Dark gradient promotion"},
 ] as const;

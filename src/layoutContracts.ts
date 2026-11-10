@@ -25,6 +25,7 @@ const textOnly = new Set([
   "magazine-pull-quote",
 ]);
 const pair = new Set([
+  "price-increase",
   "comparison",
   "two-column",
   "myth",

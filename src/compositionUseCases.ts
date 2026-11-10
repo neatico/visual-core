@@ -1,5 +1,7 @@
 /** Authored communication tasks, independent of field count and successful parameter filling. */
 const useCases:Readonly<Record<string,string>>={
+ 'dark-promo':'Promote a supplied product or offer with a bold headline, a concise product scope, an action, a website label and offer terms. Preserve exact discounts and eligibility; clearly label illustrative prices and never fabricate a real promotion.',
+ 'price-increase':'Announce an event ticket price increase or early-bird deadline, with the supplied current price, future price, effective date and event details. Preserve amounts and dates exactly; never invent urgency or ticket availability.',
  'note-question':'Ask one audience-facing question or open a discussion. A plain factual list is a weaker fit than a real question-led task.',
  'note-marker':'Emphasize one short assertion, takeaway, or opinion with highlighted typography. This is not a detailed list or quantitative explanation.',
  'note-editorial':'Present a short reflective editorial passage with a clear headline and supporting prose.',
