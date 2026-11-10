@@ -29,6 +29,8 @@ interface Slots {items?:number;value?:boolean;attribution?:boolean;image?:boolea
 const slots:Record<string,Slots>={
  'price-increase':{items:2,value:true,image:true},
  'dark-promo':{value:true,attribution:true},
+ 'neon-workflow':{items:3,value:true,attribution:true},
+ 'navy-service':{items:3,value:true},
  'note-question':{},'note-marker':{},'note-editorial':{},'note-checklist':{items:3},'note-photo':{image:true},'note-news':{value:true},
  'chat-messenger':{items:3},'chat-imessage':{items:3},'chat-telegram':{items:3},'chat-workplace':{items:3},
  'time-notice':{value:true},'news-focus':{},manifesto:{},launch:{image:true},bento:{items:3},spotlight:{items:3,value:true,image:true},
@@ -64,9 +66,24 @@ export function nativeSocialParameterContract(id:string):NativeSocialContract {
  if(spec.attribution)properties.attribution=copy(48,'Exact supplied attribution, or an empty string. Never invent an endorsement.',0);
  if(id==='dark-promo'){properties.title=copy(28,'A concise supplied offer headline; do not invent a discount.');properties.body=copy(64,'A concise product or service scope.');properties.value=copy(40,'A supplied website or short destination label. Never invent a URL.',0);properties.attribution=copy(80,'Offer eligibility and terms, or an explicit sample disclaimer. Never fabricate a real promotion.',0);}
  if(spec.image)properties.imageAssetId=asset();
+ if(id==='neon-workflow') {
+  properties.title=copy(32,'A concise launch or benefit headline. Never invent a release or model availability.');
+  properties.body=copy(60,'One short supporting sentence.');
+  properties.value=copy(28,'The supplied product or feature name, shown in large blue type.');
+  properties.attribution=copy(72,'Supplied website and optional short capabilities line. Never invent a URL or certification.',0);
+ }
+ if(id==='navy-service') {
+  properties.title=copy(32,'A concise service benefit headline.');
+  properties.body=copy(48,'A short gold subheading. Do not invent delivery times, guarantees or legal claims.');
+  properties.value=copy(40,'An optional supplied website or contact label. Never invent a URL.',0);
+ }
  if(spec.items){
   const item:Record<string,unknown>={title:copy(id==='faq'?40:id==='case-study'?18:20,id==='faq'?'A concise audience question ending in a question mark.':'A short item label.'),description:copy(id==='faq'?64:spec.quantities||id==='case-study'?32:['comparison','myth'].includes(id)?80:supportingItemSlots.has(id)?48:40,'Concise supporting copy.',spec.quantities?0:1)};
   if(id==='faq')(item.title as Record<string,unknown>).pattern='^.+[?？]$';
+  if(['neon-workflow','navy-service'].includes(id)) {
+   item.title=copy(20,id==='neon-workflow'?'A short workflow stage label, in input → product → output order.':'A supplied service capability.');
+   item.description=copy(24,'Optional concise supporting detail. Use empty text when not needed.',0);
+  }
   if(illustratedSlots.has(id))item.illustration={type:'string',enum:COMPOSITION_ILLUSTRATIONS,default:'structure',description:'An editable native illustration that explains this item. Choose document for material, review for checking, collaboration for people, feedback for revision, sequence for ordered actions, comparison for alternatives, or structure for organization. Never omit the visual slot.'};
   if(spec.itemImages)item.assetId=asset();
   if(spec.quantities){

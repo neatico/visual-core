@@ -107,5 +107,7 @@ export const SOCIAL_DISPLAY_NUMBERS: Readonly<Record<string, string>> = {
   "split-bar-compare": "S048",
   "benchmark-bars": "S049",
   "price-increase": "S050",
-  "dark-promo": "S051"
+  "dark-promo": "S051",
+  "neon-workflow": "S052",
+  "navy-service": "S053"
 };

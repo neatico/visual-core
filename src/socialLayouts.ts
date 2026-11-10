@@ -208,4 +208,6 @@ export const SOCIAL_LAYOUT_CATALOG = [
   },
   {id: "price-increase", scene: "pricing", name: "Event price increase"},
   {id: "dark-promo", scene: "pricing", name: "Dark gradient promotion"},
+  {id: "neon-workflow", scene: "launch", name: "Neon product workflow"},
+  {id: "navy-service", scene: "features", name: "Navy and gold service"},
 ] as const;

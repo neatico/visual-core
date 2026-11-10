@@ -1,5 +1,7 @@
 /** Authored communication tasks, independent of field count and successful parameter filling. */
 const useCases:Readonly<Record<string,string>>={
+ 'neon-workflow':'Introduce a supplied product or feature with a prominent blue product name, a benefit headline and exactly three input → product → output workflow stages. Use verified release facts; never invent model availability.',
+ 'navy-service':'Present a service with a concise benefit headline, a gold subheading and three supplied capabilities, beside original editable stationery artwork. Never invent legal requirements, turnaround times, qualifications or guarantees.',
  'dark-promo':'Promote a supplied product or offer with a bold headline, a concise product scope, an action, a website label and offer terms. Preserve exact discounts and eligibility; clearly label illustrative prices and never fabricate a real promotion.',
  'price-increase':'Announce an event ticket price increase or early-bird deadline, with the supplied current price, future price, effective date and event details. Preserve amounts and dates exactly; never invent urgency or ticket availability.',
  'note-question':'Ask one audience-facing question or open a discussion. A plain factual list is a weaker fit than a real question-led task.',

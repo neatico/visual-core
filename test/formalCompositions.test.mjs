@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {FORMAL_COMPOSITIONS,applicableCompositions} from '../dist/index.js';
 test('formal inventory preserves every gallery ID and separates output capabilities',()=>{
- assert.equal(FORMAL_COMPOSITIONS.length,181);
- assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,181);
+ assert.equal(FORMAL_COMPOSITIONS.length,183);
+ assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,183);
  assert.equal(applicableCompositions('article-cover',16/9).length,3);
  assert.equal(applicableCompositions('article-illustration',16/9).length,30);
  for(const item of FORMAL_COMPOSITIONS){assert.ok(item.parameterSchema&&item.semanticDescription&&item.rendererKey&&item.displayNumber);}
