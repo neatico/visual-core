@@ -11,7 +11,7 @@ export interface StyleManifest {
   themeId: string;
   themeVersion: 1;
   theme: DesignTheme;
-  fonts: { heading: string; body: string; code: string };
+  fonts: { heading: string; body: string; code: string; quantity?: string; label?: string };
   imagery: {
     medium: "native" | "photography" | "illustration" | "3d";
     referenceAssetIds: string[];
@@ -91,6 +91,10 @@ export function validateStyleManifest(value: unknown): StyleManifest {
         typeof (typography as unknown as Record<string, unknown>)[key] !==
         "string",
     ) ||
+    ["quantity", "label"].some(key => {
+      const font = (typography as unknown as Record<string, unknown>)[key];
+      return font !== undefined && (typeof font !== "string" || !font.trim() || font.length > 100);
+    }) ||
     !Number.isInteger(typography.headingWeight) ||
     typography.headingWeight < 100 ||
     typography.headingWeight > 900
@@ -109,7 +113,11 @@ export function validateStyleManifest(value: unknown): StyleManifest {
     return fail();
   if (
     !manifest.fonts ||
-    Object.keys(manifest.fonts).length !== 3 ||
+    Object.keys(manifest.fonts).some(key => !["heading", "body", "code", "quantity", "label"].includes(key)) ||
+    ["quantity", "label"].some(key => {
+      const font = (manifest.fonts as unknown as Record<string, unknown>)[key];
+      return font !== undefined && (typeof font !== "string" || !font.trim() || font.length > 100);
+    }) ||
     ["heading", "body", "code"].some((key) => {
       const font = (manifest.fonts as unknown as Record<string, unknown>)[key];
       return typeof font !== "string" || !font.trim() || font.length > 100;
@@ -144,6 +152,8 @@ export function validateStyleManifest(value: unknown): StyleManifest {
       heading: manifest.fonts.heading,
       body: manifest.fonts.body,
       code: manifest.fonts.code,
+      ...(manifest.fonts.quantity ? { quantity: manifest.fonts.quantity } : {}),
+      ...(manifest.fonts.label ? { label: manifest.fonts.label } : {}),
     },
     imagery: {
       medium: manifest.imagery.medium,

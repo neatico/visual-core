@@ -17,3 +17,12 @@ test('language fallback is resolved once and invalid suites fail explicitly',()=
   assert.throws(()=>validateStyleManifest({...manifest,themeVersion:2}));
   assert.throws(()=>validateStyleManifest({...manifest,theme:{...manifest.theme,palette:{...manifest.theme.palette,accent:'url(unsafe)'}}}));
 });
+
+test('optional quantity and auxiliary faces survive serialization without rewriting old overrides',()=>{
+ const legacy=createStyleManifest('editorial','Project knowledge');
+ assert.deepEqual(validateStyleManifest(legacy),legacy);
+ const value={...legacy,fonts:{...legacy.fonts,quantity:'IBM Plex Sans',label:'IBM Plex Mono'}};
+ assert.deepEqual(validateStyleManifest(JSON.parse(JSON.stringify(value))).fonts,value.fonts);
+ assert.throws(()=>validateStyleManifest({...value,fonts:{...value.fonts,label:''}}));
+ assert.throws(()=>validateStyleManifest({...value,fonts:{...value.fonts,unknown:'Inter'}}));
+});

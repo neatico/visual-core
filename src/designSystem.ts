@@ -25,6 +25,8 @@ export interface DesignTheme {
     heading: string;
     body: string;
     code: string;
+    quantity?: string;
+    label?: string;
     headingWeight: number;
   };
   geometry: {
