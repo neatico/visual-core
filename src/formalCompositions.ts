@@ -6,6 +6,7 @@ import {SOCIAL_LAYOUT_CATALOG} from './socialLayouts.js';
 import {recipeParameterContract,type RecipeParameterContract,type CompositionKind} from './recipeParameters.js';
 import type {SemanticKind} from './content.js';
 import {SEMANTIC_DISPLAY_NUMBERS,SOCIAL_DISPLAY_NUMBERS} from './compositionNumbers.js';
+import {articleCompositionCuration} from './articleCompositionCuration.js';
 
 export interface FormalComposition extends RecipeParameterContract {
   displayNumber:string;
@@ -95,10 +96,10 @@ function article(id:string,kind:typeof articleKinds[number]|'cover',variant:numb
     semanticDescription:compositionUseCase(id)+(cover?' '+coverDirections[variant]:'')};
 }
 
-/** Matches /dev/compositions/all: 161 default previews plus two landscape-only
- * reference entries. Output capabilities overlap and must never be summed.
+/** Original identities and schemas are shared rather than copied for article
+ * discovery. Output capabilities overlap and must never be summed.
  */
-export const FORMAL_COMPOSITIONS:readonly FormalComposition[]=[
+const BASE_COMPOSITIONS:readonly FormalComposition[]=[
   ...campaignDefinitions.map(([id,accepts,min,max,image,landscape],index)=>define(semantic(`authored-reference-${id}`,accepts,min,max,image),landscape?['presentation']:both,`new-reference:${id}`,`N${index+1}`,landscape?1.4:.25)),
   define(semantic('authored-event-poster',['parameters','paragraph'],1,6),['social'],'event:provider','E1'),
   define(semantic('authored-image-triptych',['paragraph','features','image'],3,3,true),['social'],'campaign:triptych','C1',.5,2),
@@ -113,6 +114,14 @@ export const FORMAL_COMPOSITIONS:readonly FormalComposition[]=[
   ...[3,4,5,6,7,8,9,10].map(variant=>article(`article-features-${variant}`,'features',variant)),
   article('article-process-3','process',3),
 ];
+
+export const FORMAL_COMPOSITIONS:readonly FormalComposition[]=BASE_COMPOSITIONS.map(definition=>{
+  const review=articleCompositionCuration(definition);
+  const supportedKinds=[...definition.supportedKinds];
+  if(review.cover&&!supportedKinds.includes('article-cover'))supportedKinds.push('article-cover');
+  if(review.illustration&&!supportedKinds.includes('article-illustration'))supportedKinds.push('article-illustration');
+  return {...definition,supportedKinds};
+});
 
 /** Only output, ratio, and explicit IDs are hard gates; semantic fit is scored. */
 export function applicableCompositions(kind:CompositionKind,ratio:number,id?:string):FormalComposition[] {

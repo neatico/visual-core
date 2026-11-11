@@ -27,6 +27,7 @@ export * from './candidateRanking.js';
 export * from './styleManifest.js';
 export * from './recipeParameters.js';
 export * from './formalCompositions.js';
+export * from './articleCompositionCuration.js';
 export * from './contentBrief.js';
 
 export * from "./nativeSocialParameters.js";
