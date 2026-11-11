@@ -45,3 +45,14 @@ test('formal contracts retain the visible supporting slots and comparison fields
  const column=blocks('reference:authored-reference-comparison')[0].properties.columns.items.properties;
  assert.ok(column.values&&column.price&&column.statuses);
 });
+
+test('measured table and sequence contracts preserve detail without widening authored cards',()=>{
+ for(const kind of ['parameters','steps'])for(const mode of ['stack','split']){
+  const contract=FORMAL_COMPOSITIONS.find(item=>item.id===`semantic:presentation:semantic-${kind}-${mode}`);
+  const block=contract.parameterSchema.properties.blocks.items[0];
+  const rows=block.properties[kind==='steps'?'entries':'rows'];
+  assert.equal(rows.minItems,2);assert.equal(rows.maxItems,mode==='stack'?8:6);
+ }
+ const fixed=FORMAL_COMPOSITIONS.find(item=>item.id==='semantic:presentation:authored-steps-ribbon').parameterSchema.properties.blocks.items[0].properties.entries;
+ assert.equal(fixed.minItems,3);assert.equal(fixed.maxItems,3);
+});

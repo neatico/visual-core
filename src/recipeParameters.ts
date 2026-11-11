@@ -451,6 +451,18 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
         fields.values.items.properties.value.minimum = 0;
       }
     }
+    // These measured list/table renderers support variable rows. The old global
+    // three-item fixture bound discarded useful itinerary and budget detail.
+    // Authored card compositions retain their fixed number of slots.
+    if (/^semantic-(steps|parameters)-(stack|split)$/.test(id)) {
+      const values = kind === "steps" ? fields.entries : fields.rows;
+      if (values) {
+        values.minItems = 2;
+        values.maxItems = id.endsWith("stack") ? 8 : 6;
+        values.items.properties.description.maxLength = 24;
+        values.description = "Use enough rows to complete this page's requested detail: include every relevant time slot or budget item and total, within the fixed maximum. Do not collapse a full itinerary into three vague phases.";
+      }
+    }
     return schema;
   });
   return {
