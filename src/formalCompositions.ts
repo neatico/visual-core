@@ -90,7 +90,7 @@ function article(id:string,kind:typeof articleKinds[number]|'cover',variant:numb
     blocks.items=[primary];blocks.minItems=1;blocks.maxItems=1;
     if(kind==='faq')primary.properties.entries.items.properties.title.pattern='^.+[?？]$';
   }
-  const coverDirections=['An editorial document sculpture with layered planes and a strong headline.','A connected constellation with a single focal object and an editorial headline.','An architectural archive silhouette balanced against expressive editorial typography.'];
+  const coverDirections=['An editorial split cover with a topic-specific native hero and a strong headline.','A bold cover with one topic-specific focal object and an editorial headline.','A framed topic-specific native scene balanced against expressive editorial typography.'];
   return {...definition,...(cover?{parameterSchema:coverWithHero,capacity:{minEntries:0,maxEntries:0,requiresImage:false},semanticDescription:coverDirections[variant]}:{parameterSchema:illustrationSchema}),recipe:undefined,rendererKey:`article-${kind}:${variant}`,
     semanticDescription:compositionUseCase(id)+(cover?' '+coverDirections[variant]:'')};
 }

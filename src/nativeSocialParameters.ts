@@ -1,3 +1,4 @@
+import {COMPOSITION_ILLUSTRATIONS, ILLUSTRATION_GUIDANCE, type IllustrationScene} from './illustrationScenes.js';
 import {compositionParameterDefaults} from './parameterDefaults.js';
 import {textPresentationSchema,validateTextPresentations,type TextPresentation} from './textPresentation.js';
 import {SOCIAL_LAYOUT_CATALOG} from './socialLayouts.js';
@@ -17,7 +18,7 @@ export interface NativeSocialParameters {
   attribution?:string;
   imageAssetId?:string;
   comparisonLabels?:[string,string];
-  items?:{title:string;description:string;assetId?:string;illustration?:'document'|'collaboration'|'review'|'feedback'|'sequence'|'comparison'|'structure';primaryValue?:number;secondaryValue?:number}[];
+  items?:{title:string;description:string;assetId?:string;illustration?:IllustrationScene;primaryValue?:number;secondaryValue?:number}[];
 }
 export interface NativeSocialContract {
   parameterModel:'native-social';
@@ -44,7 +45,7 @@ const slots:Record<string,Slots>={
 const copy=(maxLength:number,description:string,minLength=1)=>({type:'string',minLength,maxLength,description});
 const object=(properties:Record<string,unknown>)=>({type:'object',additionalProperties:false,properties,required:Object.keys(properties)});
 const asset=()=>copy(160,'An existing supplied asset ID. Use neatico-editorial-placeholder when no matching source image exists.');
-export const COMPOSITION_ILLUSTRATIONS=['document','collaboration','review','feedback','sequence','comparison','structure'] as const;
+export {COMPOSITION_ILLUSTRATIONS} from './illustrationScenes.js';
 const illustratedSlots=new Set(['bento','course','case-study','report','product-showcase','comparison','research-highlight']);
 const provenance=['user-fact','derived','creative','simulated'] as const;
 // These authored slots have been measured with complete provider sentences at
@@ -84,7 +85,7 @@ export function nativeSocialParameterContract(id:string):NativeSocialContract {
    item.title=copy(20,id==='neon-workflow'?'A short workflow stage label, in input → product → output order.':'A supplied service capability.');
    item.description=copy(24,'Optional concise supporting detail. Use empty text when not needed.',0);
   }
-  if(illustratedSlots.has(id))item.illustration={type:'string',enum:COMPOSITION_ILLUSTRATIONS,default:'structure',description:'An editable native illustration that explains this item. Choose document for material, review for checking, collaboration for people, feedback for revision, sequence for ordered actions, comparison for alternatives, or structure for organization. Never omit the visual slot.'};
+  if(illustratedSlots.has(id))item.illustration={type:'string',enum:COMPOSITION_ILLUSTRATIONS,default:'symbol',description:ILLUSTRATION_GUIDANCE};
   if(spec.itemImages)item.assetId=asset();
   if(spec.quantities){
    item.primaryValue={type:'number',minimum:0,maximum:100,description:spec.quantities==='comparison'?'A percentage from zero to one hundred. primaryValue plus secondaryValue must equal exactly 100 in this item.':'A percentage from zero to one hundred. Never encode numbers inside descriptive copy.'};

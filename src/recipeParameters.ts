@@ -1,4 +1,4 @@
-import { COMPOSITION_ILLUSTRATIONS } from "./nativeSocialParameters.js";
+import { COMPOSITION_ILLUSTRATIONS, ILLUSTRATION_GUIDANCE } from "./illustrationScenes.js";
 import { textPresentationSchema } from "./textPresentation.js";
 import { DESIGN_RECIPES, type DesignRecipe } from "./designSystem.js";
 import type { SemanticKind } from "./content.js";
@@ -307,10 +307,10 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       entries.maxItems = count;
       entries.items.properties.illustration = {
         type: "string",
-        enum: [...COMPOSITION_ILLUSTRATIONS, "symbol"],
-        default: "structure",
+        enum: [...COMPOSITION_ILLUSTRATIONS],
+        default: "symbol",
         description:
-          "Editable native illustration for the item. Choose the visual concept that explains its meaning. This field controls a graphic, not prose.",
+          ILLUSTRATION_GUIDANCE,
       };
       entries.items.required.push("illustration");
       entries.items.properties.icon = {

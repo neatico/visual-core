@@ -39,3 +39,5 @@ export {SOCIAL_DISPLAY_NUMBERS} from './compositionNumbers.js';
 export * from './textPresentation.js';
 
 export * from './exploreCollection.js';
+
+export {illustrationSubject, ILLUSTRATION_GUIDANCE, type IllustrationScene} from './illustrationScenes.js';

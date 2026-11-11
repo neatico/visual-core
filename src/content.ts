@@ -1,3 +1,4 @@
+import {COMPOSITION_ILLUSTRATIONS} from './illustrationScenes.js';
 import {validateTextPresentations} from "./textPresentation.js";
 import { COMPOSITION_SCENES } from "./compositionScenes.js";
 /** Source-backed content, independent of layout and editor primitives. */
@@ -948,16 +949,7 @@ function visualDescriptor(item: Record<string, unknown>): {
     "BsFolder2Open",
     "BsGrid1X2",
   ]);
-  const illustrations = new Set([
-    "document",
-    "collaboration",
-    "review",
-    "feedback",
-    "symbol",
-    "sequence",
-    "comparison",
-    "structure",
-  ]);
+  const illustrations = new Set<string>(COMPOSITION_ILLUSTRATIONS);
   if (
     item.icon != null &&
     (typeof item.icon !== "string" || !icons.has(item.icon))
