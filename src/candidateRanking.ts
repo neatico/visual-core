@@ -92,11 +92,12 @@ export function rankCandidates<T extends RankedCandidate>(
       (candidate) =>
         candidate.state === "ready" || candidate.state === "degraded",
     )
-    .slice()
+    .map(candidate => ({ candidate, score: candidateScore(candidate.scores) }))
     .sort(
       (a, b) =>
-        candidateScore(b.scores) - candidateScore(a.scores) ||
-        compare(a.slotId, b.slotId) ||
-        compare(a.compositionId, b.compositionId),
-    );
+        b.score - a.score ||
+        compare(a.candidate.slotId, b.candidate.slotId) ||
+        compare(a.candidate.compositionId, b.candidate.compositionId),
+    )
+    .map(({ candidate }) => candidate);
 }

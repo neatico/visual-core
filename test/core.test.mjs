@@ -211,6 +211,20 @@ test('balanced copy removes tiny trailing lines without deleting text or growing
  const normal=wrapCopy(text,21,12,false,measure,{balance:false}),balanced=wrapCopy(text,21,12,false,measure,{balance:true});
  assert.equal(balanced.join(''),text);assert.ok(balanced.length<=normal.length);assert.ok(balanced.at(-1).length>normal.at(-1).length);
 });
+
+test('balancing retains a valid wrap when a wide grapheme cannot fit the narrower target', () => {
+  const measure = (text) => Array.from(text).reduce((width, glyph) => width + (glyph === 'W' ? 100 : 5), 0);
+  assert.deepEqual(wrapCopy('W i', 100, 12, false, measure), ['W', 'i']);
+  assert.throws(() => wrapCopy('W', 99, 12, false, measure), /character/);
+});
+
+test('each layout uses fresh font metrics after a font loads', () => {
+  let advance = 1;
+  const measure = text => Array.from(text).length * advance;
+  assert.deepEqual(wrapCopy('abc def', 7, 12, false, measure), ['abc def']);
+  advance = 2;
+  assert.deepEqual(wrapCopy('abc def', 7, 12, false, measure), ['abc', 'def']);
+});
 test('title wrapping respects fitting CJK words and emergency wrapping keeps grapheme clusters intact',()=>{
  const measure=text=>Array.from(text).length;
  const lines=wrapCopy('Apipost快速上手：接口说明',13,12,true,measure,{keepWords:true});

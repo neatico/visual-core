@@ -15,6 +15,19 @@ test('fenced code preserves indentation and CRLF; unclosed fences are bounded by
  const source=parseSource(text);assert.equal(source.segments[1].text,'{\r\n  "a": 1\r\n}');assert.equal(source.segments[2].text,'Done');
  assert.equal(parseSource('```sql\nselect 1').segments[0].text,'select 1');
 });
+test('fences allow spaced language hints and longer matching closing markers without swallowing later prose', () => {
+ for (const marker of ['`', '~']) {
+  const input = `${marker.repeat(3)} json\n{ "count": 42 }\n${marker.repeat(4)}\nKeep this explanation.`;
+  const source = parseSource(input);
+  assert.equal(source.segments[0].kind, 'code');
+  assert.equal(source.segments[0].language, 'json');
+  assert.equal(source.segments[0].text, '{ "count": 42 }');
+  assert.equal(source.segments[1].text, 'Keep this explanation.');
+  for (const segment of source.segments) assert.equal(segment.text, input.slice(segment.start, segment.end));
+ }
+ const input = '````text\n```\nPreserved inside code\n````\nAfter';
+ assert.equal(parseSource(input).segments[0].text, '```\nPreserved inside code');
+});
 test('source code is bound by reference, not rewritten by the model',()=>{
  const result=validateContentPlan(plan(),source,'presentation');assert.equal(result.pages[0].blocks[0].code,code.text);
  assert.deepEqual(contentBlockText(result.pages[0].blocks[0]),[code.text]);

@@ -362,13 +362,16 @@ export function parseSource(input: string): SourceDocument {
       end = start + raw.replace(/\r?\n$/, "").length,
       kind: SourceKind = "text",
       language: string | undefined;
-    const fence = trimmed.match(/^(`{3,}|~{3,})([\w+-]*)\s*$/);
-    if (fence) {
+    const fence = trimmed.match(/^(`{3,}|~{3,})(.*)$/);
+    if (fence && (fence[1][0] !== '`' || !fence[2].includes('`'))) {
       kind = "code";
-      language = fence[2] || "text";
+      language = fence[2].trim().match(/^[\w+-]+/)?.[0] || "text";
       start = line.index! + raw.length;
       let j = i + 1;
-      for (; j < lines.length; j++) if (lines[j][0].trim() === fence[1]) break;
+      for (; j < lines.length; j++) {
+        const closing = lines[j][0].trim();
+        if (closing.length >= fence[1].length && [...closing].every(character => character === fence[1][0])) break;
+      }
       end = j < lines.length ? lines[j].index! : input.length;
       if (input.slice(start, end).endsWith("\n")) end--;
       if (input.slice(start, end).endsWith("\r")) end--;

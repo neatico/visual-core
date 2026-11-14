@@ -26,3 +26,11 @@ test('invalid provider scores fail explicitly rather than improving a ranking', 
   for(const semantic of [NaN,Infinity,-1,101,'100'])assert.throws(()=>candidateScore({semantic,layout:80,fidelity:80}));
   assert.equal(candidateScore({semantic:100,layout:100,fidelity:100}),100);
 });
+
+test('a single renderable candidate still requires valid scores', () => {
+  for (const semantic of [NaN, Infinity, -1, 101, '100']) {
+    const candidate = { slotId: 'page', compositionId: 'only', state: 'ready', scores: { semantic, layout: 80, fidelity: 80 } };
+    assert.throws(() => rankCandidates([candidate]), /CANDIDATE_INVALID_SCORE/);
+    assert.deepEqual(rankCandidates([{ ...candidate, state: 'failed' }]), []);
+  }
+});
