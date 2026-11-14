@@ -56,6 +56,12 @@ test("text wraps words, long tokens, and explicit line breaks", () => {
   assert.throws(() => wrapCopy("word", 0, 12, false, measure));
   assert.throws(() => wrapCopy("word", 10, 12, false, () => NaN));
 });
+test('long paragraphs preserve every fitting identifier and the complete content',()=>{
+ const words=Array.from({length:2000},(_,index)=>`word${index}/endpoint`);
+ const lines=wrapCopy(words.join(' '),36,12,false,text=>text.length,{keepWords:true});
+ assert.deepEqual(lines.join(' ').split(/\s+/),words);
+ assert.ok(lines.every(line=>line.length<=36));
+});
 test("registries are isolated and support safe extension removal", () => {
   const a = createSceneRegistry(),
     b = createSceneRegistry();

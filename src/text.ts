@@ -30,11 +30,21 @@ export function wrapCopy(text:string,width:number,size:number,bold:boolean,measu
   const ranges=options.keepWords&&typeof Intl.Segmenter==='function'?[...(wordSegmenter??=new Intl.Segmenter(undefined,{granularity:'word'})).segment(paragraph)].filter(part=>part.isWordLike).map(part=>({start:part.index,end:part.index+part.segment.length,text:part.segment})):[];
   // Keep a fitting URL/API token whole even where UAX permits a slash break.
   for(const match of paragraph.matchAll(/[A-Za-z0-9]+(?:[.:_/@+\-][A-Za-z0-9]+)+/g))ranges.push({start:match.index!,end:match.index!+match[0].length,text:match[0]});
+  ranges.sort((a,b)=>a.start-b.start);
   const wrapAt=(available:number):string[]|undefined=>{
    const breaker=new LineBreaker(paragraph),tokens:string[]=[];
+   let rangeIndex=0;
+   let activeRanges:typeof ranges=[];
    let last=0,point;
    while((point=breaker.nextBreak())){
-    if(ranges.some(range=>point!.position>range.start&&point!.position<range.end&&measured(range.text)<=available))continue;
+    // Word and identifier ranges are ordered and each family is disjoint.
+    // Visit only ranges covering this break instead of rescanning the paragraph.
+    activeRanges=activeRanges.filter(range=>range.end>point!.position);
+    while(rangeIndex<ranges.length&&ranges[rangeIndex].start<point.position){
+     const range=ranges[rangeIndex++];
+     if(range.end>point.position)activeRanges.push(range);
+    }
+    if(activeRanges.some(range=>measured(range.text)<=available))continue;
     tokens.push(paragraph.slice(last,point.position));last=point.position;
    }
    if(last<paragraph.length)tokens.push(paragraph.slice(last));
