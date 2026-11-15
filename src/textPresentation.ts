@@ -37,7 +37,8 @@ export function textPresentationSchema() {
 }
 
 const normalize = (text: string) => text.normalize('NFC').replace(/\s+/gu, ' ').trim();
-const word = (character: string) => /[\p{Script=Latin}\p{Script=Cyrillic}\p{Script=Greek}\p{Number}]/u.test(character);
+const word = (character: string) => /[\p{Letter}\p{Mark}\p{Number}]/u.test(character);
+const cjk = (character: string) => /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(character);
 
 /** Validate exact source reconstruction; script-aware boundaries permit CJK breaks. */
 export function validateTextPresentations(value: unknown, content: Record<string, unknown>): TextPresentation[] {
@@ -53,6 +54,12 @@ export function validateTextPresentations(value: unknown, content: Record<string
     if (typeof copy !== 'string' || !copy.trim()) throw new Error('TEXT_PRESENTATION_PATH');
     if (!['natural', 'equal-width'].includes(entry.fit) || !Array.isArray(entry.lines) || entry.lines.length < 1 || entry.lines.length > 8) throw new Error('TEXT_PRESENTATION_INVALID');
     const source = normalize(copy);
+    const graphemeBoundaries = typeof Intl.Segmenter === 'function'
+      ? new Set([...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(source)].map(part=>part.index))
+      : undefined;
+    const wordBoundaries = typeof Intl.Segmenter === 'function'
+      ? new Set([...new Intl.Segmenter(undefined,{granularity:'word'}).segment(source)].map(part=>part.index))
+      : undefined;
     let cursor = 0;
     for (const line of entry.lines) {
       if (!line || typeof line !== 'object' || Array.isArray(line) || Object.keys(line).some(key => !['text', 'font', 'scale', 'tone', 'decoration', 'italic'].includes(key))) throw new Error('TEXT_PRESENTATION_INVALID');
@@ -60,7 +67,10 @@ export function validateTextPresentations(value: unknown, content: Record<string
       const phrase = normalize(line.text);
       if (source[cursor] === ' ') cursor++;
       if (!source.startsWith(phrase, cursor)) throw new Error('TEXT_PRESENTATION_CONTENT');
-      if (cursor && source[cursor - 1] !== ' ' && word(source[cursor - 1]) && word(phrase[0])) throw new Error('TEXT_PRESENTATION_WORD_BOUNDARY');
+      if (cursor && (
+        (graphemeBoundaries && !graphemeBoundaries.has(cursor)) ||
+        (word(source[cursor - 1]) && word(phrase[0]) && !cjk(source[cursor - 1]) && !cjk(phrase[0]) && !wordBoundaries?.has(cursor))
+      )) throw new Error('TEXT_PRESENTATION_WORD_BOUNDARY');
       cursor += phrase.length;
     }
     if (cursor !== source.length) throw new Error('TEXT_PRESENTATION_CONTENT');

@@ -20,6 +20,17 @@ test('adaptation remains available for creative input and retains the original a
  assert.deepEqual(validateContentBrief(brief),brief);
 });
 
+test('retains an explicit prohibition on simulated content for drafts and revisions',()=>{
+ for(const kind of ['creative-draft','user-revision']){
+  const source=parseSource('The customer supplied verified results.');
+  source.provenance={kind,original:'Use the verified report.',disclosure:'Reviewed input',simulationAllowed:false};
+  const brief=createContentBrief(source);
+  assert.equal(brief.creativeAllowed,true);
+  assert.equal(brief.simulationAllowed,false);
+  assert.equal(validateContentBrief(brief).simulationAllowed,false);
+ }
+});
+
 test('malformed or contradictory provenance cannot enable creative or simulated output',()=>{
  for(const provenance of [{kind:'creative-draft',original:'',disclosure:'Draft'},{kind:'creative-draft',original:'Original',disclosure:'Draft',simulationAllowed:'yes'},{kind:'creative-draft',original:'Original',disclosure:'Draft',language:'<script>'}])assert.throws(()=>createContentBrief({...parseSource('Source'),provenance}),/CONTENT_BRIEF_INVALID/);
  const valid=createContentBrief(parseSource('Actual source'));

@@ -18,6 +18,22 @@ test('preserves mixed-script boundaries without breaking Latin words',()=>{
  assert.throws(()=>validateTextPresentations([hint('title',['Know','ledge'])],{title:'Knowledge'}),/WORD_BOUNDARY/);
 });
 
+test('keeps Arabic and Indic words and emoji graphemes intact',()=>{
+ const examples=[
+  ['\u0627\u0644\u0639\u0631\u0628\u064a\u0629',['\u0627\u0644\u0639','\u0631\u0628\u064a\u0629']],
+  ['\u0928\u092e\u0938\u094d\u0924\u0947',['\u0928','\u092e\u0938\u094d\u0924\u0947']],
+  ['\u0915\u093f',['\u0915','\u093f']],
+  ['\u{1f469}\u200d\u{1f4bb}',['\u{1f469}','\u200d\u{1f4bb}']],
+ ];
+ for(const [title,parts] of examples)assert.throws(()=>validateTextPresentations([hint('title',parts)],{title}),/WORD_BOUNDARY/);
+});
+
+test('allows real Thai word boundaries without requiring spaces',()=>{
+ const title='\u0e20\u0e32\u0e29\u0e32\u0e44\u0e17\u0e22';
+ const values=[hint('title',['\u0e20\u0e32\u0e29\u0e32','\u0e44\u0e17\u0e22'])];
+ assert.deepEqual(validateTextPresentations(values,{title}),values);
+});
+
 test('rejects arbitrary styling, duplicate fields, metadata and unreadable scale requests',()=>{
  const content={body:'Read together.',blocks:[{code:'print(1)'}]};
  const valid=hint('body',['Read together.']);

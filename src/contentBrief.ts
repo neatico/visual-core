@@ -58,7 +58,7 @@ export function createContentBrief(source: SourceDocument): ContentBrief {
     mode: provenance?.kind === "user-revision" ? provenance.originalMode || "source-backed" : provenance ? "creative" : "source-backed",
     ...(provenance?.language ? { language: provenance.language } : {}),
     creativeAllowed: true,
-    simulationAllowed: true,
+    simulationAllowed: provenance?.simulationAllowed ?? true,
     sourceIds,
   });
 }
