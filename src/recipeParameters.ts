@@ -459,7 +459,7 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       if (values) {
         values.minItems = 2;
         values.maxItems = id.endsWith("stack") ? 8 : 6;
-        values.items.properties.description.maxLength = 24;
+        values.items.properties.description.maxLength = kind === "steps" ? 80 : 24;
         values.description = "Use enough rows to complete this page's requested detail: include every relevant time slot or budget item and total, within the fixed maximum. Do not collapse a full itinerary into three vague phases.";
       }
     }

@@ -52,6 +52,7 @@ test('measured table and sequence contracts preserve detail without widening aut
   const block=contract.parameterSchema.properties.blocks.items[0];
   const rows=block.properties[kind==='steps'?'entries':'rows'];
   assert.equal(rows.minItems,2);assert.equal(rows.maxItems,mode==='stack'?8:6);
+  assert.equal(rows.items.properties.description.maxLength,kind==='steps'?80:24);
  }
  const fixed=FORMAL_COMPOSITIONS.find(item=>item.id==='semantic:presentation:authored-steps-ribbon').parameterSchema.properties.blocks.items[0].properties.entries;
  assert.equal(fixed.minItems,3);assert.equal(fixed.maxItems,3);

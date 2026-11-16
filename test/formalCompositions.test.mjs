@@ -46,11 +46,11 @@ test('illustration contracts require their actual visual structure and bounded n
 });
 
 test('article reuse changes no original identifier, schema, renderer, recipe, ratio or display identity',()=>{
- // Recorded from the original 0.14.72 inventory before article capabilities
- // were appended. A deliberate future contract migration must update this
+ // Updated for the reviewed 0.14.77 measured-step capacity migration.
+ // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
  const original=JSON.stringify(FORMAL_COMPOSITIONS.map(({supportedKinds,...definition})=>definition));
- assert.equal(createHash('sha256').update(original).digest('hex'),'ea9397908a883ad22664c8e1a6d7beb67bdc737ef5afa0c2da22ee8ecd6f9ecc');
+ assert.equal(createHash('sha256').update(original).digest('hex'),'665a30bf81f1aebba4ee4f15dd621437bd252df3538d191add951557c6752fb3');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
 });
