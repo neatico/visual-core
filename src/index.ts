@@ -41,4 +41,4 @@ export * from './textPresentation.js';
 
 export * from './exploreCollection.js';
 
-export {illustrationSubject, ILLUSTRATION_GUIDANCE, type IllustrationScene} from './illustrationScenes.js';
+export {resolveIllustrationScene, illustrationSubject, ILLUSTRATION_GUIDANCE, type IllustrationScene} from './illustrationScenes.js';
