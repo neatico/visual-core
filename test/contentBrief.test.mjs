@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseSource,createContentBrief,validateContentBrief} from '../dist/index.js';
 
-test('source-backed input permits labeled adaptation while retaining the original facts',()=>{
+test('every input is a creative brief while retaining the original submission',()=>{
  const source=parseSource('Revenue was $50 in the supplied report.');
  const brief=createContentBrief(source);
- assert.equal(brief.mode,'source-backed');assert.equal(brief.creativeAllowed,true);assert.equal(brief.simulationAllowed,true);
+ assert.equal(brief.mode,'creative');assert.equal(brief.creativeAllowed,true);assert.equal(brief.simulationAllowed,true);
  assert.equal(brief.originalInput,source.text);assert.deepEqual(brief.sourceIds,source.segments.map(segment=>segment.id));
  brief.sourceIds.push('another');assert.equal(source.segments.length,1);
 });
@@ -20,21 +20,21 @@ test('adaptation remains available for creative input and retains the original a
  assert.deepEqual(validateContentBrief(brief),brief);
 });
 
-test('retains an explicit prohibition on simulated content for drafts and revisions',()=>{
+test('legacy provenance flags cannot reintroduce a factual-source gate on reopened content',()=>{
  for(const kind of ['creative-draft','user-revision']){
   const source=parseSource('The customer supplied verified results.');
   source.provenance={kind,original:'Use the verified report.',disclosure:'Reviewed input',simulationAllowed:false};
   const brief=createContentBrief(source);
   assert.equal(brief.creativeAllowed,true);
-  assert.equal(brief.simulationAllowed,false);
-  assert.equal(validateContentBrief(brief).simulationAllowed,false);
+  assert.equal(brief.simulationAllowed,true);
+  assert.equal(validateContentBrief(brief).simulationAllowed,true);
  }
 });
 
-test('malformed or contradictory provenance cannot enable creative or simulated output',()=>{
+test('malformed provenance is rejected while legacy permissions normalize to creative',()=>{
  for(const provenance of [{kind:'creative-draft',original:'',disclosure:'Draft'},{kind:'creative-draft',original:'Original',disclosure:'Draft',simulationAllowed:'yes'},{kind:'creative-draft',original:'Original',disclosure:'Draft',language:'<script>'}])assert.throws(()=>createContentBrief({...parseSource('Source'),provenance}),/CONTENT_BRIEF_INVALID/);
  const valid=createContentBrief(parseSource('Actual source'));
- assert.throws(()=>validateContentBrief({...valid,creativeAllowed:false,simulationAllowed:true}),/CONTENT_BRIEF_INVALID/);
+ assert.equal(validateContentBrief({...valid,creativeAllowed:false,simulationAllowed:false}).creativeAllowed,true);
  assert.throws(()=>validateContentBrief({...valid,sourceIds:['same','same']}),/CONTENT_BRIEF_INVALID/);
  assert.throws(()=>createContentBrief(null),/CONTENT_BRIEF_INVALID/);
 });
@@ -45,7 +45,7 @@ test('explicit revisions preserve the initial submission and retain their separa
  const brief=createContentBrief(source);
  assert.equal(brief.originalInput,'Launch on June 4.');
  assert.equal(brief.revisedInput,source.text);
- assert.equal(brief.mode,'source-backed');
+ assert.equal(brief.mode,'creative');
  assert.deepEqual(validateContentBrief(brief),brief);
  source.provenance.originalMode='creative';
  assert.equal(createContentBrief(source).mode,'creative');

@@ -120,7 +120,7 @@ export const EXPLORE_LAYOUTS = [
     "chart",
     2,
     6,
-    "Compare source-backed quantities in labeled bars with the original unit.",
+    "Compare quantities in labeled bars with a shared unit.",
   ],
   [
     "ledger",

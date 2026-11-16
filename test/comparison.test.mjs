@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {parseSource,validateContentPlan,validateEditableContentPage,contentBlockText,canonicalRecipeId,designCandidates} from '../dist/index.js';
-test('comparison facts survive validation and reject ungrounded prices or misaligned rows',()=>{
+test('authored comparison prices survive validation while misaligned rows are rejected',()=>{
  const source=parseSource('Team $29 unlimited projects. Basic $19 10 projects. Priority support is included for Team and excluded for Basic.');
  const evidence=[{sourceId:'source-1'}];
  const block={id:'compare',kind:'comparison',evidence,columns:[{title:'Team',price:'$29',points:['Projects','Priority support'],values:['unlimited',''],statuses:['included','included']},{title:'Basic',price:'$19',points:['Projects','Priority support'],values:['10',''],statuses:['included','excluded']}]};
@@ -11,7 +11,7 @@ test('comparison facts survive validation and reject ungrounded prices or misali
  assert.deepEqual(validateEditableContentPage(page).blocks[0],block);
  assert.ok(contentBlockText(block).includes('$29'));
  const invalid=structuredClone(plan);invalid.pages[0].blocks[0].columns[0].price='$99';
- assert.throws(()=>validateContentPlan(invalid,source),/CONTENT_UNSUPPORTED_COMPARISON/);
+ assert.equal(validateContentPlan(invalid,source).pages[0].blocks[0].columns[0].price,'$99');
  const malformed=structuredClone(page);malformed.blocks[0].columns[0].statuses=['included'];
  assert.throws(()=>validateEditableContentPage(malformed),/CONTENT_INVALID_LIST/);
  assert.ok(designCandidates(page,{kind:'presentation',ratio:16/9}).every(r=>r.renderer!=='catalog'));

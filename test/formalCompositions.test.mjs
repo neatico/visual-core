@@ -46,11 +46,11 @@ test('illustration contracts require their actual visual structure and bounded n
 });
 
 test('article reuse changes no original identifier, schema, renderer, recipe, ratio or display identity',()=>{
- // Updated for the reviewed 0.14.77 measured-step capacity migration.
+ // Updated for the reviewed creative-authoring contract migration.
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
  const original=JSON.stringify(FORMAL_COMPOSITIONS.map(({supportedKinds,...definition})=>definition));
- assert.equal(createHash('sha256').update(original).digest('hex'),'665a30bf81f1aebba4ee4f15dd621437bd252df3538d191add951557c6752fb3');
+ assert.equal(createHash('sha256').update(original).digest('hex'),'a4e61f8a44ebbd2e1b7a0ee907b475f64685dd168f33acd92c3ce597aefcf522');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
 });
@@ -74,19 +74,19 @@ test('every existing renderer has one explicit, reviewable article curation deci
  });
 });
 
-test('covers include source-backed feature, comparison and data summaries instead of only hero paragraphs',()=>{
+test('covers include authored feature, comparison and data summaries instead of only hero paragraphs',()=>{
  const cases=[
   ['social:bento','editorial-copy'],
   ['social:research-highlight','empty-promotion-slots'],
   ['social:comparison','aligned-comparison'],
-  ['social:metric','source-quantities'],
-  ['social:usage-breakdown','source-quantities'],
-  ['social:organization','source-relationships'],
-  ['social:editorial-quote','source-quotation'],
+  ['social:metric','quantities'],
+  ['social:usage-breakdown','quantities'],
+  ['social:organization','relationships'],
+  ['social:editorial-quote','quotation'],
   ['reference:authored-reference-photo','source-asset'],
   ['reference:authored-reference-vision','editorial-copy'],
   ['reference:authored-reference-comparison','aligned-comparison'],
-  ['reference:authored-reference-share','source-quantities'],
+  ['reference:authored-reference-share','quantities'],
  ];
  for(const [id,requirement] of cases){
   const [definition]=applicableCompositions('article-cover',16/9,id);
@@ -119,7 +119,7 @@ test('formal suitability descriptions distinguish communication intent from fill
  const description=id=>FORMAL_COMPOSITIONS.find(item=>item.id===id).semanticDescription;
  assert.match(description('social:team'),/people/);assert.match(description('social:team'),/not a roster/);
  assert.match(description('reference:authored-reference-list'),/parallel/);
- assert.match(description('social:pricing'),/pricing is requested/);
+ assert.match(description('social:pricing'),/Develop useful prices/);
  assert.match(description('social:metric'),/requested illustrative/);
  for(const composition of FORMAL_COMPOSITIONS)assert.ok(composition.semanticDescription.length>50,composition.id);
 });

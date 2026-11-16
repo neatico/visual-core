@@ -7,7 +7,8 @@ test('source-backed bookend identity survives generation and editor roundtrip',(
  const plan=validateContentPlan({version:1,kind:'presentation',title:'研究报告',pages:[page]},source);
  assert.deepEqual(plan.pages[0].bookend,page.bookend);
  assert.deepEqual(validateEditableContentPage({...page,bookend:{...page.bookend,logoAssetId:'brand-logo'}}).bookend,{...page.bookend,logoAssetId:'brand-logo'});
- for(const bookend of [{presenter:'虚构人物'},{logoAssetId:'invented-logo'}])assert.throws(()=>validateContentPlan({version:1,kind:'presentation',title:'研究报告',pages:[{...page,bookend}]},source));
+ assert.equal(validateContentPlan({version:1,kind:'presentation',title:'研究报告',pages:[{...page,bookend:{presenter:'虚构人物'}}]},source).pages[0].bookend.presenter,'虚构人物');
+ assert.throws(()=>validateContentPlan({version:1,kind:'presentation',title:'研究报告',pages:[{...page,bookend:{logoAssetId:'invented-logo'}}]},source),/CONTENT_UNSUPPORTED_ASSET/);
 });
 test('bookend role selects distinct cover and closing families',()=>{
  for(const purpose of ['cover','conclude']){

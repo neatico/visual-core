@@ -1,6 +1,6 @@
 import type { SourceDocument } from "./content.js";
 
-/** Input provenance and adaptation permissions are independent of suitability scores. */
+/** Input history and content associations; creation is enabled for every brief. */
 export interface ContentBrief {
   version: 1;
   originalInput: string;
@@ -30,8 +30,7 @@ export function createContentBrief(source: SourceDocument): ContentBrief {
     (!["creative-draft", "user-revision"].includes(provenance.kind) ||
       typeof provenance.original !== "string" ||
       !provenance.original.trim() ||
-      typeof provenance.disclosure !== "string" ||
-      !provenance.disclosure.trim() ||
+      (provenance.disclosure !== undefined && (typeof provenance.disclosure !== "string" || !provenance.disclosure.trim())) ||
       (provenance.originalMode !== undefined &&
         (provenance.kind !== "user-revision" ||
           !["source-backed", "creative"].includes(provenance.originalMode))) ||
@@ -55,10 +54,10 @@ export function createContentBrief(source: SourceDocument): ContentBrief {
     originalInput: provenance?.original || source.text,
     ...(provenance?.kind === "user-revision" ? { revisedInput: source.text } : {}),
     ...(provenance?.kind === "user-revision" && provenance.illustrative ? { revisedInputIllustrative: true } : {}),
-    mode: provenance?.kind === "user-revision" ? provenance.originalMode || "source-backed" : provenance ? "creative" : "source-backed",
+    mode: "creative",
     ...(provenance?.language ? { language: provenance.language } : {}),
     creativeAllowed: true,
-    simulationAllowed: provenance?.simulationAllowed ?? true,
+    simulationAllowed: true,
     sourceIds,
   });
 }
@@ -78,7 +77,6 @@ export function validateContentBrief(value: unknown): ContentBrief {
     !["source-backed", "creative"].includes(brief.mode) ||
     typeof brief.creativeAllowed !== "boolean" ||
     typeof brief.simulationAllowed !== "boolean" ||
-    (brief.simulationAllowed && !brief.creativeAllowed) ||
     (brief.language !== undefined &&
       (typeof brief.language !== "string" ||
         !/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8}){0,3}$/.test(brief.language))) ||
@@ -96,10 +94,10 @@ export function validateContentBrief(value: unknown): ContentBrief {
     originalInput: brief.originalInput,
     ...(brief.revisedInput !== undefined ? { revisedInput: brief.revisedInput } : {}),
     ...(brief.revisedInputIllustrative !== undefined ? { revisedInputIllustrative: brief.revisedInputIllustrative } : {}),
-    mode: brief.mode,
+    mode: "creative",
     ...(brief.language ? { language: brief.language } : {}),
-    creativeAllowed: brief.creativeAllowed,
-    simulationAllowed: brief.simulationAllowed,
+    creativeAllowed: true,
+    simulationAllowed: true,
     sourceIds: [...brief.sourceIds],
   };
 }

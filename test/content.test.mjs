@@ -28,17 +28,17 @@ test('fences allow spaced language hints and longer matching closing markers wit
  const input = '````text\n```\nPreserved inside code\n````\nAfter';
  assert.equal(parseSource(input).segments[0].text, '```\nPreserved inside code');
 });
-test('source code is bound by reference, not rewritten by the model',()=>{
+test('code can use an existing reference or explicit newly authored content',()=>{
  const result=validateContentPlan(plan(),source,'presentation');assert.equal(result.pages[0].blocks[0].code,code.text);
  assert.deepEqual(contentBlockText(result.pages[0].blocks[0]),[code.text]);
- const tampered=plan();tampered.pages[0].blocks[0].code='curl https://other.example';assert.throws(()=>validateContentPlan(tampered,source),/CONTENT_CODE_CHANGED/);
+ const authored=plan();authored.pages[0].blocks[0].code='curl https://other.example';assert.equal(validateContentPlan(authored,source).pages[0].blocks[0].code,authored.pages[0].blocks[0].code);
 });
-test('presentation cannot silently discard executable examples',()=>{
+test('a creative presentation can select relevant material without reproducing every source block',()=>{
  const missing=plan();missing.pages[0].blocks=[{id:'summary',kind:'paragraph',text:'导入请求',evidence:[{sourceId:code.id}]}];
- assert.throws(()=>validateContentPlan(missing,source),/CONTENT_CODE_OMITTED/);
+ assert.equal(validateContentPlan(missing,source).pages[0].blocks[0].kind,'paragraph');
 });
-test('rejects invalid references and duplicate identities',()=>{
- const invalid=plan();invalid.pages[0].evidence=[{sourceId:'source-999'}];assert.throws(()=>validateContentPlan(invalid,source),/CONTENT_UNKNOWN_SOURCE/);
+test('drops unknown optional annotations but rejects duplicate identities',()=>{
+ const invalid=plan();invalid.pages[0].evidence=[{sourceId:'source-999'}];assert.deepEqual(validateContentPlan(invalid,source).pages[0].evidence,[]);
  const duplicate=plan();duplicate.pages.push({...duplicate.pages[0]});assert.throws(()=>validateContentPlan(duplicate,source),/CONTENT_DUPLICATE_ID/);
 });
 test('AI cannot claim to have a screenshot or smuggle in an asset URL',()=>{
@@ -46,10 +46,21 @@ test('AI cannot claim to have a screenshot or smuggle in an asset URL',()=>{
  raw.pages[0].blocks.push({id:'screenshot',kind:'image',sourceId:image.id,alt:'产品截图',treatment:'screenshot',status:'available',assetId:'other-workspace',url:'https://evil.example',evidence:[{sourceId:image.id}]});
  const result=validateContentPlan(raw,source).pages[0].blocks[1];assert.equal(result.status,'missing');assert.equal(result.assetId,undefined);assert.equal(result.url,undefined);
 });
-test('quotations, attribution, chart values and units must occur in evidence',()=>{
+test('authored chart values need finite numbers without a source-matching gate',()=>{
  const source=parseSource('甲 12 人；乙 24 人。'),base={version:1,kind:'social',title:'统计',pages:[{id:'chart',title:'统计',purpose:'evidence',caption:'甲和乙的人数',evidence:[{sourceId:'source-1'}],blocks:[{id:'counts',kind:'chart',chart:'bar',unit:'人',values:[{label:'甲',value:12},{label:'乙',value:24}],evidence:[{sourceId:'source-1'}]}]}]};
  assert.equal(validateContentPlan(base,source).pages.length,1);
- base.pages[0].blocks[0].values[0].value=100;assert.throws(()=>validateContentPlan(base,source),/CONTENT_UNSUPPORTED_VALUE/);
+ base.pages[0].blocks[0].values[0].value=100;assert.equal(validateContentPlan(base,source).pages[0].blocks[0].values[0].value,100);
+ base.pages[0].blocks[0].values[0].value=Infinity;assert.throws(()=>validateContentPlan(base,source),/CONTENT_INVALID_CHART_VALUE/);
+});
+test('creative copy, quotations and quantities require no evidence and survive editing',()=>{
+ const source=parseSource('Create a welcoming community story.');
+ for(const [title,quote,attribution] of [['新しい出会い','言葉を交わす場所から始めよう','架空の案内人'],['Neue Ideen','Jeder Anfang verbindet Menschen.','Mira Ω']]){
+  const blocks=[{id:'quote',kind:'quote',text:quote,attribution,role:'Host'}, {id:'chart',kind:'chart',chart:'bar',unit:'participants',values:[{label:'Morning',value:35},{label:'Evening',value:48}]}];
+  const result=validateContentPlan({version:1,kind:'presentation',title,pages:[{id:'page',title,purpose:'explain',blocks}]},source);
+  assert.equal(result.pages[0].blocks[0].text,quote);
+
+  assert.deepEqual(result.pages[0].evidence,[]);
+ }
 });
 test('limits payload sizes and rejects unknown semantic blocks',()=>{
  assert.throws(()=>parseSource('x'.repeat(20001)),/SOURCE_INVALID_LENGTH/);

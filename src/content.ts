@@ -1,7 +1,7 @@
 import {COMPOSITION_ILLUSTRATIONS} from './illustrationScenes.js';
 import {validateTextPresentations} from "./textPresentation.js";
 import { COMPOSITION_SCENES } from "./compositionScenes.js";
-/** Source-backed content, independent of layout and editor primitives. */
+/** Authored content, independent of layout and editor primitives. */
 export type SourceKind = "text" | "code" | "image-reference";
 export interface SourceSegment {
   id: string;
@@ -20,7 +20,7 @@ export interface SourceDocument {
     original: string;
     originalMode?: "source-backed" | "creative";
     illustrative?: boolean;
-    disclosure: string;
+    disclosure?: string;
     language?: string;
     simulationAllowed?: boolean;
   };
@@ -52,7 +52,7 @@ interface BlockBase {
 }
 export type ContentBlock = BlockBase &
   (
-    | { kind: "paragraph"; text: string; heading?: string; level?: 2 | 3 }
+    | { kind: "paragraph"; text: string; heading?: string; level?: 2 | 3; role?: "action" | "qualification" }
     | {
         kind: "steps" | "features";
         entries: {
@@ -157,6 +157,13 @@ export class ContentContractError extends Error {
 const fail = (code: string, path: string): never => {
   throw new ContentContractError(code, path);
 };
+/** Approved content is a pageable collection; individual layouts retain their own capacity limits. */
+export const EDITABLE_CONTENT_BLOCK_LIMIT = 64;
+function paragraphRole(value: unknown, path: string): {role?: "action" | "qualification"} {
+  if (value === undefined) return {};
+  if (value !== "action" && value !== "qualification") return fail("CONTENT_INVALID_PARAGRAPH_ROLE", path);
+  return {role: value};
+}
 /** AI-selected exact title phrases; no positional or last-words heuristic. */
 const titleEmphasis = (
   value: unknown,
@@ -221,7 +228,7 @@ const identity = (raw: unknown, path: string) => {
   return id;
 };
 
-/** Publication metadata is optional and source-backed; never infer engagement figures. */
+/** Optional authored publication metadata. */
 function publication(
   raw: unknown,
   path: string,
@@ -231,8 +238,6 @@ function publication(
   const v = object(raw, path);
   const field = (value: unknown, key: string, max = 100) => {
     const result = text(value, `${path}.${key}`, max);
-    if (sourceText !== undefined && !sourceText.includes(result))
-      fail("CONTENT_UNSUPPORTED_PUBLICATION", `${path}.${key}`);
     return result;
   };
   const result: PublicationInfo = {};
@@ -270,7 +275,7 @@ function publication(
   return { publication: result };
 }
 
-/** Identity copy is source-backed; asset IDs are editor-owned, never AI URLs. */
+/** Identity copy is editable; asset IDs are editor-owned, never AI URLs. */
 function bookend(
   raw: unknown,
   path: string,
@@ -288,8 +293,6 @@ function bookend(
   ] as const) {
     if (v[key] === undefined) continue;
     const value = text(v[key], `${path}.${key}`, key === "contact" ? 160 : 80);
-    if (sourceText !== undefined && !sourceText.includes(value))
-      fail("CONTENT_UNSUPPORTED_IDENTITY", `${path}.${key}`);
     result[key] = value;
   }
   if (v.logoAssetId !== undefined) {
@@ -300,7 +303,7 @@ function bookend(
   return { bookend: result };
 }
 
-/** Optional comparison facts stay aligned to their rows. Values/prices are source-verbatim. */
+/** Optional comparison values stay aligned to their rows. */
 function comparisonColumn(
   raw: unknown,
   path: string,
@@ -315,8 +318,6 @@ function comparisonColumn(
     );
   const fact = (v: unknown, p: string) => {
     const result = draft(v, p, 80, true);
-    if (sourceText !== undefined && result && !sourceText.includes(result))
-      fail("CONTENT_UNSUPPORTED_COMPARISON", p);
     return result;
   };
   const result: ComparisonColumn = {
@@ -440,18 +441,16 @@ export function validateContentPlan(
     source.segments.map((segment) => [segment.id, segment]),
   );
   const evidence = (raw: unknown, path: string): Evidence[] =>
-    list(raw, path, 1, 32).map((entry, index) => {
+    list(raw ?? [], path, 0, 32).flatMap((entry, index) => {
       const item = object(entry, `${path}.${index}`),
         sourceId = text(item.sourceId, `${path}.${index}.sourceId`, 80);
       const segment = sources.get(sourceId);
-      if (!segment) fail("CONTENT_UNKNOWN_SOURCE", path);
+      if (!segment) return [];
       const quote =
         item.quote === undefined
           ? undefined
           : text(item.quote, `${path}.${index}.quote`, 20000);
-      if (quote && !segment!.text.includes(quote))
-        fail("CONTENT_UNSUPPORTED_QUOTE", path);
-      return { sourceId, ...(quote ? { quote } : {}) };
+      return [{ sourceId, ...(quote ? { quote } : {}) }];
     });
   const ids = new Set<string>();
   const unique = (raw: unknown, path: string) => {
@@ -474,6 +473,7 @@ export function validateContentPlan(
           ...base,
           kind: "paragraph",
           text: field("text", 1600),
+          ...paragraphRole(value.role, `${path}.role`),
           ...(value.heading === undefined
             ? {}
             : {
@@ -512,21 +512,14 @@ export function validateContentPlan(
           ),
         };
       case "code": {
-        const sourceId = field("sourceId", 80),
+        const sourceId = value.sourceId === undefined ? base.id : field("sourceId", 80),
           segment = sources.get(sourceId);
-        if (
-          segment?.kind !== "code" ||
-          !base.evidence.some((e) => e.sourceId === sourceId)
-        )
-          return fail("CONTENT_INVALID_CODE_SOURCE", path);
-        if (value.code !== undefined && value.code !== segment.text)
-          fail("CONTENT_CODE_CHANGED", path);
         return {
           ...base,
           kind: "code",
           sourceId,
-          language: segment.language || "text",
-          code: segment.text,
+          language: value.language === undefined ? segment?.language || "text" : field("language", 80),
+          code: value.code === undefined ? text(segment?.text, `${path}.code`, 20000) : field("code", 20000),
         };
       }
       case "parameters":
@@ -544,29 +537,9 @@ export function validateContentPlan(
         };
       case "quote": {
         const copy = field("text", 1600);
-        if (
-          !base.evidence.some((e) =>
-            sources.get(e.sourceId)!.text.includes(copy),
-          )
-        )
-          fail("CONTENT_UNSUPPORTED_QUOTE", path);
         const attribution = field("attribution", 160, true);
-        if (
-          attribution &&
-          !base.evidence.some((e) =>
-            sources.get(e.sourceId)!.text.includes(attribution),
-          )
-        )
-          fail("CONTENT_UNSUPPORTED_ATTRIBUTION", path);
         const role =
           value.role === undefined ? undefined : field("role", 160, true);
-        if (
-          role &&
-          !base.evidence.some((e) =>
-            sources.get(e.sourceId)!.text.includes(role),
-          )
-        )
-          fail("CONTENT_UNSUPPORTED_ATTRIBUTION", path);
         return {
           ...base,
           kind: "quote",
@@ -586,15 +559,7 @@ export function validateContentPlan(
       case "chart": {
         if (!["bar", "line"].includes(String(value.chart)))
           fail("CONTENT_INVALID_CHART", path);
-        const proof = base.evidence
-          .map((e) => sources.get(e.sourceId)!.text)
-          .join("\n");
         const unit = field("unit", 60, true);
-        if (unit && !proof.includes(unit))
-          fail("CONTENT_UNSUPPORTED_UNIT", path);
-        const numbers = new Set(
-          proof.match(/-?\d+(?:\.\d+)?/g)?.map(Number) || [],
-        );
         return {
           ...base,
           kind: "chart",
@@ -604,12 +569,10 @@ export function validateContentPlan(
             const entry = object(raw, path);
             if (
               typeof entry.value !== "number" ||
-              !Number.isFinite(entry.value) ||
-              !numbers.has(entry.value)
+              !Number.isFinite(entry.value)
             )
-              fail("CONTENT_UNSUPPORTED_VALUE", path);
+              fail("CONTENT_INVALID_CHART_VALUE", path);
             const label = text(entry.label, path, 100);
-            if (!proof.includes(label)) fail("CONTENT_UNSUPPORTED_LABEL", path);
             return { label, value: entry.value as number };
           }),
         };
@@ -683,14 +646,6 @@ export function validateContentPlan(
         : {}),
     };
   });
-  if (root.kind === "presentation")
-    for (const segment of source.segments.filter((s) => s.kind === "code"))
-      if (
-        !pages.some((p) =>
-          p.blocks.some((b) => b.kind === "code" && b.sourceId === segment.id),
-        )
-      )
-        fail("CONTENT_CODE_OMITTED", segment.id);
   if (root.kind === "social" && pages.some((page) => !page.caption?.trim()))
     fail("CONTENT_CAPTION_REQUIRED", "pages");
   return {
@@ -752,7 +707,7 @@ export function validateEditableContentPage(
     return result;
   };
   const proof = (value: unknown, path: string): Evidence[] =>
-    list(value, path, 1, 32).map((raw, index) => {
+    list(value ?? [], path, 0, 32).map((raw, index) => {
       const item = object(raw, `${path}.${index}`);
       return {
         sourceId: text(item.sourceId, path, 80),
@@ -773,7 +728,7 @@ export function validateEditableContentPage(
   )
     fail("CONTENT_INVALID_PURPOSE", "page.purpose");
   const pageId = id(page.id, "page.id");
-  const blocks = list(page.blocks, "page.blocks", 1, 8).map(
+  const blocks = list(page.blocks, "page.blocks", 1, EDITABLE_CONTENT_BLOCK_LIMIT).map(
     (raw, index): ContentBlock => {
       const path = `page.blocks.${index}`,
         value = object(raw, path),
@@ -789,6 +744,7 @@ export function validateEditableContentPage(
             ...base,
             kind: "paragraph",
             text: field("text", 1600),
+            ...paragraphRole(value.role, `${path}.role`),
             ...(value.heading === undefined
               ? {}
               : {

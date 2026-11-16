@@ -326,7 +326,7 @@ export const MANUAL_COMPOSITION_REASONS: Readonly<Record<string, string>> = {
   "split-bar-compare":
     "Requires paired measured series; generic comparison text is insufficient.",
   "benchmark-bars":
-    "Requires explicit benchmark values, not invented percentages.",
+    "Use coherent benchmark values with clear labels and units.",
   "usage-breakdown":
     "Requires typed parts and a validated total; current chart blocks support bar/line measurements, not inferred percentage shares.",
   organization: "Requires an explicit parent/child relationship contract.",

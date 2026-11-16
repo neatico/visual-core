@@ -110,7 +110,7 @@ const source = parseSource(rawInputText);
 const plan = validateContentPlan(aiJson, source, "presentation");
 ```
 
-`validateContentPlan` is a hard boundary for untrusted model output. It strips unknown properties, never trusts generated code or asset URLs, and verifies content against the source ranges. File-name placeholders are treated as references, not fabricated assets. Use `validateEditableContentPage` for editor-authored pages (pass `{ allowIncomplete: true }` while the user is still editing).
+`validateContentPlan` is a hard boundary for untrusted model output. It validates structure, strips unknown properties, accepts authored text and inline code, and checks real asset references. Content is not required to occur in the input; optional annotations do not prove facts. Document-formatting applications should apply their own preservation contract. File-name placeholders are treated as references, not fabricated assets. Use `validateEditableContentPage` for editor-authored pages (pass `{ allowIncomplete: true }` while the user is still editing).
 
 ## Validate compositions and blueprints
 

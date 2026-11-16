@@ -14,3 +14,26 @@ test('literal explanatory visual descriptors survive editing without changing so
  }
  assert.throws(()=>validateEditableContentPage({...page,blocks:[{id:'method',kind:'features',evidence:page.evidence,entries:[{title:'Method',description:'Explanation.',illustration:'invented-scene'}]}]}),/Invalid semantic illustration/);
 });
+
+test('approved long-form content retains every independent block before measured pagination',()=>{
+ const blocks=Array.from({length:64},(_,i)=>({id:`unit-${i}`,kind:'paragraph',text:`未確定 Ω ${i} — Preserve every condition.`,evidence:page.evidence}));
+ const parsed=validateEditableContentPage({...page,blocks});
+ assert.deepEqual(parsed.blocks,blocks);
+ assert.deepEqual(validateEditableContentPage(JSON.parse(JSON.stringify(parsed))),parsed);
+ assert.throws(()=>validateEditableContentPage({...page,blocks:[...blocks,{...blocks[0],id:'extra'}]}));
+});
+test('explicit action and qualification roles survive editing; prose alone never assigns a role',()=>{
+ for(const role of ['action','qualification',undefined]){
+  const block={id:'copy',kind:'paragraph',text:'未知名称 — Join the review',evidence:page.evidence,...(role?{role}:{})};
+  assert.deepEqual(validateEditableContentPage({...page,blocks:[block]}).blocks,[block]);
+ }
+ assert.throws(()=>validateEditableContentPage({...page,blocks:[{id:'copy',kind:'paragraph',text:'Ω',evidence:page.evidence,role:'invented'}]}),/CONTENT_INVALID_PARAGRAPH_ROLE/);
+});
+
+test('authored content without evidence annotations remains editable and serializable',()=>{
+ const page={id:'creative',title:'Nieuwe ideeën Ω',purpose:'explain',blocks:[{id:'quote',kind:'quote',text:'Samen maken we ruimte.',attribution:'Mira Ω',role:'Host'}]};
+ const normalized=validateEditableContentPage(page);
+ assert.deepEqual(normalized.evidence,[]);assert.deepEqual(normalized.blocks[0].evidence,[]);
+ assert.equal(normalized.blocks[0].attribution,'Mira Ω');
+ assert.deepEqual(validateEditableContentPage(JSON.parse(JSON.stringify(normalized))),normalized);
+});

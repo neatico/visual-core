@@ -23,7 +23,7 @@ export interface RecipeParameterContract {
   generationPolicy: Readonly<Record<string, readonly string[]>>;
   themeBindings: readonly string[];
   fallbackPolicy: {
-    missingContent: "derive-or-labeled-example";
+    missingContent: "develop-content";
     missingAsset: "search-or-native-placeholder";
     omitCandidate: false;
   };
@@ -50,12 +50,12 @@ const array = (
 const evidence = array(
   object(
     {
-      sourceId: text("Existing source segment ID.", 160),
-      quote: text("Exact source quotation.", 2000),
+      sourceId: text("Existing optional content-reference ID.", 160),
+      quote: text("Optional reference annotation.", 2000),
     },
     ["sourceId"],
   ),
-  1,
+  0,
   32,
 );
 const base = (
@@ -78,15 +78,15 @@ const descriptions: Record<SemanticKind, string> = {
   features:
     "Present parallel capabilities or a list of distinct ideas without implying a sequence.",
   steps:
-    "Explain ordered actions or a chronological sequence supported by the source.",
+    "Explain ordered actions or a coherent chronological sequence.",
   comparison:
-    "Compare supplied alternatives with aligned criteria; never invent a competing alternative.",
+    "Develop comparable alternatives with aligned criteria.",
   parameters:
     "Present exact specifications, logistics, identifiers, dates, prices, or named facts.",
-  quote: "Emphasize a verbatim quotation with its supplied attribution.",
+  quote: "Emphasize a compelling quotation with editable attribution.",
   chart:
-    "Explain a comparable numeric series with source-backed values and a shared unit.",
-  code: "Display exact source code without rewriting identifiers, literals, or line breaks.",
+    "Explain a coherent numeric series with a shared unit.",
+  code: "Display supplied or newly authored code with its original formatting.",
   image:
     "Arrange a real, previously supplied image asset with its source reference and focal subject.",
 };
@@ -97,9 +97,10 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
       return base(
         kind,
         {
-          text: text("Source-faithful prose.", 2000),
-          heading: text("Optional source-supported heading.", 120),
+          text: text("Complete audience-facing prose.", 2000),
+          heading: text("Optional descriptive heading.", 120),
           level: { enum: [2, 3] },
+          role: { enum: ["action", "qualification"], description: "Explicit audience call to action or factual qualification. Omit for ordinary prose." },
         },
         ["text"],
       );
@@ -116,7 +117,7 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
                   120,
                 ),
                 description: text(
-                  "Source-faithful explanation; omit filler.",
+                  "Useful explanation; omit filler.",
                   600,
                 ),
               },
@@ -137,11 +138,11 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
               {
                 title: text("A supplied alternative.", 120),
                 points: array(
-                  text("Source-backed comparison criterion.", 600),
+                  text("Meaningful comparison criterion.", 600),
                   1,
                   8,
                 ),
-                price: text("Exact source price, only when supplied.", 120),
+                price: text("Price for this comparison item.", 120),
                 values: array(
                   text("Exact value aligned with points.", 160),
                   1,
@@ -169,9 +170,9 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
             object(
               {
                 name: text("Fact name.", 120),
-                value: text("Exact source value.", 300),
+                value: text("Value for this named item.", 300),
                 description: text(
-                  "Source-supported qualification, otherwise an empty string.",
+                  "Relevant supporting detail, otherwise an empty string.",
                   600,
                 ),
               },
@@ -187,11 +188,11 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
       return base(
         kind,
         {
-          text: text("Verbatim source quotation.", 1200),
-          attribution: text("Exact source attribution.", 160),
-          role: text("Role only when explicitly supplied.", 160),
+          text: text("A quotation or authored focal statement.", 1200),
+          attribution: text("An attribution or speaker name.", 160),
+          role: text("Editable role or title for the attributed person.", 160),
           avatarAssetId: text(
-            "Existing supplied portrait asset ID; never invent a person or image.",
+            "Existing supplied portrait asset ID; a generated name does not create an image file.",
             160,
           ),
         },
@@ -202,11 +203,11 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
         kind,
         {
           chart: { enum: ["bar", "line"] },
-          unit: text("Exact source unit.", 80),
+          unit: text("Shared unit for the numeric series.", 80),
           values: array(
             object(
               {
-                label: text("Exact source label.", 120),
+                label: text("Label for this numeric value.", 120),
                 value: { type: "number" },
               },
               ["label", "value"],
@@ -222,11 +223,11 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
         kind,
         {
           sourceId: text(
-            "Existing code source ID; code remains unchanged.",
+            "Reference ID for this supplied or authored code block.",
             160,
           ),
-          language: text("Source code language.", 80),
-          code: text("Exact source code.", 20000),
+          language: text("Code language.", 80),
+          code: text("Complete code with intact line breaks.", 20000),
         },
         ["sourceId", "language", "code"],
       );
@@ -385,7 +386,7 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
     if (kind === "code") {
       fields.code.maxLength = 400;
       fields.code.description =
-        "A concise exact source excerpt, or a clearly labeled illustrative example when no source code exists. At most eight lines and 56 columns per line.";
+        "A concise supplied or newly authored code example. At most eight lines and 56 columns per line.";
       fields.code.pattern = String.raw`^(?:[^\n]{0,56}\n){0,7}[^\n]{0,56}$`;
     }
     if (kind === "image") fields.alt.maxLength = 80;
@@ -513,12 +514,12 @@ export function recipeParameterContract(
     ),
     importance: { title: 3, blocks: 7 },
     generationPolicy: {
-      title: ["user-fact", "derived", "creative"],
+      title: ["user-fact", "derived", "creative", "simulated"],
       blocks: ["user-fact", "derived", "creative", "simulated"],
       assets: ["existing-reference-only"],
     },
     fallbackPolicy: {
-      missingContent: "derive-or-labeled-example",
+      missingContent: "develop-content",
       missingAsset: "search-or-native-placeholder",
       omitCandidate: false,
     },

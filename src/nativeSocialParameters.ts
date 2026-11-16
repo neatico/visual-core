@@ -57,25 +57,25 @@ const supportingItemSlots=new Set(['team','course','specification','schedule','r
 export function nativeSocialParameterContract(id:string):NativeSocialContract {
  const spec=slots[id];
  if(!spec||!SOCIAL_LAYOUT_CATALOG.some(item=>item.id===id))throw new Error('COMPOSITION_UNKNOWN_NATIVE_SOCIAL');
- const properties:Record<string,unknown>={title:copy(id==='note-question'?44:40,'Concise audience-facing headline.'),body:copy(id==='organization'?32:id==='case-study'?64:['quote','testimonial','editorial-quote'].includes(id)?140:sentenceBodySlots.has(id)?96:80,id==='organization'?'A short label for the parent or coordinating role; never invent a real person.':'One supporting sentence, or the quoted passage for a quote composition.')};
+ const properties:Record<string,unknown>={title:copy(id==='note-question'?44:40,'Concise audience-facing headline.'),body:copy(id==='organization'?32:id==='case-study'?64:['quote','testimonial','editorial-quote'].includes(id)?140:sentenceBodySlots.has(id)?96:80,id==='organization'?'A short label for the parent or coordinating role.':'One supporting sentence, or the quoted passage for a quote composition.')};
  if(!id.startsWith('chat-')&&!['note-photo','note-checklist'].includes(id))properties.eyebrow={...copy(20,'Optional concise section label. Use an empty string when no label improves the message.',0),default:''};
  if(!id.startsWith('chat-')&&!['note-photo','note-checklist'].includes(id))properties.cta={...copy(24,'Optional short call to action appropriate to the input. Use an empty string when this is purely informational.',0),default:''};
  if(['note-marker','note-editorial','note-question','dark-promo'].includes(id))properties.titleLines={type:'array',minItems:0,maxItems:4,default:[],items:copy(40,'One complete phrase from the title, preserving its original language.'),description:'Preferred title lines: one item for a single line, two to four for a multiline heading, or empty for automatic fitting. Concatenating the phrases must preserve the complete title and word boundaries. The renderer may reflow only when the requested lines cannot fit legibly.'};
  if(id==='note-marker')properties.emphasis={type:'array',minItems:0,maxItems:2,default:[],items:copy(40,'An exact contiguous phrase from title to highlight.'),description:'Choose one or two important exact title phrases. Empty means the renderer highlights the final title line.'};
- if(id==='price-increase') { properties.title=copy(28,'Short price-change headline; keep the event name in eyebrow.'); properties.body=copy(64,'Short event descriptor. Use only supplied event facts or explicitly labelled sample text.'); }
- if(spec.value)properties.value=copy(24,'The focal quantity, price, time, or short value statement. Label fictional quantities as simulated.');
- if(spec.attribution)properties.attribution=copy(48,'Exact supplied attribution, or an empty string. Never invent an endorsement.',0);
- if(id==='dark-promo'){properties.title=copy(28,'A concise supplied offer headline; do not invent a discount.');properties.body=copy(64,'A concise product or service scope.');properties.value=copy(40,'A supplied website or short destination label. Never invent a URL.',0);properties.attribution=copy(80,'Offer eligibility and terms, or an explicit sample disclaimer. Never fabricate a real promotion.',0);}
+ if(id==='price-increase') { properties.title=copy(28,'Short price-change headline; keep the event name in eyebrow.'); properties.body=copy(64,'Short event descriptor developed from the brief.'); }
+ if(spec.value)properties.value=copy(24,'The focal quantity, price, time, or short value statement.');
+ if(spec.attribution)properties.attribution=copy(48,'An attribution, speaker name, or empty string.',0);
+ if(id==='dark-promo'){properties.title=copy(28,'A concise offer headline.');properties.body=copy(64,'A concise product or service scope.');properties.value=copy(40,'A supplied website or short destination label. Never invent a URL.',0);properties.attribution=copy(80,'Concise offer eligibility and terms.',0);}
  if(spec.image)properties.imageAssetId=asset();
  if(id==='neon-workflow') {
-  properties.title=copy(32,'A concise launch or benefit headline. Never invent a release or model availability.');
+  properties.title=copy(32,'A concise launch or benefit headline.');
   properties.body=copy(60,'One short supporting sentence.');
   properties.value=copy(28,'The supplied product or feature name, shown in large blue type.');
-  properties.attribution=copy(72,'Supplied website and optional short capabilities line. Never invent a URL or certification.',0);
+  properties.attribution=copy(72,'An optional website or short capabilities line.',0);
  }
  if(id==='navy-service') {
   properties.title=copy(32,'A concise service benefit headline.');
-  properties.body=copy(48,'A short gold subheading. Do not invent delivery times, guarantees or legal claims.');
+  properties.body=copy(48,'A short gold subheading.');
   properties.value=copy(40,'An optional supplied website or contact label. Never invent a URL.',0);
  }
  if(spec.items){
@@ -96,9 +96,9 @@ export function nativeSocialParameterContract(id:string):NativeSocialContract {
  }
  if(id==='price-increase') {
   properties.value=copy(24,'Current ticket price and currency, optionally followed by Now. Preserve supplied amounts exactly.');
-  (properties.items as Record<string,unknown>).description='Exactly two detail pairs in this order: item 0 title is event date and description is location; item 1 title is future ticket price and description is its effective date. Never invent missing dates or prices. Label illustrative content explicitly.';
+  (properties.items as Record<string,unknown>).description='Exactly two detail pairs in this order: item 0 title is event date and description is location; item 1 title is future ticket price and description is its effective date. Develop coherent dates and prices for the requested event.';
  }
- if(spec.quantities==='comparison'||spec.quantities==='benchmark')properties.comparisonLabels={type:'array',minItems:2,maxItems:2,items:copy(20,'A supplied or explicitly illustrative series label.')};
+ if(spec.quantities==='comparison'||spec.quantities==='benchmark')properties.comparisonLabels={type:'array',minItems:2,maxItems:2,items:copy(20,'A meaningful series label.')};
  if(['note-question','note-marker','note-editorial'].includes(id))properties.decorationEmoji={type:'string',enum:['','✨','💡','🌱','💬','🎯','📚'],default:'',description:'Optional built-in decorative emoji for informal social notes. Choose one relevant symbol, or empty for the authored illustration. Never use it as factual evidence.'};
  properties.textPresentation=textPresentationSchema();
  const contentKeys=Object.keys(properties).filter(key=>!['textPresentation','decorationEmoji'].includes(key));
