@@ -37,13 +37,13 @@ export interface DesignTheme {
 }
 /** Complete, deterministic token sets; decorative geometry belongs to individual compositions. */
 export const DESIGN_THEMES: readonly DesignTheme[] = [
-  ...EXPLORE_THEMES,
   {
     id: "neatico",
     palette: { background: "#FAF9F6", surface: "#FFFFFF", ink: "#202124", muted: "#62646B", accent: "#F4CE36", line: "#E4E1D9" },
     typography: { heading: "Manrope", body: "Inter", code: "monospace", headingWeight: 700 },
     geometry: { radius: 12, spacing: 1, rule: "accent" },
   },
+  ...EXPLORE_THEMES,
   {
     id: "archive",
     palette: { background: "#F6F1E7", surface: "#FFFCF5", ink: "#19382E", muted: "#59665B", accent: "#C17A35", line: "#D7CEBC" },

@@ -1,7 +1,7 @@
 import type { DesignRecipe, DesignTheme } from "./designSystem.js";
 import type { ContentPage, SemanticKind } from "./content.js";
 
-export const DEFAULT_PRESENTATION_THEME = "explore-teal";
+export const DEFAULT_PRESENTATION_THEME = "neatico";
 /** Explore's editorial colorways, including light and solid-background variants. */
 const colors = [
   ["teal", "#214B4A", "#E1EEEB", "#F7FAF9", "#1C3533"],
