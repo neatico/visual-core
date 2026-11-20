@@ -2,11 +2,11 @@ import {COMPOSITION_ILLUSTRATIONS, ILLUSTRATION_GUIDANCE, type IllustrationScene
 import {compositionParameterDefaults} from './parameterDefaults.js';
 import {textPresentationSchema,validateTextPresentations,type TextPresentation} from './textPresentation.js';
 import {SOCIAL_LAYOUT_CATALOG} from './socialLayouts.js';
-import {isReferencePoster,referencePosterSchema,type PosterPriceTable} from './referencePosters.js';
+import {isReferencePoster,referencePosterSchema,type PosterPriceTable,type PosterExtras} from './referencePosters.js';
 import type {ParameterSchema} from './recipeParameters.js';
 
 /** Native slots keep renderer-specific content separate from semantic page projection. */
-export interface NativeSocialParameters {
+export interface NativeSocialParameters extends PosterExtras {
   priceTable?:PosterPriceTable;
   textPresentation?:TextPresentation[];
   decorationEmoji?:string;
@@ -152,6 +152,8 @@ export function validateNativeSocialParameters(id:string,raw:unknown):NativeSoci
  if(id==='split-bar-compare'&&values.items!.some(item=>Math.abs(item.primaryValue!+item.secondaryValue!-100)>.001))throw new Error('CANDIDATE_INVALID_PERCENTAGES');
  if(id==='split-photo-poll'&&values.items!.some(item=>!Number.isSafeInteger(item.primaryValue)))throw new Error('CANDIDATE_INVALID_COUNTS');
  if(id==='cost-comparison'&&values.items![0].unit!==values.items![1].unit)throw new Error('CANDIDATE_INCOMPARABLE_UNITS');
+ if(values.dataChart){const chart=values.dataChart;if(chart.rows.some(row=>row.value<chart.baseline))throw new Error('CANDIDATE_INVALID_CHART_BASELINE');}
+ if(id==='portrait-news-cover'&&values.accentText&&!values.title.includes(values.accentText))throw new Error('CANDIDATE_INVALID_EMPHASIS');
  return JSON.parse(JSON.stringify(values)) as NativeSocialParameters;
 }
 
@@ -160,9 +162,10 @@ export function nativeSocialContentPage(values:NativeSocialParameters,original:i
  const proof=original.evidence,blocks:import('./content.js').ContentBlock[]=values.body?[{id:'native-body',kind:'paragraph',text:values.body,evidence:proof}]:[];
  if(values.items?.length)blocks.push({id:'native-items',kind:'features',evidence:proof,entries:values.items.map(item=>({title:item.title,...(item.illustration?{illustration:item.illustration}:{}),description:[item.subtitle,item.description,...[item.primaryValue,item.secondaryValue].filter(value=>value!==undefined).map(value=>`${value}${isReferencePoster(layoutId)?item.unit||'':'%'}`)].filter(Boolean).join(' · ')}))});
  if(values.priceTable){const p=values.priceTable;blocks.push({id:'native-price-table',kind:'parameters',evidence:proof,rows:p.rows.map(row=>({name:row.name,value:`${p.currency}${row.input} / ${p.currency}${row.output}`,description:`${p.columns.provider} ${p.currency}${row.providerInput} / ${p.currency}${row.providerOutput} · ${p.unit}`}))});blocks.push({id:'native-price-notes',kind:'paragraph',evidence:proof,text:[p.heading,p.badge,...p.benefits].filter(Boolean).join(' · ')});}
- for(const field of ['value','attribution','eyebrow','cta'] as const)if(values[field])blocks.push({id:`native-${field}`,kind:'paragraph',text:values[field]!,evidence:proof});
+ if(values.dataChart){const p=values.dataChart;for(let start=0;start<p.rows.length;start+=20)blocks.push({id:`native-chart-data-${start}`,kind:'parameters',evidence:proof,rows:p.rows.slice(start,start+20).map(row=>({name:row.name,value:`${row.value}${row.qualifier}`,description:[row.period,p.unit].filter(Boolean).join(' · ')}))});}
+ for(const field of ['value','attribution','eyebrow','cta','secondaryBrand','valueSuffix','accentText'] as const)if(values[field])blocks.push({id:`native-${field.replace(/[A-Z]/g,letter=>`-${letter.toLowerCase()}`)}`,kind:'paragraph',text:values[field]!,evidence:proof});
  if(values.comparisonLabels)blocks.push({id:'native-series',kind:'paragraph',evidence:proof,text:values.comparisonLabels.join(' / ')});
- const images=[values.imageAssetId,...(values.items||[]).map(item=>item.assetId),...(values.priceTable?.rows||[]).map(row=>row.assetId)].filter((id):id is string=>!!id);
+ const images=[values.imageAssetId,values.logoAssetId,values.secondaryLogoAssetId,values.foregroundAssetId,values.avatarAssetId,...(values.dataChart?.rows||[]).map(row=>row.assetId),...(values.items||[]).map(item=>item.assetId),...(values.priceTable?.rows||[]).map(row=>row.assetId)].filter((id):id is string=>!!id);
  for(const [index,assetId] of images.entries())blocks.push({id:`native-image-${index}`,kind:'image',evidence:[{sourceId:assetId}],sourceId:assetId,assetId,alt:values.title,treatment:assetId==='neatico-editorial-placeholder'?'diagram':'photograph',status:'available'});
  return {...original,title:values.title,blocks};
 }

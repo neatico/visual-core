@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {isReferencePoster,FORMAL_COMPOSITIONS,applicableCompositions,articleCompositionCuration,ARTICLE_COMPOSITION_CURATION} from '../dist/index.js';
 test('formal inventory preserves every gallery ID and separates output capabilities',()=>{
- assert.equal(FORMAL_COMPOSITIONS.length,190);
- assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,190);
+ assert.equal(FORMAL_COMPOSITIONS.length,197);
+ assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,197);
  assert.equal(applicableCompositions('presentation',16/9).length,80);
  assert.equal(applicableCompositions('presentation',1).length,62);
- assert.equal(applicableCompositions('social',16/9).length,129);
- assert.equal(applicableCompositions('social',1).length,125);
+ assert.equal(applicableCompositions('social',16/9).length,132);
+ assert.equal(applicableCompositions('social',1).length,127);
  assert.equal(applicableCompositions('article-cover',16/9).length,73);
  assert.equal(applicableCompositions('article-cover',1).length,63);
  assert.equal(applicableCompositions('article-illustration',16/9).length,151);

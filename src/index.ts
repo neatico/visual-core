@@ -32,6 +32,7 @@ export * from './contentBrief.js';
 
 export * from "./nativeSocialParameters.js";
 export * from "./referencePosters.js";
+export * from "./campaignAssets.js";
 
 export * from "./compositionUseCases.js";
 

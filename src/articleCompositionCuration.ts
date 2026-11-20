@@ -28,7 +28,7 @@ const native:readonly ArticleCompositionRequirement[]=['editorial-copy','empty-p
 export const ARTICLE_COMPOSITION_CURATION:readonly CurationGroup[]=[
   {category:'reference-campaign-poster',cover:false,illustration:false,requirements:[],
     reason:'These seven campaign compositions use precise square, portrait or landscape geometry with pricing, recruitment, rental, voting, publication or event slots. Their editable marketing artwork stays in social creation; article reuse would require a separate visual and content audit.',
-    rendererKeys:catalog('model-price-table','planet-career','rental-features','split-photo-poll','journal-announcement','speaker-meetup','cost-comparison')},
+    rendererKeys:catalog('model-price-table','planet-career','rental-features','split-photo-poll','journal-announcement','speaker-meetup','cost-comparison','split-product-pricing','neon-enterprise-trial','ranked-data-table','city-service-offer','editorial-benchmark','portrait-news-cover','hardware-offer')},
   {category:'native-article-cover',cover:true,illustration:false,requirements:editorial,
     reason:'The three original article covers pair a bounded headline/deck with an editable topic-specific hero; they retain their original cover-only contracts.',
     rendererKeys:[0,1,2].map(index=>`article-cover:${index}`)},

@@ -34,8 +34,8 @@ export const GOOGLE_FONT_CATALOG: readonly FontFamily[] = [
     "PT Serif",
   ].map((f) => entry(f, "serif")),
   entry("Instrument Serif", "serif", ["latin"], [400]),
-  ...["Space Grotesk", "Oswald", "Bebas Neue"].map((f) =>
-    entry(f, "display", ["latin"], f === "Bebas Neue" ? [400] : [400, 700]),
+  ...["Space Grotesk", "Oswald", "Bebas Neue", "Anton"].map((f) =>
+    entry(f, "display", ["latin"], ["Bebas Neue","Anton"].includes(f) ? [400] : [400, 700]),
   ),
   ...["JetBrains Mono", "IBM Plex Mono", "Fira Code", "Source Code Pro"].map(
     (f) => entry(f, "mono"),

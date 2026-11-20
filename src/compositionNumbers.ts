@@ -110,5 +110,6 @@ export const SOCIAL_DISPLAY_NUMBERS: Readonly<Record<string, string>> = {
   "dark-promo": "S051",
   "neon-workflow": "S052",
   "navy-service": "S053",
-  "model-price-table":"S054","planet-career":"S055","rental-features":"S056","split-photo-poll":"S057","journal-announcement":"S058","speaker-meetup":"S059","cost-comparison":"S060"
+  "model-price-table":"S054","planet-career":"S055","rental-features":"S056","split-photo-poll":"S057","journal-announcement":"S058","speaker-meetup":"S059","cost-comparison":"S060",
+  "split-product-pricing":"S061","neon-enterprise-trial":"S062","ranked-data-table":"S063","city-service-offer":"S064","editorial-benchmark":"S065","portrait-news-cover":"S066","hardware-offer":"S067"
 };
