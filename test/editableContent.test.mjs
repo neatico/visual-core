@@ -12,7 +12,8 @@ test('literal explanatory visual descriptors survive editing without changing so
   const block={id:'method',kind:'features',evidence:page.evidence,entries:[{title:'Source method',description:'Source explanation.',illustration}]};
   assert.deepEqual(validateEditableContentPage({...page,blocks:[block]}).blocks,[block]);
  }
- assert.throws(()=>validateEditableContentPage({...page,blocks:[{id:'method',kind:'features',evidence:page.evidence,entries:[{title:'Method',description:'Explanation.',illustration:'invented-scene'}]}]}),/Invalid semantic illustration/);
+ const repaired=validateEditableContentPage({...page,blocks:[{id:'method',kind:'features',evidence:page.evidence,entries:[{title:'Method',description:'Explanation.',illustration:'invented-scene'}]}]});
+ assert.deepEqual(repaired.blocks[0].entries,[{title:'Method',description:'Explanation.'}]);
 });
 
 test('approved long-form content retains every independent block before measured pagination',()=>{

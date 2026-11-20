@@ -4,6 +4,12 @@ export function compositionParameterDefaults(schema:Readonly<Record<string,unkno
  if(schema.type==='object'&&value&&typeof value==='object'&&!Array.isArray(value)){
   const next={...value} as Record<string,unknown>;
   for(const [key,child] of Object.entries(schema.properties||{})){
+   const field=child as Record<string,unknown>;
+   if((key==='icon'||key==='illustration')&&Array.isArray(field.enum)&&next[key]!==undefined&&!field.enum.includes(next[key])){
+    // Only decorative catalog IDs are recoverable this way. Never normalize
+    // arbitrary enums, factual fields, or text according to guessed semantics.
+    delete next[key];
+   }
    const resolved=compositionParameterDefaults(child as Record<string,unknown>,next[key]);
    if(resolved!==undefined)next[key]=resolved;
   }

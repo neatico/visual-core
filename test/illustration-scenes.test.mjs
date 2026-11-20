@@ -5,7 +5,8 @@ test('all illustration contracts expose the same supported subjects',()=>{
  const contract=FORMAL_COMPOSITIONS.find(c=>c.id==='article-features-0');
  const field=contract.parameterSchema.properties.blocks.items[0].properties.entries.items.properties.illustration;
  assert.deepEqual(field.enum,[...COMPOSITION_ILLUSTRATIONS]);
- assert.equal(field.default,'symbol');
+ assert.equal(field.default,undefined);
+ assert.ok(!contract.parameterSchema.properties.blocks.items[0].properties.entries.items.required.includes('illustration'));
  for(const subject of ['camping','landscape','route','climate','access','software'])assert.ok(field.enum.includes(subject));
 });
 test('only explicit scene IDs resolve; prose and contextual topics cannot override them',()=>{

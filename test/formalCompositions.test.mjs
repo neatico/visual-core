@@ -46,11 +46,12 @@ test('illustration contracts require their actual visual structure and bounded n
 });
 
 test('article reuse changes no original identifier, schema, renderer, recipe, ratio or display identity',()=>{
- // Updated for the reviewed creative-authoring contract migration.
+ // Reviewed migration: semantic row decorations are optional, without forced
+ // illustration defaults. Native large-region illustration slots are unchanged.
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
  const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
- assert.equal(createHash('sha256').update(original).digest('hex'),'a4e61f8a44ebbd2e1b7a0ee907b475f64685dd168f33acd92c3ce597aefcf522');
+ assert.equal(createHash('sha256').update(original).digest('hex'),'9662bddfaa15d95f7844dd83eedacc24d45a5e286209960161e2d1f9359b8a37');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
 });

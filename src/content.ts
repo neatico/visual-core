@@ -909,20 +909,12 @@ function visualDescriptor(item: Record<string, unknown>): {
     "BsGrid1X2",
   ]);
   const illustrations = new Set<string>(COMPOSITION_ILLUSTRATIONS);
-  if (
-    item.icon != null &&
-    (typeof item.icon !== "string" || !icons.has(item.icon))
-  )
-    throw new Error("Invalid semantic icon");
-  if (
-    item.illustration != null &&
-    (typeof item.illustration !== "string" ||
-      !illustrations.has(item.illustration))
-  )
-    throw new Error("Invalid semantic illustration");
+  // Decorations are optional catalog references. An unknown reference must not
+  // invalidate authored copy, a saved page, or the rest of a streamed deck.
+  // Omit it instead of guessing an asset from the wording of the content.
   return {
-    ...(typeof item.icon === "string" ? { icon: item.icon } : {}),
-    ...(typeof item.illustration === "string"
+    ...(typeof item.icon === "string" && icons.has(item.icon) ? { icon: item.icon } : {}),
+    ...(typeof item.illustration === "string" && illustrations.has(item.illustration)
       ? { illustration: item.illustration }
       : {}),
   };

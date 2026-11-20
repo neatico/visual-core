@@ -309,11 +309,9 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       entries.items.properties.illustration = {
         type: "string",
         enum: [...COMPOSITION_ILLUSTRATIONS],
-        default: "symbol",
         description:
-          ILLUSTRATION_GUIDANCE,
+          `Optional large-region illustration. Omit for small row markers. ${ILLUSTRATION_GUIDANCE}`,
       };
-      entries.items.required.push("illustration");
       entries.items.properties.icon = {
         type: "string",
         enum: [
@@ -331,7 +329,7 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
           "BsGrid1X2",
         ],
         description:
-          "Optional authored icon variant; illustration remains the primary visual concept.",
+          "Optional supported row icon. Omit when unnecessary; an illustration is not required.",
       };
       entries.items.properties.title.maxLength = 28;
       entries.items.properties.description.maxLength =
