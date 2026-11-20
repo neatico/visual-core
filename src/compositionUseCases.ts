@@ -1,5 +1,6 @@
 /** Authored communication tasks, independent of field count and successful parameter filling. */
 const useCases:Readonly<Record<string,string>>={
+ 'annotated-horizontal-bars':'Compare three to five numeric categories on a shared zero-based horizontal axis, with a complete annotation beside each bar. Preserve row order, explicit emphasis, numeric scale, units and user-requested qualifications. The design does not infer names, probabilities or facts from the topic.',
  'model-price-table':'Announce model or product availability with four explicit comparable input/output price rows. Use numeric price fields and a shared currency/unit; savings are computed. Develop a coherent illustrative comparison when requested, preserving supplied prices and qualifications.',
  'planet-career':'Present a two-line aspirational careers campaign over a generic industry photograph, with a highlighted second line and an explicit organization label. Do not infer an employer or real person from the subject.',
  'rental-features':'Explain a rental service with a product photograph, three prominent benefits and complete eligibility or usage notes. Develop the creative brief in the requested language and refer only to actual image asset IDs.',

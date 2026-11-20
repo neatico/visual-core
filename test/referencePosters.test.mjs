@@ -2,8 +2,8 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {REFERENCE_POSTERS,FORMAL_COMPOSITIONS,referencePosterSchema,validateNativeSocialParameters,nativeSocialContentPage,applicableCompositions} from '../dist/index.js';
 import {GENERIC_CAMPAIGN_ASSETS,referencePosterAssetDefaults} from '../dist/index.js';
 const sample=s=>Object.hasOwn(s,'default')?s.default:s.enum?s.enum[0]:s.type==='boolean'?false:s.type==='object'?Object.fromEntries(Object.entries(s.properties).map(([k,v])=>[k,sample(v)])):s.type==='array'?Array.from({length:s.minItems},()=>sample(s.items)):s.type==='number'?1:s.minLength?'X':'';
-test('fourteen reference contracts have unique identities, exact ratios and lossless structured values',()=>{
- assert.equal(REFERENCE_POSTERS.length,14);
+test('fifteen reference contracts have unique identities, exact ratios and lossless structured values',()=>{
+ assert.equal(REFERENCE_POSTERS.length,15);
  for(const spec of REFERENCE_POSTERS){const definition=FORMAL_COMPOSITIONS.find(c=>c.id===`social:${spec.id}`);assert.equal(definition.parameterModel,'native-social');assert.equal(applicableCompositions('social',spec.ratio,definition.id).length,1);assert.equal(applicableCompositions('social',spec.min-.01,definition.id).length,0);const values=sample(referencePosterSchema(spec.id));assert.deepEqual(validateNativeSocialParameters(spec.id,values),values);assert.equal(nativeSocialContentPage(values,{id:'sample',title:'Original',purpose:'explain',blocks:[]},spec.id).title,'X');}
 });
 test('votes are integers and cost comparisons share the same billing period',()=>{
@@ -26,4 +26,17 @@ test('template asset defaults resolve to real catalog identities and never depen
  for(const spec of REFERENCE_POSTERS)for(const id of Object.values(referencePosterAssetDefaults(spec.id)))assert.ok(GENERIC_CAMPAIGN_ASSETS[id]?.src.endsWith('.webp'));
  assert.deepEqual(referencePosterAssetDefaults('Unknown company'),{});
  const copy=referencePosterAssetDefaults('portrait-news-cover');copy.imageAssetId='changed';assert.notEqual(referencePosterAssetDefaults('portrait-news-cover').imageAssetId,'changed');
+});
+test('annotated bars preserve arbitrary labels, fractional values and complete notes without guessing emphasis',()=>{
+ const values=sample(referencePosterSchema('annotated-horizontal-bars'));
+ values.barChart.rows=[{name:'未知 Ω',value:.125,description:'Keep this qualification.',highlight:false},{name:'別の選択肢',value:0,description:'Zero remains zero.',highlight:true},{name:'Mavelo',value:40,description:'Full-scale value.',highlight:false}];
+ values.barChart.valueSuffix='%';
+ const checked=validateNativeSocialParameters('annotated-horizontal-bars',values);
+ assert.deepEqual(checked,values);
+ const page=nativeSocialContentPage(checked,{id:'sample',title:'Original',purpose:'explain',blocks:[]},'annotated-horizontal-bars');
+ const rows=page.blocks.find(b=>b.id==='native-annotated-bars').rows;
+ assert.equal(rows[0].value,'0.125%');assert.equal(rows[1].value,'0%');assert.equal(rows[2].description,'Full-scale value.');
+ for(const patch of [{maximum:39},{tickStep:0},{tickStep:41},{tickStep:1}]){
+  assert.throws(()=>validateNativeSocialParameters('annotated-horizontal-bars',{...values,barChart:{...values.barChart,...patch}}));
+ }
 });

@@ -16,6 +16,7 @@ export const REFERENCE_POSTERS = [
  {id:'editorial-benchmark',scene:'metric',name:'Editorial benchmark',ratio:3200/1880,min:1.6,max:1.8},
  {id:'portrait-news-cover',scene:'editorial',name:'Portrait news cover',ratio:16/9,min:1.65,max:1.9},
  {id:'hardware-offer',scene:'pricing',name:'Hardware offer',ratio:1200/628,min:1.8,max:2.05},
+ {id:'annotated-horizontal-bars',scene:'metric',name:'Annotated horizontal bars',ratio:2100/1240,min:1.6,max:1.8},
 ] as const;
 export type ReferencePosterId=typeof REFERENCE_POSTERS[number]['id'];
 export const isReferencePoster=(id:string):id is ReferencePosterId=>REFERENCE_POSTERS.some(p=>p.id===id);
@@ -32,6 +33,10 @@ export interface PosterExtras {
  logoAssetId?:string;secondaryLogoAssetId?:string;secondaryBrand?:string;
  foregroundAssetId?:string;avatarAssetId?:string;valueSuffix?:string;accentText?:string;
  dataChart?:PosterChart;
+ barChart?:{
+  unit:string;numberLocale:string;maximum:number;tickStep:number;valueSuffix:string;
+  rows:{name:string;value:number;description:string;highlight:boolean}[];
+ };
 }
 export interface PosterItem {title:string;description:string;assetId?:string;subtitle?:string;primaryValue?:number;unit?:string}
 const text=(maxLength:number,description:string,minLength=0)=>({type:'string',minLength,maxLength,description});
@@ -73,6 +78,19 @@ export function referencePosterSchema(id:ReferencePosterId):ParameterSchema {
  }
  if(id==='hardware-offer'){
   p.title=text(32,'Product model or category.',1);p.value=text(16,'Highlighted specification value.',1);p.valueSuffix=text(16,'Specification unit or name.');p.body=text(64,'Main offer including complete rate and billing unit.',1);p.accentText=text(40,'Optional credit or secondary offer. Preserve supplied terms without inventing a time limit, eligibility condition or guarantee.');p.attribution=text(80,'Required offer qualifications.');p.cta=text(32,'Action button.',1);p.imageAssetId=asset();
+ }
+ if(id==='annotated-horizontal-bars'){
+  p.title=text(80,'Complete chart headline in the requested language.',1);
+  p.eyebrow=text(110,'Short context or qualification above the headline. Do not infer a company or identity.');
+  p.body=text(100,'Optional short methodology note below the headline.');
+  p.barChart=obj({
+   unit:text(90,'Full numeric axis label, including requested units and qualifications.',1),
+   numberLocale:{...text(16,'BCP47 locale for visible numbers.'),enum:['en','en-US','zh-CN','zh-TW','de-DE','es-ES','fr-FR','hi-IN','id-ID','it-IT','ja-JP','ko-KR','nl-NL','pl-PL','pt-BR','pt-PT','th-TH','tr-TR','vi-VN']},
+   maximum:{...num('Explicit upper axis bound, at least as large as every row value. The axis always begins at zero.'),minimum:.000001,default:40},
+   tickStep:{...num('Positive spacing between numeric ticks. Choose no more than twenty intervals across the axis.'),minimum:.000001,default:5},
+   valueSuffix:text(12,'Exact suffix after each value, e.g. % or a quantity unit. A value of 35 with suffix % is displayed as 35%, never converted to 0.35.'),
+   rows:{type:'array',minItems:3,maxItems:5,description:'Three to five rows in the exact requested order. Each value controls its bar length. Keep every requested annotation; emphasis is an explicit boolean, never inferred from a name.',items:obj({name:text(36,'Category label.',1),value:num('Nonnegative numeric magnitude, in the same unit as maximum.'),description:text(64,'Concise complete annotation displayed beside this bar.'),highlight:{type:'boolean',description:'Use the contrasting accent color for this row.'}})},
+  });
  }
  return obj(p);
 }
