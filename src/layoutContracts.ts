@@ -1,4 +1,5 @@
 import { SOCIAL_LAYOUT_CATALOG } from "./socialLayouts.js";
+import {REFERENCE_POSTERS,referencePosterSchema} from './referencePosters.js';
 export interface LayoutContract {
   id: string;
   kind: "presentation" | "social";
@@ -35,7 +36,10 @@ const pair = new Set([
 ]);
 /** Eligibility is a first filter, never a substitute for measured fit. */
 export const LAYOUT_CONTRACTS: readonly LayoutContract[] = [
-  ...SOCIAL_LAYOUT_CATALOG.map(({ id, scene }) => ({
+  ...SOCIAL_LAYOUT_CATALOG.map(({ id, scene }) => {
+    const poster=REFERENCE_POSTERS.find(p=>p.id===id);
+    if(poster){const schema=referencePosterSchema(poster.id);const count=((schema.properties as Record<string,unknown>).items as {minItems?:number}|undefined)?.minItems||0;return {id,kind:'social' as const,semantic:scene,minItems:count,maxItems:count,minRatio:poster.min,maxRatio:poster.max,required:['headline']};}
+    return ({
     id,
     kind: "social" as const,
     semantic: scene,
@@ -47,7 +51,7 @@ export const LAYOUT_CONTRACTS: readonly LayoutContract[] = [
       "headline",
       ...(["pricing", "metric"].includes(scene) ? ["value"] : []),
     ],
-  })),
+  });}),
 ];
 export function eligibleLayouts(
   kind: LayoutContract["kind"],

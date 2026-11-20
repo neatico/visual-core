@@ -2,10 +2,12 @@ import {COMPOSITION_ILLUSTRATIONS, ILLUSTRATION_GUIDANCE, type IllustrationScene
 import {compositionParameterDefaults} from './parameterDefaults.js';
 import {textPresentationSchema,validateTextPresentations,type TextPresentation} from './textPresentation.js';
 import {SOCIAL_LAYOUT_CATALOG} from './socialLayouts.js';
+import {isReferencePoster,referencePosterSchema,type PosterPriceTable} from './referencePosters.js';
 import type {ParameterSchema} from './recipeParameters.js';
 
 /** Native slots keep renderer-specific content separate from semantic page projection. */
 export interface NativeSocialParameters {
+  priceTable?:PosterPriceTable;
   textPresentation?:TextPresentation[];
   decorationEmoji?:string;
   title:string;
@@ -18,7 +20,7 @@ export interface NativeSocialParameters {
   attribution?:string;
   imageAssetId?:string;
   comparisonLabels?:[string,string];
-  items?:{title:string;description:string;assetId?:string;illustration?:IllustrationScene;primaryValue?:number;secondaryValue?:number}[];
+  items?:{title:string;description:string;assetId?:string;subtitle?:string;unit?:string;illustration?:IllustrationScene;primaryValue?:number;secondaryValue?:number}[];
 }
 export interface NativeSocialContract {
   parameterModel:'native-social';
@@ -55,6 +57,10 @@ const supportingItemSlots=new Set(['team','course','specification','schedule','r
 
 /** Every field corresponds to an authored visible slot; no scene-based eligibility filter. */
 export function nativeSocialParameterContract(id:string):NativeSocialContract {
+ if(isReferencePoster(id)){
+  const schema=referencePosterSchema(id),keys=Object.keys(schema.properties as object);
+  return {parameterModel:'native-social',parameterSchema:schema,importance:Object.fromEntries(keys.map(key=>[key,key==='title'?3:2])),generationPolicy:Object.fromEntries(keys.map(key=>[key,provenance]))};
+ }
  const spec=slots[id];
  if(!spec||!SOCIAL_LAYOUT_CATALOG.some(item=>item.id===id))throw new Error('COMPOSITION_UNKNOWN_NATIVE_SOCIAL');
  const properties:Record<string,unknown>={title:copy(id==='note-question'?44:40,'Concise audience-facing headline.'),body:copy(id==='organization'?32:id==='case-study'?64:['quote','testimonial','editorial-quote'].includes(id)?140:sentenceBodySlots.has(id)?96:80,id==='organization'?'A short label for the parent or coordinating role.':'One supporting sentence, or the quoted passage for a quote composition.')};
@@ -144,16 +150,19 @@ export function validateNativeSocialParameters(id:string,raw:unknown):NativeSoci
  if(values.emphasis?.some(phrase=>!values.title.includes(phrase)))throw new Error('CANDIDATE_INVALID_EMPHASIS');
  if(id==='usage-breakdown'&&values.items!.reduce((sum,item)=>sum+item.primaryValue!,0)>100.0001)throw new Error('CANDIDATE_INVALID_PERCENTAGES');
  if(id==='split-bar-compare'&&values.items!.some(item=>Math.abs(item.primaryValue!+item.secondaryValue!-100)>.001))throw new Error('CANDIDATE_INVALID_PERCENTAGES');
+ if(id==='split-photo-poll'&&values.items!.some(item=>!Number.isSafeInteger(item.primaryValue)))throw new Error('CANDIDATE_INVALID_COUNTS');
+ if(id==='cost-comparison'&&values.items![0].unit!==values.items![1].unit)throw new Error('CANDIDATE_INCOMPARABLE_UNITS');
  return JSON.parse(JSON.stringify(values)) as NativeSocialParameters;
 }
 
 /** Numeric and image identities remain available when a native design becomes editable content. */
-export function nativeSocialContentPage(values:NativeSocialParameters,original:import('./content.js').ContentPage):import('./content.js').ContentPage {
- const proof=original.evidence,blocks:import('./content.js').ContentBlock[]=[{id:'native-body',kind:'paragraph',text:values.body,evidence:proof}];
- if(values.items?.length)blocks.push({id:'native-items',kind:'features',evidence:proof,entries:values.items.map(item=>({title:item.title,...(item.illustration?{illustration:item.illustration}:{}),description:[item.description,...[item.primaryValue,item.secondaryValue].filter(value=>value!==undefined).map(value=>`${value}%`)].filter(Boolean).join(' · ')}))});
+export function nativeSocialContentPage(values:NativeSocialParameters,original:import('./content.js').ContentPage,layoutId=''):import('./content.js').ContentPage {
+ const proof=original.evidence,blocks:import('./content.js').ContentBlock[]=values.body?[{id:'native-body',kind:'paragraph',text:values.body,evidence:proof}]:[];
+ if(values.items?.length)blocks.push({id:'native-items',kind:'features',evidence:proof,entries:values.items.map(item=>({title:item.title,...(item.illustration?{illustration:item.illustration}:{}),description:[item.subtitle,item.description,...[item.primaryValue,item.secondaryValue].filter(value=>value!==undefined).map(value=>`${value}${isReferencePoster(layoutId)?item.unit||'':'%'}`)].filter(Boolean).join(' · ')}))});
+ if(values.priceTable){const p=values.priceTable;blocks.push({id:'native-price-table',kind:'parameters',evidence:proof,rows:p.rows.map(row=>({name:row.name,value:`${p.currency}${row.input} / ${p.currency}${row.output}`,description:`${p.columns.provider} ${p.currency}${row.providerInput} / ${p.currency}${row.providerOutput} · ${p.unit}`}))});blocks.push({id:'native-price-notes',kind:'paragraph',evidence:proof,text:[p.heading,p.badge,...p.benefits].filter(Boolean).join(' · ')});}
  for(const field of ['value','attribution','eyebrow','cta'] as const)if(values[field])blocks.push({id:`native-${field}`,kind:'paragraph',text:values[field]!,evidence:proof});
  if(values.comparisonLabels)blocks.push({id:'native-series',kind:'paragraph',evidence:proof,text:values.comparisonLabels.join(' / ')});
- const images=[values.imageAssetId,...(values.items||[]).map(item=>item.assetId)].filter((id):id is string=>!!id);
+ const images=[values.imageAssetId,...(values.items||[]).map(item=>item.assetId),...(values.priceTable?.rows||[]).map(row=>row.assetId)].filter((id):id is string=>!!id);
  for(const [index,assetId] of images.entries())blocks.push({id:`native-image-${index}`,kind:'image',evidence:[{sourceId:assetId}],sourceId:assetId,assetId,alt:values.title,treatment:assetId==='neatico-editorial-placeholder'?'diagram':'photograph',status:'available'});
  return {...original,title:values.title,blocks};
 }

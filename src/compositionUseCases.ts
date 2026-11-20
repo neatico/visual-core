@@ -1,5 +1,12 @@
 /** Authored communication tasks, independent of field count and successful parameter filling. */
 const useCases:Readonly<Record<string,string>>={
+ 'model-price-table':'Announce model or product availability with four explicit comparable input/output price rows. Use numeric price fields and a shared currency/unit; savings are computed. Develop a coherent illustrative comparison when requested, preserving supplied prices and qualifications.',
+ 'planet-career':'Present a two-line aspirational careers campaign over a generic industry photograph, with a highlighted second line and an explicit organization label. Do not infer an employer or real person from the subject.',
+ 'rental-features':'Explain a rental service with a product photograph, three prominent benefits and complete eligibility or usage notes. Develop the creative brief in the requested language and refer only to actual image asset IDs.',
+ 'split-photo-poll':'Ask one opinion question over two contrasting photographs. Two explicit vote counts determine percentages and the proportional bar. Use coherent illustrative counts for a creative example; preserve supplied counts.',
+ 'journal-announcement':'Announce a publication with a prominent title, short introduction, online status, overlapping cover and bottom action line. Preserve the requested language and explicitly supplied imprint and access labels.',
+ 'speaker-meetup':'Promote a meetup with a large two-line title, date/city, full event details and exactly four speaker cards. Each card has a name, affiliation, role and existing portrait asset ID. Names can be fictional for a creative concept.',
+ 'cost-comparison':'Compare two explicitly named plans using numeric totals in one currency and the same billing period, short cost explanations and a workload footnote. Keep any headline savings claim consistent with the totals.',
  'neon-workflow':'Introduce a supplied product or feature with a prominent blue product name, a benefit headline and exactly three input → product → output workflow stages. Develop a coherent launch story from the brief.',
  'navy-service':'Present a service with a concise benefit headline, a gold subheading and three supplied capabilities, beside original editable stationery artwork. Develop relevant supporting details.',
  'dark-promo':'Promote a supplied product or offer with a bold headline, a concise product scope, an action, a website label and offer terms. Develop an engaging, coherent offer from the brief.',

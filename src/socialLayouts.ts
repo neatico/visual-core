@@ -1,3 +1,4 @@
+import {REFERENCE_POSTERS} from './referencePosters.js';
 /** Stable authored social layouts and their semantic scenes. */
 export const SOCIAL_LAYOUT_CATALOG = [
   {id:"note-question",scene:"editorial",name:"Emoji question"},
@@ -210,4 +211,5 @@ export const SOCIAL_LAYOUT_CATALOG = [
   {id: "dark-promo", scene: "pricing", name: "Dark gradient promotion"},
   {id: "neon-workflow", scene: "launch", name: "Neon product workflow"},
   {id: "navy-service", scene: "features", name: "Navy and gold service"},
+  ...REFERENCE_POSTERS,
 ] as const;

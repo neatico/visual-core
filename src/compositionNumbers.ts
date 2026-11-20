@@ -109,5 +109,6 @@ export const SOCIAL_DISPLAY_NUMBERS: Readonly<Record<string, string>> = {
   "price-increase": "S050",
   "dark-promo": "S051",
   "neon-workflow": "S052",
-  "navy-service": "S053"
+  "navy-service": "S053",
+  "model-price-table":"S054","planet-career":"S055","rental-features":"S056","split-photo-poll":"S057","journal-announcement":"S058","speaker-meetup":"S059","cost-comparison":"S060"
 };

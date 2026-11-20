@@ -1,4 +1,5 @@
 import {EXPLORE_LAYOUTS} from './exploreCollection.js';
+import {REFERENCE_POSTERS} from './referencePosters.js';
 import {compositionUseCase} from './compositionUseCases.js';
 import {nativeSocialParameterContract} from './nativeSocialParameters.js';
 import {DESIGN_RECIPES,type DesignRecipe} from './designSystem.js';
@@ -106,7 +107,8 @@ const BASE_COMPOSITIONS:readonly FormalComposition[]=[
   ...FORMAL_REFERENCE_COMPOSITIONS.map(spec=>define(semantic(spec.id,spec.accepts,0,12,spec.accepts.includes('image')),both,`reference:${spec.id}`,`R${String(spec.reference).padStart(2,'0')}`)),
   ...SOCIAL_LAYOUT_CATALOG.map(preset=>{
     const recipe=DESIGN_RECIPES.find(item=>item.id===preset.id&&item.kind==='social')!;
-    return {...define({...recipe,renderer:'catalog'},['social'],`social:${preset.id}`,SOCIAL_DISPLAY_NUMBERS[preset.id],.5,2.4),...nativeSocialParameterContract(preset.id)};
+    const poster=REFERENCE_POSTERS.find(item=>item.id===preset.id);
+    return {...define({...recipe,renderer:'catalog'},['social'],`social:${preset.id}`,SOCIAL_DISPLAY_NUMBERS[preset.id],poster?.min??.5,poster?.max??2.4),...nativeSocialParameterContract(preset.id)};
   }),
   ...uniqueSemantic.map(recipe=>define(recipe,semanticRecipes.filter(other=>other.id===recipe.id).map(other=>other.kind),`semantic:${recipe.kind}:${recipe.id}`,recipe.id.startsWith("authored-explore-")?`X${String(EXPLORE_LAYOUTS.findIndex(item=>recipe.id===`authored-explore-${item[0]}`)+1).padStart(2,"0")}`:SEMANTIC_DISPLAY_NUMBERS[`semantic:${recipe.kind}:${recipe.id}`],recipe.id.startsWith("authored-explore-")?1.4:.25,recipe.id.startsWith("authored-explore-")?2:4)),
   ...founderDefinitions.map(([id,accepts,min,max],index)=>define(semantic(id,accepts,min,max),['social'],`semantic:social:${id}`,`F${index+1}`,1.3)),

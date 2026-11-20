@@ -31,6 +31,7 @@ export * from './articleCompositionCuration.js';
 export * from './contentBrief.js';
 
 export * from "./nativeSocialParameters.js";
+export * from "./referencePosters.js";
 
 export * from "./compositionUseCases.js";
 

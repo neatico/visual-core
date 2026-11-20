@@ -1,14 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {FORMAL_COMPOSITIONS,applicableCompositions,articleCompositionCuration,ARTICLE_COMPOSITION_CURATION} from '../dist/index.js';
+import {isReferencePoster,FORMAL_COMPOSITIONS,applicableCompositions,articleCompositionCuration,ARTICLE_COMPOSITION_CURATION} from '../dist/index.js';
 test('formal inventory preserves every gallery ID and separates output capabilities',()=>{
- assert.equal(FORMAL_COMPOSITIONS.length,183);
- assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,183);
+ assert.equal(FORMAL_COMPOSITIONS.length,190);
+ assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,190);
  assert.equal(applicableCompositions('presentation',16/9).length,80);
  assert.equal(applicableCompositions('presentation',1).length,62);
- assert.equal(applicableCompositions('social',16/9).length,126);
- assert.equal(applicableCompositions('social',1).length,122);
+ assert.equal(applicableCompositions('social',16/9).length,129);
+ assert.equal(applicableCompositions('social',1).length,125);
  assert.equal(applicableCompositions('article-cover',16/9).length,73);
  assert.equal(applicableCompositions('article-cover',1).length,63);
  assert.equal(applicableCompositions('article-illustration',16/9).length,151);
@@ -49,7 +49,7 @@ test('article reuse changes no original identifier, schema, renderer, recipe, ra
  // Updated for the reviewed creative-authoring contract migration.
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
- const original=JSON.stringify(FORMAL_COMPOSITIONS.map(({supportedKinds,...definition})=>definition));
+ const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
  assert.equal(createHash('sha256').update(original).digest('hex'),'a4e61f8a44ebbd2e1b7a0ee907b475f64685dd168f33acd92c3ce597aefcf522');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
