@@ -40,6 +40,7 @@ export type SemanticKind =
   | "chart"
   | "image";
 export interface ComparisonColumn {
+  tone?: "positive" | "negative" | "caution" | "neutral";
   title: string;
   points: string[];
   price?: string;
@@ -324,6 +325,11 @@ function comparisonColumn(
     title: draft(col.title, `${path}.title`, 160),
     points,
   };
+  if (col.tone !== undefined) {
+    if (!["positive", "negative", "caution", "neutral"].includes(String(col.tone)))
+      fail("CONTENT_INVALID_COMPARISON_TONE", `${path}.tone`);
+    result.tone = col.tone as ComparisonColumn["tone"];
+  }
   if (col.price !== undefined) result.price = fact(col.price, `${path}.price`);
   if (col.values !== undefined)
     result.values = list(

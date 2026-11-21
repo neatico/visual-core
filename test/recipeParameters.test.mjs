@@ -57,3 +57,18 @@ test('measured table and sequence contracts preserve detail without widening aut
  const fixed=FORMAL_COMPOSITIONS.find(item=>item.id==='semantic:presentation:authored-steps-ribbon').parameterSchema.properties.blocks.items[0].properties.entries;
  assert.equal(fixed.minItems,3);assert.equal(fixed.maxItems,3);
 });
+
+ test('comparison playbook uses explicit status and a single prominent value per column',async()=>{
+ const {FORMAL_COMPOSITIONS}=await import('../dist/index.js');
+ const definition=FORMAL_COMPOSITIONS.find(item=>item.id==='new-reference:comparison-playbook');
+ assert.deepEqual(definition.supportedKinds,['presentation','social']);
+ const blocks=definition.parameterSchema.properties.blocks.items;
+ assert.deepEqual(blocks.map(item=>item.properties.kind.const),['comparison','paragraph','steps','paragraph']);
+ const values=blocks[0].properties.columns.items.properties.values;
+ assert.equal(values.items[0].maxLength,24);
+ assert.equal(values.items[1].const,'');
+ assert.equal(values.additionalItems,false);
+ assert.equal(blocks[2].properties.entries.maxItems,5);
+ assert.deepEqual(blocks[0].properties.columns.items.properties.tone.enum,['positive','negative','caution','neutral']);
+ assert.equal(blocks[0].properties.columns.items.properties.statuses,undefined);
+ });

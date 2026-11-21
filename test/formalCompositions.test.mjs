@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {isReferencePoster,FORMAL_COMPOSITIONS,applicableCompositions,articleCompositionCuration,ARTICLE_COMPOSITION_CURATION} from '../dist/index.js';
 test('formal inventory preserves every gallery ID and separates output capabilities',()=>{
- assert.equal(FORMAL_COMPOSITIONS.length,198);
- assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,198);
- assert.equal(applicableCompositions('presentation',16/9).length,80);
+ assert.equal(FORMAL_COMPOSITIONS.length,199);
+ assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,199);
+ assert.equal(applicableCompositions('presentation',16/9).length,81);
  assert.equal(applicableCompositions('presentation',1).length,62);
- assert.equal(applicableCompositions('social',16/9).length,133);
+ assert.equal(applicableCompositions('social',16/9).length,134);
  assert.equal(applicableCompositions('social',1).length,127);
  assert.equal(applicableCompositions('article-cover',16/9).length,73);
  assert.equal(applicableCompositions('article-cover',1).length,63);
@@ -51,7 +51,7 @@ test('article reuse changes no original identifier, schema, renderer, recipe, ra
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
  const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
- assert.equal(createHash('sha256').update(original).digest('hex'),'38bfd54e5b9b58a9719a7047fbf04caa08b977128288adf0df0afd0ea1cae20f');
+ assert.equal(createHash('sha256').update(original).digest('hex'),'a2538b4b04dbf563cad232cc000945972aca6d8bfeb14971a41c5a2ff2d639f4');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
 });

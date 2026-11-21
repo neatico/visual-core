@@ -252,6 +252,7 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
   let kinds: SemanticKind[];
   if (["authored-explore-cover", "authored-explore-photo-story"].includes(id))
     kinds = ["paragraph", "image"];
+  else if (id === "authored-reference-comparison-playbook") kinds = ["comparison", "paragraph", "steps", "paragraph"];
   else if (id.endsWith("ledger-chart")) kinds = ["parameters", "chart"];
   else if (id.endsWith("detail-sidebar")) kinds = ["paragraph", "parameters"];
   else if (id.endsWith("technical-log")) kinds = ["paragraph", "code"];
@@ -285,7 +286,7 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
     ];
   if (id.startsWith("bookend-") || recipe.family.startsWith("prose-"))
     kinds = ["paragraph"];
-  const items = kinds.map((kind) => {
+  const items = kinds.map((kind, blockIndex) => {
     const schema = JSON.parse(
       JSON.stringify(blockSchema(kind, recipe.maxEntries)),
     );
@@ -469,6 +470,41 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
         values.description = "Use enough rows to complete this page's requested detail: include every relevant time slot or budget item and total, within the fixed maximum. Do not collapse a full itinerary into three vague phases.";
       }
     }
+    if (id === "authored-reference-comparison-playbook") {
+      if (kind === "comparison") {
+        const column = fields.columns.items;
+        delete column.properties.price;
+        column.required.push("values");
+        column.properties.title.maxLength = 64;
+        column.properties.points.minItems = 1;
+        column.properties.points.maxItems = 2;
+        column.properties.points.items.maxLength = 100;
+        column.properties.points.description = "One supporting description, or two entries: a short qualifier beside the large value, then supporting context below. Never add an empty point.";
+        column.properties.values.minItems = 1;
+        column.properties.values.maxItems = 2;
+        column.properties.values.items = [
+          {type: "string", minLength: 1, maxLength: 24, description: "One short display value or status label, not a sentence. Move explanations to points."},
+          {type: "string", const: "", description: "Empty alignment slot for the supporting context; do not repeat a value or explanation."},
+        ];
+        column.properties.values.additionalItems = false;
+        column.properties.values.description = "Same length as points. First entry is the prominent value or status label. If there is a second entry, it must be an empty string.";
+        delete column.properties.statuses;
+        column.properties.tone = {enum: ["positive", "negative", "caution", "neutral"], description: "Explicit outcome tone for this panel: positive, negative, caution or neutral. Honor the brief's stated outcome; use neutral when unspecified. This is not feature availability or whether the panel is included."};
+        column.required.push("tone");
+      }
+      if (kind === "paragraph") {
+        delete fields.heading; delete fields.level; delete fields.role;
+        fields.text.maxLength = blockIndex === 1 ? 48 : 140;
+        fields.text.description = blockIndex === 1 ? "Section label introducing the numbered actions, in the output language." : "Optional footer context, date range or attribution. Use an empty string when unnecessary; do not fabricate source attribution.";
+      }
+      if (kind === "steps") {
+        fields.entries.minItems = 1; fields.entries.maxItems = 5;
+        fields.entries.items.properties.title.maxLength = 100;
+        fields.entries.items.properties.description.maxLength = 140;
+        delete fields.entries.items.properties.icon;
+        delete fields.entries.items.properties.illustration;
+      }
+    }
     return schema;
   });
   return {
@@ -510,7 +546,7 @@ export function recipeParameterContract(
             recipe.id.startsWith("bookend-")
               ? "A focused cover or closing headline, not the whole brief. Use deliberate line breaks when helpful; do not join multiple headings with pipes."
               : "Audience-facing headline preserving the original topic.",
-            recipe.id.startsWith("bookend-") ? 44 : 64,
+            recipe.id.startsWith("bookend-") ? 44 : recipe.id === "authored-reference-comparison-playbook" ? 120 : 64,
           ),
           minLength: 1,
         },

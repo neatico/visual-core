@@ -69,6 +69,7 @@ const useCases:Readonly<Record<string,string>>={
  'research-highlight':'Summarize a research question, method, findings, or limitations. General process advice without a study is a weak fit even when research-like text can be drafted.',
  'product-showcase':'Show a product in a meaningful use context with a few supporting benefits. Generic workflow guidance without a product or requested product concept is weaker.',
  'authored-reference-ledger-chart':'Explain named logistics or specifications together with a small quantitative comparison. Both the facts and the chart should serve the requested task.',
+ 'authored-reference-comparison-playbook':'Contrast two explicitly labeled results or conditions with prominent values and supporting context, then present ordered actions below a divider. Use for evaluation summaries, operational reviews and decision briefings; outcome colors only use the explicit panel tone.',
  'authored-reference-detail-sidebar':'Explain a narrative topic beside a few named supporting facts. Suitable when prose and factual details have different reading priorities.',
  'authored-reference-technical-log':'Explain exact code or a technical log with a short supporting note. Develop a useful code example when relevant to the task.',
  'authored-reference-architecture-stack':'Explain ordered layers, successive stages, or an architectural stack, using visually connected cards. Parallel features with no order fit a list better.',

@@ -101,6 +101,7 @@ function article(id:string,kind:typeof articleKinds[number]|'cover',variant:numb
  * discovery. Output capabilities overlap and must never be summed.
  */
 const BASE_COMPOSITIONS:readonly FormalComposition[]=[
+  define(semantic('authored-reference-comparison-playbook',['comparison','paragraph','steps'],3,7),both,'new-reference:comparison-playbook','N7',1.4,2),
   ...campaignDefinitions.map(([id,accepts,min,max,image,landscape],index)=>define(semantic(`authored-reference-${id}`,accepts,min,max,image),landscape?['presentation']:both,`new-reference:${id}`,`N${index+1}`,landscape?1.4:.25)),
   define(semantic('authored-event-poster',['parameters','paragraph'],1,6),['social'],'event:provider','E1'),
   define(semantic('authored-image-triptych',['paragraph','features','image'],3,3,true),['social'],'campaign:triptych','C1',.5,2),

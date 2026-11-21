@@ -26,6 +26,7 @@ const native:readonly ArticleCompositionRequirement[]=['editorial-copy','empty-p
  * renderer must be reviewed instead of inheriting eligibility from its name.
  */
 export const ARTICLE_COMPOSITION_CURATION:readonly CurationGroup[]=[
+  {category:'comparison-playbook',cover:false,illustration:false,requirements:[],reason:'A landscape comparison and numbered action plan needs its full slide or social canvas to preserve readable values, qualifiers and actions. It has not been approved for article cover or illustration reuse.',rendererKeys:semantic('authored-reference-comparison-playbook')},
   {category:'reference-campaign-poster',cover:false,illustration:false,requirements:[],
     reason:'These reference compositions use precise square, portrait or landscape geometry with pricing, recruitment, rental, voting, publication or event slots. Their editable marketing artwork stays in social creation; article reuse would require a separate visual and content audit.',
     rendererKeys:catalog('model-price-table','planet-career','rental-features','split-photo-poll','journal-announcement','speaker-meetup','cost-comparison','split-product-pricing','neon-enterprise-trial','ranked-data-table','city-service-offer','editorial-benchmark','portrait-news-cover','hardware-offer','annotated-horizontal-bars')},
