@@ -46,12 +46,13 @@ test('illustration contracts require their actual visual structure and bounded n
 });
 
 test('article reuse changes no original identifier, schema, renderer, recipe, ratio or display identity',()=>{
- // Reviewed migration: bookends now separate optional identity fields from
- // concise display copy. No renderer identifiers or output capabilities changed.
+ // Reviewed migration: chat item schemas now accept optional real avatar asset IDs
+ // and explicitly authored fictional nicknames. Asset descriptors prefer the real
+ // supplied catalog; legacy stored placeholder IDs remain valid.
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
  const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
- assert.equal(createHash('sha256').update(original).digest('hex'),'a2538b4b04dbf563cad232cc000945972aca6d8bfeb14971a41c5a2ff2d639f4');
+ assert.equal(createHash('sha256').update(original).digest('hex'),'c8ea5e78f4b8ce03931f9dda3b7d1d98aa491264779af7ef1dfcec0b752de666');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
 });

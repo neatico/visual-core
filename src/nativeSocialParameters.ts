@@ -35,7 +35,7 @@ const slots:Record<string,Slots>={
  'neon-workflow':{items:3,value:true,attribution:true},
  'navy-service':{items:3,value:true},
  'note-question':{},'note-marker':{},'note-editorial':{},'note-checklist':{items:3},'note-photo':{image:true},'note-news':{value:true},
- 'chat-messenger':{items:3},'chat-imessage':{items:3},'chat-telegram':{items:3},'chat-workplace':{items:3},
+ 'chat-messenger':{items:3,itemImages:true},'chat-imessage':{items:3,itemImages:true},'chat-telegram':{items:3,itemImages:true},'chat-workplace':{items:3,itemImages:true},
  'time-notice':{value:true},'news-focus':{},manifesto:{},launch:{image:true},bento:{items:3},spotlight:{items:3,value:true,image:true},
  ticket:{items:2,value:true},webinar:{value:true,image:true},quote:{attribution:true},testimonial:{attribution:true},metric:{value:true},
  report:{items:3},checklist:{items:3},steps:{items:3},comparison:{items:2},myth:{items:2},pricing:{items:3,value:true},offer:{value:true,image:true},
@@ -46,7 +46,7 @@ const slots:Record<string,Slots>={
 };
 const copy=(maxLength:number,description:string,minLength=1)=>({type:'string',minLength,maxLength,description});
 const object=(properties:Record<string,unknown>)=>({type:'object',additionalProperties:false,properties,required:Object.keys(properties)});
-const asset=()=>copy(160,'An existing supplied asset ID. Use neatico-editorial-placeholder when no matching source image exists.');
+const asset=()=>copy(160,'An existing asset ID from the supplied assets catalog. Inspect its actual subject and artDirection. If no suitable image exists, choose a composition without an image slot instead of inventing an asset or using an unrelated placeholder.');
 export {COMPOSITION_ILLUSTRATIONS} from './illustrationScenes.js';
 const illustratedSlots=new Set(['bento','course','case-study','report','product-showcase','comparison','research-highlight']);
 const provenance=['user-fact','derived','creative','simulated'] as const;
@@ -92,7 +92,8 @@ export function nativeSocialParameterContract(id:string):NativeSocialContract {
    item.description=copy(24,'Optional concise supporting detail. Use empty text when not needed.',0);
   }
   if(illustratedSlots.has(id))item.illustration={type:'string',enum:COMPOSITION_ILLUSTRATIONS,default:'symbol',description:ILLUSTRATION_GUIDANCE};
-  if(spec.itemImages)item.assetId=asset();
+  if(spec.itemImages)item.assetId=id.startsWith('chat-')?{...asset(),default:'',minLength:0,description:'AI-generated portrait asset ID from assets (generic-chat-avatar-man-v1 or generic-chat-avatar-woman-v1). Keep the same portrait for every message from the same speaker. Never use stock people as fictional speakers.'}:asset();
+  if(id.startsWith('chat-'))item.title=copy(20,'A natural fictional nickname in the output language, authored for this conversation. Keep the same name for each speaker; do not use generic role labels.');
   if(spec.quantities){
    item.primaryValue={type:'number',minimum:0,maximum:100,description:spec.quantities==='comparison'?'A percentage from zero to one hundred. primaryValue plus secondaryValue must equal exactly 100 in this item.':'A percentage from zero to one hundred. Never encode numbers inside descriptive copy.'};
    if(spec.quantities!=='share')item.secondaryValue={type:'number',minimum:0,maximum:100,description:'The comparison or benchmark percentage.'};
@@ -112,12 +113,13 @@ export function nativeSocialParameterContract(id:string):NativeSocialContract {
  return {parameterModel:'native-social',parameterSchema:object(properties),importance,generationPolicy:Object.fromEntries(contentKeys.map(key=>[key,provenance]))};
 }
 
-/** Apply the small closed schema vocabulary used by native slots on every local render. */
-export function validateNativeSocialParameters(id:string,raw:unknown):NativeSocialParameters {
+/** Validate structural contracts. Measured renderers may exceed writing budgets,
+ * retaining every character, then reject actual overflow at the target geometry. */
+export function validateNativeSocialParameters(id:string,raw:unknown,options:{measuredText?:boolean}={}):NativeSocialParameters {
  const check=(value:unknown,schema:Record<string,unknown>):boolean=>{
   if(Object.hasOwn(schema,'const'))return value===schema.const;
   if(Array.isArray(schema.enum))return schema.enum.includes(value);
-  if(schema.type==='string')return typeof value==='string'&&Array.from(value).length>=Number(schema.minLength||0)&&Array.from(value).length<=Number(schema.maxLength)&&(!schema.pattern||new RegExp(String(schema.pattern),'u').test(value));
+  if(schema.type==='string')return typeof value==='string'&&Array.from(value).length>=Number(schema.minLength||0)&&Array.from(value).length<=(options.measuredText?10000:Number(schema.maxLength))&&(!schema.pattern||new RegExp(String(schema.pattern),'u').test(value));
   if(schema.type==='boolean')return typeof value==='boolean';
   if(schema.type==='number')return typeof value==='number'&&Number.isFinite(value)&&value>=Number(schema.minimum)&&value<=Number(schema.maximum);
   if(schema.type==='array')return Array.isArray(value)&&value.length>=Number(schema.minItems)&&value.length<=Number(schema.maxItems)&&value.every(item=>check(item,schema.items as Record<string,unknown>));

@@ -24,8 +24,8 @@ test('numeric visual slots are typed separately from descriptive copy',()=>{
  }
 });
 
-test('hero and portrait slots always permit the source-attributed native placeholder',()=>{
- for(const id of ['launch','webinar','editorial','note-photo'])assert.ok(nativeSocialParameterContract(id).parameterSchema.properties.imageAssetId.description.includes('neatico-editorial-placeholder'));
+test('hero and portrait slots select actual catalog assets without prescribing a placeholder',()=>{
+ for(const id of ['launch','webinar','editorial','note-photo'])assert.ok(nativeSocialParameterContract(id).parameterSchema.properties.imageAssetId.description.includes('supplied assets catalog'));
  assert.equal(nativeSocialParameterContract('ticket').parameterSchema.properties.items.maxItems,2);
  assert.equal(nativeSocialParameterContract('research-highlight').parameterSchema.properties.items.maxItems,2);
 });
@@ -107,4 +107,18 @@ test('mixed-script title lines retain spaces and never split Latin words',async(
  const values={title:'AI \u77e5\u8bc6 knowledge',body:'Keep the complete title.'};
  assert.deepEqual(validateNativeSocialParameters('note-marker',{...values,titleLines:['AI','\u77e5\u8bc6 knowledge']}).titleLines,['AI','\u77e5\u8bc6 knowledge']);
  assert.throws(()=>validateNativeSocialParameters('note-marker',{...values,titleLines:['AI \u77e5\u8bc6 know','ledge']}),/CANDIDATE_INVALID_TITLE_LINES/);
+});
+
+test('measured native text preserves complete multilingual sentences without relaxing structure',async()=>{
+ const {validateNativeSocialParameters}=await import('../dist/index.js');
+ const values={title:'Neighborhood conversation',body:'A book swap between fictional neighbors.',items:[
+  {title:'Éloïse',description:'Let’s meet at the library on Saturday and bring the books we would like to share.',assetId:'generic-professional-woman-v1'},
+  {title:'Noah',description:'I will bring two novels and a notebook. Shall we meet by the entrance at ten?',assetId:'generic-professional-man-v1'},
+  {title:'Éloïse',description:'Perfect. We can browse together and decide which books to exchange when we arrive.',assetId:'generic-professional-woman-v1'}]};
+ assert.throws(()=>validateNativeSocialParameters('chat-imessage',values));
+ const measured=validateNativeSocialParameters('chat-imessage',values,{measuredText:true});
+ assert.deepEqual(measured.items,values.items);
+ assert.deepEqual(validateNativeSocialParameters('chat-imessage',JSON.parse(JSON.stringify(measured)),{measuredText:true}),measured);
+ assert.throws(()=>validateNativeSocialParameters('chat-imessage',{...values,items:values.items.slice(0,2)},{measuredText:true}));
+ assert.throws(()=>validateNativeSocialParameters('chat-imessage',{...values,items:values.items.map(x=>({...x,unknown:'x'}))},{measuredText:true}));
 });
