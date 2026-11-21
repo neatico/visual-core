@@ -302,6 +302,13 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       ].includes(id)
         ? 160
         : 120;
+    if (id.startsWith("bookend-") && kind === "paragraph") {
+      delete fields.heading;
+      delete fields.level;
+      fields.text.description = id.startsWith("bookend-cover-")
+        ? "One short subtitle explaining the presentation's purpose. Do not repeat the title, add a section label, or pack dates, progress, project metadata or an outline into this paragraph. Put presenter/date/organization/contact in bookend fields; develop detailed requested information on body pages."
+        : "One concise closing takeaway or next action. Do not repeat the title or summarize every page. Keep contact and presenter information in bookend fields.";
+    }
     if (kind === "features" || kind === "steps") {
       const entries = fields.entries;
       entries.minItems = id === "authored-reference-story" ? 2 : count;
@@ -500,13 +507,23 @@ export function recipeParameterContract(
       {
         title: {
           ...text(
-            "Audience-facing headline preserving the original topic.",
-            64,
+            recipe.id.startsWith("bookend-")
+              ? "A focused cover or closing headline, not the whole brief. Use deliberate line breaks when helpful; do not join multiple headings with pipes."
+              : "Audience-facing headline preserving the original topic.",
+            recipe.id.startsWith("bookend-") ? 44 : 64,
           ),
           minLength: 1,
         },
         blocks: fixedBlocks(recipe),
         textPresentation: textPresentationSchema(),
+        ...(recipe.id.startsWith("bookend-") ? {bookend: object({
+          organization: text("Optional organization or event identity explicitly chosen in the brief. Do not repeat the headline.", 64),
+          presenter: text("Optional presenter explicitly provided in the brief.", 48),
+          role: text("Optional presenter role explicitly provided in the brief.", 48),
+          date: text("Optional presentation date or period explicitly provided in the brief, in the output language.", 48),
+          contact: text("Optional contact or next-step destination explicitly provided in the brief.", 96),
+          logoAssetId: text("Optional existing logo asset ID explicitly selected for this presentation.", 160),
+        }, [])} : {}),
       },
       ["title", "blocks"],
     ),

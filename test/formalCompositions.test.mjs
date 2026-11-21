@@ -46,12 +46,12 @@ test('illustration contracts require their actual visual structure and bounded n
 });
 
 test('article reuse changes no original identifier, schema, renderer, recipe, ratio or display identity',()=>{
- // Reviewed migration: semantic row decorations are optional, without forced
- // illustration defaults. Native large-region illustration slots are unchanged.
+ // Reviewed migration: bookends now separate optional identity fields from
+ // concise display copy. No renderer identifiers or output capabilities changed.
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
  const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
- assert.equal(createHash('sha256').update(original).digest('hex'),'9662bddfaa15d95f7844dd83eedacc24d45a5e286209960161e2d1f9359b8a37');
+ assert.equal(createHash('sha256').update(original).digest('hex'),'38bfd54e5b9b58a9719a7047fbf04caa08b977128288adf0df0afd0ea1cae20f');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
 });
@@ -131,4 +131,19 @@ test('all formal FAQ patterns include the full question rather than only punctua
  FORMAL_COMPOSITIONS.forEach(contract=>visit(contract.parameterSchema));
  assert.ok(patterns.length>3);
  for(const pattern of patterns){const regex=new RegExp(pattern,'u');assert.equal('What should I save?'.match(regex)?.[0],'What should I save?');assert.equal(regex.test('?'),false);}
+});
+
+
+test('bookend contracts separate subtitle and optional identity from headline',()=>{
+ const contracts=FORMAL_COMPOSITIONS.filter(c=>c.id.startsWith('semantic:presentation:bookend-'));
+ assert.equal(contracts.length,6);
+ for(const {parameterSchema:s} of contracts){
+  assert.equal(s.properties.title.maxLength,44);
+  const subtitle=s.properties.blocks.items[0];
+  assert.equal(subtitle.properties.kind.const,'paragraph');
+  assert.equal(subtitle.properties.heading,undefined);
+  assert.deepEqual(s.properties.bookend.required,[]);
+  assert.equal(s.properties.bookend.properties.date.maxLength,48);
+  assert.equal(s.properties.bookend.additionalProperties,false);
+ }
 });
