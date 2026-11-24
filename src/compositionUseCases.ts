@@ -1,5 +1,14 @@
+import {campaignEdition} from './campaignEditions.js';
 /** Authored communication tasks, independent of field count and successful parameter filling. */
 const useCases:Readonly<Record<string,string>>={
+ 'before-after':'Explain two explicit visual states of a project, product, space or design, with two actual image assets and independent labels and descriptions. Use for process comparisons and transformations. Do not fabricate outcomes or infer identities from photographs; a text-only comparison should use the existing comparison layout.',
+ recipe:'Present a saveable recipe with a real dish image, complete ingredients, optional time and yield, and three to six ordered preparation steps. Keep required actions and quantities; choose a larger format or more pages rather than omitting necessary instructions.',
+ 'color-block-index':'A bold headline and introduction on one color field, paired with three separately labeled, concise takeaways. Use for public education, feature launches and announcements with three distinct points.',
+ 'marker-broadside':'A typography-led poster with a single dominant headline in fitted ink bands, a supporting statement and an optional action. Suits an editorial takeaway or campaign message that can be read at feed size.',
+ 'service-hours':'Publish service availability or opening hours as one to seven explicitly labeled date/day groups with full intervals and exceptions, supporting notes and an optional action. Suitable for stores, venues, offices and community services; never derive hours from a brand or industry name.',
+ 'authored-diagram-funnel':'Explain a narrowing sequence from broad input to qualified output using three to five stages. Use for filtering, conversion and selection processes. Stages are schematic, not proportional quantities; preserve requested figures and units in descriptions and do not invent conversion rates.',
+ 'authored-diagram-pyramid':'Explain three to five explicitly ordered layers from a top-level aim to its supporting foundation. Use for hierarchies, levels and capability foundations, not unrelated feature lists. The tier shapes are schematic and do not encode numeric amounts.',
+ 'authored-diagram-cycle':'Explain three to five stages of a recurring process with a closing connection from the final stage back to the first. Use for feedback loops and iterative work. A finite chronological plan should retain a timeline or steps layout instead.',
  'annotated-horizontal-bars':'Compare three to five numeric categories on a shared zero-based horizontal axis, with a complete annotation beside each bar. Preserve row order, explicit emphasis, numeric scale, units and user-requested qualifications. The design does not infer names, probabilities or facts from the topic.',
  'model-price-table':'Announce model or product availability with four explicit comparable input/output price rows. Use numeric price fields and a shared currency/unit; savings are computed. Develop a coherent illustrative comparison when requested, preserving supplied prices and qualifications.',
  'planet-career':'Present a two-line aspirational careers campaign over a generic industry photograph, with a highlighted second line and an explicit organization label. Do not infer an employer or real person from the subject.',
@@ -49,6 +58,9 @@ const useCases:Readonly<Record<string,string>>={
  offer:'Promote a specific offer, benefit, discount, or requested campaign. This is not an ordinary explanatory list.',
  editorial:'Introduce an article or editorial subject with a headline-led visual and supporting context.',
  story:'Tell a short narrative or explain a meaningful change through a visual story. A flat collection of unrelated facts is weaker.',
+ 'hiring-role':'Present one job opening as a professional role profile: a prominent job title, short introduction, responsibilities, qualifications and application call to action. Keep complete requirements in the authored slots.',
+ 'hiring-openings':'Present several distinct open positions as a recruitment directory. Each item is a separate job with its own supporting detail, alongside employer introduction and a clear application call to action.',
+ 'hiring-benefits':'Present a recruitment campaign around the value of joining a team, with a strong employer proposition, three supporting benefits or growth opportunities, and a clear application call to action.',
  hiring:'Advertise a role or recruitment opportunity and its requirements. Mentioning a team does not make ordinary work guidance a hiring task.',
  team:'Introduce authored people with names and roles. Three parallel workflow actions are not a roster of people, even when their text fits the cards.',
  course:'Describe a course, learning program, or syllabus with an educational progression. A generic workflow is weaker unless teaching or learning is the task.',
@@ -152,6 +164,7 @@ const article:Readonly<Record<string,string>>={
  chart:'Explain a comparable numeric series or a requested illustrative numerical example. Qualitative prose alone does not establish quantitative intent.',
 };
 export function compositionUseCase(id:string):string {
+  const edition=campaignEdition(id);if(edition)return edition.description+'. '+(edition.blocks.includes('image')?'Choose photographs whose subjects match the audience and the specific story. Place short, independently readable copy against their reserved text areas.':edition.blocks.includes('comparison')?'Compare like-for-like dimensions, with each point in the same row representing the same subject across alternatives.':'Lead with the main takeaway. Keep the supporting copy concise enough to read at publication size.');
  const entry=useCases[id];
  if(entry)return entry;
  const match=/^article-(cover|features|process|comparison|summary|checklist|faq|chart)-\d+$/.exec(id);

@@ -1,3 +1,4 @@
+import {CAMPAIGN_EDITIONS} from './campaignEditions.js';
 import type {RecipeParameterContract} from './recipeParameters.js';
 
 export type ArticleCompositionRequirement =
@@ -26,6 +27,17 @@ const native:readonly ArticleCompositionRequirement[]=['editorial-copy','empty-p
  * renderer must be reviewed instead of inheriting eligibility from its name.
  */
 export const ARTICLE_COMPOSITION_CURATION:readonly CurationGroup[]=[
+  ...CAMPAIGN_EDITIONS.map((spec):CurationGroup=>{
+    const detail=spec.blocks.includes('comparison')||['tiles','hub','questions'].includes(spec.key);
+    const requirements:ArticleCompositionRequirement[]=['editorial-copy'];
+    if(spec.blocks.includes('image'))requirements.push('source-asset');
+    if(spec.blocks.includes('comparison'))requirements.push('aligned-comparison');
+    if(spec.blocks.includes('quote'))requirements.push('quotation');
+    return {category:'editorial-edition',cover:!detail,illustration:true,requirements,rendererKeys:semantic('authored-edition-'+spec.key),
+      reason:spec.description+'. '+(detail?'The item-by-item structure is intended for detailed reading inside an article; it retains labels and relationships at illustration size.':'The headline provides the entry point in a cover or an inline editorial illustration, with separate editable fields for the supporting material.')};
+  }),
+  {category:'industry-social-detail',cover:false,illustration:false,requirements:[],reason:'Image pairs, complete recipes and service-hour tables are authored social materials; article reuse awaits a dedicated content and visual audit.',rendererKeys:catalog('before-after','recipe','service-hours')},
+  {category:'structured-diagram',cover:false,illustration:true,requirements:['editorial-copy','relationships'],reason:'Editable funnel tiers, pyramid layers and a recurring cycle explain an explicit relationship using three to five numbered stages and their full descriptions. Shapes are schematic and never infer quantities from unrelated prose.',rendererKeys:semantic('authored-diagram-funnel','authored-diagram-pyramid','authored-diagram-cycle')},
   {category:'comparison-playbook',cover:false,illustration:false,requirements:[],reason:'A landscape comparison and numbered action plan needs its full slide or social canvas to preserve readable values, qualifiers and actions. It has not been approved for article cover or illustration reuse.',rendererKeys:semantic('authored-reference-comparison-playbook')},
   {category:'reference-campaign-poster',cover:false,illustration:false,requirements:[],
     reason:'These reference compositions use precise square, portrait or landscape geometry with pricing, recruitment, rental, voting, publication or event slots. Their editable marketing artwork stays in social creation; article reuse would require a separate visual and content audit.',
@@ -65,7 +77,7 @@ export const ARTICLE_COMPOSITION_CURATION:readonly CurationGroup[]=[
     rendererKeys:semantic('authored-image-triptych')},
   {category:'native-editorial-summary',cover:true,illustration:true,requirements:native,
     reason:'These native slots render expressive note headlines, a photo/editorial split or compact feature panels. Their optional promotion slots can be empty while title, body and every structural item remain visible; action copy follows the creative task.',
-    rendererKeys:catalog('note-question','note-marker','note-editorial','note-photo','note-news','news-focus','manifesto','launch','bento','spotlight','report','editorial','story','case-study','notice','research-highlight','product-showcase')},
+    rendererKeys:catalog('color-block-index','marker-broadside','note-question','note-marker','note-editorial','note-photo','note-news','news-focus','manifesto','launch','bento','spotlight','report','editorial','story','case-study','notice','research-highlight','product-showcase')},
   {category:'native-comparison',cover:true,illustration:true,requirements:[...native,'aligned-comparison'],
     reason:'The two authored contrast panels have their own title/body/item slots and can provide a compact article synopsis. Use coherent alternatives with comparable dimensions.',
     rendererKeys:catalog('comparison','myth')},
@@ -89,7 +101,7 @@ export const ARTICLE_COMPOSITION_CURATION:readonly CurationGroup[]=[
     rendererKeys:catalog('chat-messenger','chat-imessage','chat-telegram','chat-workplace')},
   {category:'person-event-or-brand',cover:false,illustration:false,requirements:[],
     reason:'These dedicated renderers require speaker portraits/lineups, team identity, event admissions/recruitment/community invitations, or a brand collection. Repurposing them would change their semantic slots or remove their defining visual structure.',
-    rendererKeys:[...semantic('authored-reference-speaker-spotlight','authored-reference-speaker-lineup','authored-event-poster','brand-collection-grid','ticket','webinar','hiring','community'),...catalog('ticket','webinar','hiring','team','community')]},
+    rendererKeys:[...semantic('authored-reference-speaker-spotlight','authored-reference-speaker-lineup','authored-event-poster','brand-collection-grid','ticket','webinar','hiring','community'),...catalog('ticket','webinar','hiring','hiring-role','hiring-openings','hiring-benefits','team','community')]},
   {category:'promotion-and-brand-poster',cover:false,illustration:false,requirements:[],
     reason:'Price-plan/offer/price-increase posters encode commercial comparisons or deadline/terms slots; branded neon/navy service posters have dedicated website/product identity and fixed art direction. They remain available in their original workflows, not generic article generation.',
     rendererKeys:[...semantic('pricing','offer'),...catalog('pricing','offer','price-increase','dark-promo','neon-workflow','navy-service')]},

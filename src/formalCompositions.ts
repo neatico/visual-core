@@ -1,3 +1,4 @@
+import {CAMPAIGN_EDITIONS} from './campaignEditions.js';
 import {EXPLORE_LAYOUTS} from './exploreCollection.js';
 import {REFERENCE_POSTERS} from './referencePosters.js';
 import {compositionUseCase} from './compositionUseCases.js';
@@ -101,6 +102,10 @@ function article(id:string,kind:typeof articleKinds[number]|'cover',variant:numb
  * discovery. Output capabilities overlap and must never be summed.
  */
 const BASE_COMPOSITIONS:readonly FormalComposition[]=[
+  ...CAMPAIGN_EDITIONS.map((spec,i)=>({
+    ...define(semantic('authored-edition-'+spec.key,[...new Set(spec.blocks)],0,spec.entries||6,spec.blocks.includes('image')),both,'edition:'+spec.key,'V'+String(i+1).padStart(2,'0'),.5,2.1),
+  })),
+  ...(['funnel','pyramid','cycle'] as const).map((shape,index)=>define(semantic(`authored-diagram-${shape}`,[shape==='pyramid'?'features':'steps'],3,5),both,`diagram:${shape}`,`D${index+1}`,.5,2)),
   define(semantic('authored-reference-comparison-playbook',['comparison','paragraph','steps'],3,7),both,'new-reference:comparison-playbook','N7',1.4,2),
   ...campaignDefinitions.map(([id,accepts,min,max,image,landscape],index)=>define(semantic(`authored-reference-${id}`,accepts,min,max,image),landscape?['presentation']:both,`new-reference:${id}`,`N${index+1}`,landscape?1.4:.25)),
   define(semantic('authored-event-poster',['parameters','paragraph'],1,6),['social'],'event:provider','E1'),
@@ -109,7 +114,7 @@ const BASE_COMPOSITIONS:readonly FormalComposition[]=[
   ...SOCIAL_LAYOUT_CATALOG.map(preset=>{
     const recipe=DESIGN_RECIPES.find(item=>item.id===preset.id&&item.kind==='social')!;
     const poster=REFERENCE_POSTERS.find(item=>item.id===preset.id);
-    return {...define({...recipe,renderer:'catalog'},['social'],`social:${preset.id}`,SOCIAL_DISPLAY_NUMBERS[preset.id],poster?.min??.5,poster?.max??2.4),...nativeSocialParameterContract(preset.id)};
+    return {...define({...recipe,renderer:'catalog'},['social'],`social:${preset.id}`,SOCIAL_DISPLAY_NUMBERS[preset.id],poster?.min??.5,poster?.max??(['color-block-index','marker-broadside'].includes(preset.id)?2:['before-after','recipe','service-hours'].includes(preset.id)?1:2.4)),...nativeSocialParameterContract(preset.id)};
   }),
   ...uniqueSemantic.map(recipe=>define(recipe,semanticRecipes.filter(other=>other.id===recipe.id).map(other=>other.kind),`semantic:${recipe.kind}:${recipe.id}`,recipe.id.startsWith("authored-explore-")?`X${String(EXPLORE_LAYOUTS.findIndex(item=>recipe.id===`authored-explore-${item[0]}`)+1).padStart(2,"0")}`:SEMANTIC_DISPLAY_NUMBERS[`semantic:${recipe.kind}:${recipe.id}`],recipe.id.startsWith("authored-explore-")?1.4:.25,recipe.id.startsWith("authored-explore-")?2:4)),
   ...founderDefinitions.map(([id,accepts,min,max],index)=>define(semantic(id,accepts,min,max),['social'],`semantic:social:${id}`,`F${index+1}`,1.3)),

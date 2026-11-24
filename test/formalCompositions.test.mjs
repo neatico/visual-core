@@ -3,16 +3,17 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {isReferencePoster,FORMAL_COMPOSITIONS,applicableCompositions,articleCompositionCuration,ARTICLE_COMPOSITION_CURATION} from '../dist/index.js';
 test('formal inventory preserves every gallery ID and separates output capabilities',()=>{
- assert.equal(FORMAL_COMPOSITIONS.length,199);
- assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,199);
- assert.equal(applicableCompositions('presentation',16/9).length,81);
- assert.equal(applicableCompositions('presentation',1).length,62);
- assert.equal(applicableCompositions('social',16/9).length,134);
- assert.equal(applicableCompositions('social',1).length,127);
- assert.equal(applicableCompositions('article-cover',16/9).length,73);
- assert.equal(applicableCompositions('article-cover',1).length,63);
- assert.equal(applicableCompositions('article-illustration',16/9).length,151);
- assert.equal(applicableCompositions('article-illustration',1).length,130);
+ for(const id of ['edition:questions','edition:competitors']) assert.ok(FORMAL_COMPOSITIONS.some(item=>item.id===id));
+ assert.equal(FORMAL_COMPOSITIONS.length,243);
+ assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,243);
+ assert.equal(applicableCompositions('presentation',16/9).length,117);
+ assert.equal(applicableCompositions('presentation',1).length,98);
+ assert.equal(applicableCompositions('social',16/9).length,175);
+ assert.equal(applicableCompositions('social',1).length,171);
+ assert.equal(applicableCompositions('article-cover',16/9).length,101);
+ assert.equal(applicableCompositions('article-cover',1).length,91);
+ assert.equal(applicableCompositions('article-illustration',16/9).length,189);
+ assert.equal(applicableCompositions('article-illustration',1).length,168);
  for(const item of FORMAL_COMPOSITIONS){assert.ok(item.parameterSchema&&item.semanticDescription&&item.rendererKey&&item.displayNumber);}
 });
 test('explicit IDs never substitute a different composition and semantic fit is not an eligibility gate',()=>{
@@ -46,13 +47,17 @@ test('illustration contracts require their actual visual structure and bounded n
 });
 
 test('article reuse changes no original identifier, schema, renderer, recipe, ratio or display identity',()=>{
- // Reviewed migration: chat item schemas now accept optional real avatar asset IDs
- // and explicitly authored fictional nicknames. Asset descriptors prefer the real
- // supplied catalog; legacy stored placeholder IDs remain valid.
+ // Reviewed migration: lineups accept 2–4 people; shared icon IDs include
+ // subject-specific media, logistics and finance glyphs; decoration defaults
+ // to none. Existing renderer identities and three-person data remain valid.
+ // Three photographic layouts accept an optional informative caption after the image.
+ // Portrait contracts cover Korean regional assets alongside Chinese and Japanese.
+ // Bento cards may bind a catalog photograph for each item. The empty default
+ // preserves saved graphic-only cards.
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
- const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
- assert.equal(createHash('sha256').update(original).digest('hex'),'c8ea5e78f4b8ce03931f9dda3b7d1d98aa491264779af7ef1dfcec0b752de666');
+ const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!item.id.startsWith('edition:')&&!item.id.startsWith('diagram:')&&!['social:color-block-index','social:marker-broadside','social:hiring-role','social:hiring-openings','social:hiring-benefits','social:before-after','social:recipe','social:service-hours'].includes(item.id)&&!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
+ assert.equal(createHash('sha256').update(original).digest('hex'),'0bc7786b93661da6718de633dcbf407d88c9cbb5685a38a21eaf8176f891eb8f');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
 });

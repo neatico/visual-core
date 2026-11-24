@@ -29,7 +29,7 @@ export function textPresentationSchema() {
         font: {type: 'string', enum: ['display', 'body', 'mono']},
         scale: {type: 'number', minimum: 0.8, maximum: 1.35},
         tone: {type: 'string', enum: ['ink', 'accent', 'secondary']},
-        decoration: {type: 'string', enum: ['none', 'marker', 'underline']},
+        decoration: {type: 'string', enum: ['none', 'marker', 'underline'], description: 'Default to none. Do not underline an entire heading as a generic decoration. Use marker or underline only for a deliberate emphasis explicitly requested by the user; retain legible spacing and avoid link-like titles.'},
         italic: {type: 'boolean'},
       })},
     }),

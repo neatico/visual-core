@@ -43,3 +43,11 @@ test('large illustration slots retain neutral defaults while unrelated invalid e
  assert.equal(values.items[0].description,'Do not rewrite this.');
  assert.equal(compositionParameterDefaults({type:'object',properties:{status:{type:'string',enum:['ready']}}},{status:'unknown'}).status,'unknown');
 });
+
+test('concrete icon choices survive defaulting, validation and save/reopen across languages',()=>{
+ const contract=FORMAL_COMPOSITIONS.find(item=>item.id==='semantic:presentation:semantic-steps-stack');
+ const entries=[{title:'未知 Δ',description:'保持内容。',icon:'BsCameraReels'},{title:'Étape',description:'Keep the complete action.',icon:'BsWallet2'},{title:'録音',description:'声を記録する。',icon:'BsMic'}];
+ const value=compositionParameterDefaults(contract.parameterSchema,{title:'Workflow',blocks:[{id:'steps',kind:'steps',evidence:[],entries}]});
+ const page=validateEditableContentPage({id:'page',purpose:'instruct',evidence:[],...value});
+ assert.deepEqual(validateEditableContentPage(JSON.parse(JSON.stringify(page))).blocks[0].entries,entries);
+});

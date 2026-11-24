@@ -39,7 +39,7 @@ export interface DesignTheme {
 export const DESIGN_THEMES: readonly DesignTheme[] = [
   {
     id: "neatico",
-    palette: { background: "#FAF9F6", surface: "#FFFFFF", ink: "#202124", muted: "#62646B", accent: "#F4CE36", line: "#E4E1D9" },
+    palette: { background: "#FAF9F5", surface: "#FFFFFF", ink: "#20272E", muted: "#505D68", accent: "#EBB945", line: "#E4E2DA" },
     typography: { heading: "Manrope", body: "Inter", code: "monospace", headingWeight: 700 },
     geometry: { radius: 12, spacing: 1, rule: "accent" },
   },
@@ -53,12 +53,12 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
   {
     "id": "bloom",
     "palette": {
-      "background": "#FFF1F6",
+      "background": "#FBF4F3",
       "surface": "#FFFFFF",
-      "ink": "#341838",
-      "muted": "#70536D",
-      "accent": "#CC1D61",
-      "line": "#F3BED5"
+      "ink": "#392333",
+      "muted": "#694F5D",
+      "accent": "#AA315D",
+      "line": "#E9D4DA"
     },
     "typography": {
       "heading": "Montserrat",
@@ -75,12 +75,12 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
   {
     "id": "splash",
     "palette": {
-      "background": "#E9FAFF",
+      "background": "#F0F6FA",
       "surface": "#FFFFFF",
-      "ink": "#162E60",
+      "ink": "#17314A",
       "muted": "#4D637E",
-      "accent": "#2454E6",
-      "line": "#B8DEFA"
+      "accent": "#285AB6",
+      "line": "#CEDFE9"
     },
     "typography": {
       "heading": "Space Grotesk",
@@ -97,12 +97,12 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
   {
     "id": "candy",
     "palette": {
-      "background": "#F3EDFF",
+      "background": "#F5F2FA",
       "surface": "#FFFFFF",
-      "ink": "#35205C",
+      "ink": "#382944",
       "muted": "#69557F",
-      "accent": "#7841D5",
-      "line": "#DCCAF6"
+      "accent": "#7150AB",
+      "line": "#E0D7EC"
     },
     "typography": {
       "heading": "Manrope",
@@ -123,7 +123,7 @@ export const DESIGN_THEMES: readonly DesignTheme[] = [
       surface: "#FFFFFF",
       ink: "#20251F",
       muted: "#5F685C",
-      accent: "#376346",
+      accent: "#28664F",
       line: "#D7DED3",
     },
     typography: {
@@ -354,6 +354,16 @@ const recipe = (
   kind: DesignRecipe["kind"],
   semantic?: string,
 ): DesignRecipe => {
+  if(id==='color-block-index'||id==='marker-broadside'){
+    const list=id==='color-block-index';
+    return {id,kind,renderer:'catalog',automatic:true,family:list?'features':'paragraph',accepts:list?['features','paragraph']:['paragraph'],minEntries:list?3:0,maxEntries:list?3:0,requiresImage:false};
+  }
+  if(['before-after','recipe','service-hours'].includes(id))return {
+    id,kind,renderer:'catalog',automatic:true,family:id,
+    accepts:(id==='before-after'?['image','comparison']:id==='recipe'?['image','steps','paragraph']:['parameters','paragraph']) as SemanticKind[],
+    minEntries:id==='before-after'?2:id==='recipe'?3:1,maxEntries:id==='before-after'?2:id==='recipe'?6:7,
+    requiresImage:id!=='service-hours',
+  };
   if (parameterScenes[id])
     return {
       id,

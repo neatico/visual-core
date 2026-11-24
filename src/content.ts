@@ -1,3 +1,4 @@
+import {COMPOSITION_ICONS} from './compositionIcons.js';
 import {COMPOSITION_ILLUSTRATIONS} from './illustrationScenes.js';
 import {validateTextPresentations} from "./textPresentation.js";
 import { COMPOSITION_SCENES } from "./compositionScenes.js";
@@ -56,6 +57,7 @@ export type ContentBlock = BlockBase &
     | { kind: "paragraph"; text: string; heading?: string; level?: 2 | 3; role?: "action" | "qualification" }
     | {
         kind: "steps" | "features";
+        relationship?: "funnel" | "pyramid" | "cycle";
         entries: {
           title: string;
           description: string;
@@ -160,6 +162,11 @@ const fail = (code: string, path: string): never => {
 };
 /** Approved content is a pageable collection; individual layouts retain their own capacity limits. */
 export const EDITABLE_CONTENT_BLOCK_LIMIT = 64;
+function diagramRelationship(value: unknown, path: string): {relationship?: "funnel" | "pyramid" | "cycle"} {
+  if (value === undefined) return {};
+  if (value !== 'funnel' && value !== 'pyramid' && value !== 'cycle') fail('CONTENT_INVALID_RELATIONSHIP', path);
+  return {relationship:value as 'funnel' | 'pyramid' | 'cycle'};
+}
 function paragraphRole(value: unknown, path: string): {role?: "action" | "qualification"} {
   if (value === undefined) return {};
   if (value !== "action" && value !== "qualification") return fail("CONTENT_INVALID_PARAGRAPH_ROLE", path);
@@ -492,7 +499,8 @@ export function validateContentPlan(
         return {
           ...base,
           kind: value.kind,
-          entries: list(value.entries, `${path}.entries`, 1, 12).map(
+          ...diagramRelationship(value.relationship, `${path}.relationship`),
+          entries: list(value.entries, `${path}.entries`, 1, value.kind === 'features' ? 20 : 12).map(
             (raw, i) => {
               const item = object(raw, `${path}.entries.${i}`);
               return {
@@ -763,7 +771,8 @@ export function validateEditableContentPage(
           return {
             ...base,
             kind: value.kind,
-            entries: list(value.entries, path, 1, 12).map((raw) => {
+            ...diagramRelationship(value.relationship, `${path}.relationship`),
+            entries: list(value.entries, path, 1, value.kind === 'features' ? 20 : 12).map((raw) => {
               const item = object(raw, path);
               return {
                 title: draftText(item.title, path, 160),
@@ -900,20 +909,7 @@ function visualDescriptor(item: Record<string, unknown>): {
   icon?: string;
   illustration?: string;
 } {
-  const icons = new Set([
-    "BsJournalText",
-    "BsPersonCheck",
-    "BsShare",
-    "BsPeople",
-    "BsSearch",
-    "BsShieldCheck",
-    "BsBarChart",
-    "BsCodeSlash",
-    "BsSignpostSplit",
-    "BsCheck2Circle",
-    "BsFolder2Open",
-    "BsGrid1X2",
-  ]);
+  const icons = new Set<string>(COMPOSITION_ICONS);
   const illustrations = new Set<string>(COMPOSITION_ILLUSTRATIONS);
   // Decorations are optional catalog references. An unknown reference must not
   // invalidate authored copy, a saved page, or the rest of a streamed deck.

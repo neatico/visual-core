@@ -1,3 +1,5 @@
+import {campaignEdition} from './campaignEditions.js';
+import { COMPOSITION_ICONS, COMPOSITION_ICON_GUIDANCE } from './compositionIcons.js';
 import { COMPOSITION_ILLUSTRATIONS, ILLUSTRATION_GUIDANCE } from "./illustrationScenes.js";
 import { textPresentationSchema } from "./textPresentation.js";
 import { DESIGN_RECIPES, type DesignRecipe } from "./designSystem.js";
@@ -250,7 +252,9 @@ function blockSchema(kind: SemanticKind, maximum: number): ParameterSchema {
 function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
   const id = recipe.id;
   let kinds: SemanticKind[];
-  if (["authored-explore-cover", "authored-explore-photo-story"].includes(id))
+  const edition=campaignEdition(id);
+  if(edition) kinds=edition.blocks;
+  else if (["authored-explore-cover", "authored-explore-photo-story"].includes(id))
     kinds = ["paragraph", "image"];
   else if (id === "authored-reference-comparison-playbook") kinds = ["comparison", "paragraph", "steps", "paragraph"];
   else if (id.endsWith("ledger-chart")) kinds = ["parameters", "chart"];
@@ -269,13 +273,15 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
   else if (id === "semantic-hero-editorial")
     kinds = ["paragraph", "paragraph", "paragraph", "image"];
   else if (id.endsWith("speaker-lineup"))
-    kinds = ["parameters", "quote", "quote", "quote"];
+    kinds = ["parameters", "quote", "quote", "quote", "quote"];
   else if (id.endsWith("speaker-spotlight")) kinds = ["parameters", "quote"];
   else if (id === "authored-reference-story")
     kinds = ["image", "paragraph", "features"];
   else if (id === "authored-reference-photo") kinds = ["paragraph", "image"];
   else if (id === "authored-image-triptych")
     kinds = ["paragraph", "features", "paragraph", "image"];
+  else if (["authored-image-editorial", "authored-image-campaign", "authored-image-inset"].includes(id))
+    kinds = ["image", "paragraph"];
   else if (recipe.requiresImage && recipe.accepts.includes("image"))
     kinds = ["image"];
   else if (recipe.family === "mixed-stack") kinds = ["features"];
@@ -303,6 +309,10 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       ].includes(id)
         ? 160
         : 120;
+    if (["authored-image-editorial", "authored-image-campaign", "authored-image-inset"].includes(id) && kind === "paragraph") {
+      fields.text.description = "Write a short, useful caption with the concrete detail or action readers need beyond the headline. Pair it with the actual photograph.";
+      fields.text.maxLength = 100;
+    }
     if (id.startsWith("bookend-") && kind === "paragraph") {
       delete fields.heading;
       delete fields.level;
@@ -322,22 +332,8 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       };
       entries.items.properties.icon = {
         type: "string",
-        enum: [
-          "BsJournalText",
-          "BsPersonCheck",
-          "BsShare",
-          "BsPeople",
-          "BsSearch",
-          "BsShieldCheck",
-          "BsBarChart",
-          "BsCodeSlash",
-          "BsSignpostSplit",
-          "BsCheck2Circle",
-          "BsFolder2Open",
-          "BsGrid1X2",
-        ],
-        description:
-          "Optional supported row icon. Omit when unnecessary; an illustration is not required.",
+        enum: [...COMPOSITION_ICONS],
+        description: COMPOSITION_ICON_GUIDANCE,
       };
       entries.items.properties.title.maxLength = 28;
       entries.items.properties.description.maxLength =
@@ -385,7 +381,7 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
       fields.attribution.maxLength = 32;
       if (id.includes("speaker-")) {
         fields.avatarAssetId.description =
-          "An existing portrait asset ID, or neatico-editorial-placeholder for an original source-attributed illustration.";
+          "Select a supplied fictional portrait from portraitCatalog: for Chinese/Japanese/Korean copy use east-asian, otherwise western, unless the user explicitly specifies a different appearance. Match the asset metadata to the person, never infer appearance from a name. Every distinct person needs a distinct real asset ID.";
         schema.required.push("avatarAssetId");
       }
     }
@@ -505,16 +501,56 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
         delete fields.entries.items.properties.illustration;
       }
     }
+    if (['authored-diagram-funnel','authored-diagram-pyramid','authored-diagram-cycle'].includes(id)) {
+      const relationship = id.slice('authored-diagram-'.length);
+      fields.relationship = {const:relationship, description:'Explicit visual relationship selected for this composition. Preserve it on save and reuse.'};
+      schema.required.push('relationship');
+      fields.entries.minItems = 3; fields.entries.maxItems = 5;
+      fields.entries.items.properties.title.maxLength = 48;
+      fields.entries.items.properties.description.maxLength = 96;
+      fields.entries.description = relationship === 'funnel'
+        ? 'Ordered stages from broad input to narrow output. Geometry is schematic, not a quantitative area chart; put requested quantities and units in the descriptions without inventing conversion percentages.'
+        : relationship === 'pyramid'
+          ? 'Hierarchy ordered from the top level to its supporting foundation. Explain how each layer supports the level above. Geometry does not encode amounts.'
+          : 'A recurring process in clockwise order. The last stage explicitly returns to the first; do not force a one-way timeline into a cycle.';
+      delete fields.entries.items.properties.icon; delete fields.entries.items.properties.illustration;
+    }
+    if(edition){
+      if(kind==='paragraph'){
+        delete fields.heading;delete fields.role;delete fields.level;
+        fields.text.maxLength=180;
+        if(edition.key==='edge-light' && blockIndex===1) fields.text.maxLength=36;
+        fields.text.description=edition.key==='edge-light' && blockIndex===1?'One short button label in the output language.': 'One audience-facing supporting statement, with natural phrase breaks. Preserve requested detail.';
+      }
+      if(kind==='image'){
+        schema.required.push('assetId');fields.status={const:'available'};fields.treatment={const:'photograph'};
+        fields.assetId.minLength=1;
+      }
+      if(kind==='features'){
+        fields.entries.minItems=edition.key==='opening'?3:Math.min(3,edition.entries);
+        fields.entries.maxItems=edition.entries;fields.entries.items.properties.title.maxLength=36;
+        fields.entries.items.properties.description.maxLength=76;
+        fields.entries.description=edition.key==='tiles'?'An illustrated index of up to twenty distinct subjects. Use compact labels, a corresponding catalog icon per tile and very short optional captions. Match the requested count.':edition.key==='hub'?'Branches around a central topic. Give each a catalog icon, short name and short explanation.':edition.key==='questions'?'Each title is a specific question in the requested language and its description is a concise, self-contained answer.':edition.key==='opening'?'Distinct information groups in reading order, such as offer and conditions, featured products, location and date. Use complete units, no repeated promotional copy.':'Individual labeled entries with concise, distinct explanations and a matching icon where appropriate.';
+      }
+      if(kind==='comparison'){
+        fields.columns.minItems=2;fields.columns.maxItems=edition.entries;
+        const column=fields.columns.items;for(const field of ['price','values','statuses'])delete column.properties[field];
+        column.properties.points.maxItems=4;
+        if(edition.key==='proof') column.properties.tone={enum:['positive','negative','neutral','caution'],description:'Outcome of this example. Use negative and positive for an actual flawed vs corrected pair; use neutral for alternatives without a verdict.'};
+        if(edition.key==='competitors') column.properties.points.description='Use the same criteria in the same order for both alternatives. Each point names the criterion and gives its concrete difference.';
+      }
+      if(kind==='quote'){delete fields.avatarAssetId;delete fields.role;}
+    }
     return schema;
   });
   return {
     type: "array",
     items,
-    minItems: id === "authored-explore-cover" ? 1 : items.length,
+    minItems: ["authored-explore-cover", "authored-image-editorial", "authored-image-campaign", "authored-image-inset"].includes(id) ? 1 : id.endsWith("speaker-lineup") ? 3 : items.length,
     maxItems: items.length,
     additionalItems: false,
     description:
-      "Fixed ordered parameters for this renderer. Return every block exactly once in this order; do not add explanatory blocks.",
+      id.endsWith("speaker-lineup") ? "One parameters block followed by 2–4 quote/person records, one per visible person. Include every requested person, never silently drop someone to fit three slots. For more than four people, plan additional complete roster pages. Any displayed person count must equal the corresponding records; use a figure for a deck-wide total. Omit unused trailing quote slots." : "Fixed ordered parameters for this renderer. Return every block exactly once in this order; do not add explanatory blocks.",
   };
 }
 
@@ -545,6 +581,7 @@ export function recipeParameterContract(
           ...text(
             recipe.id.startsWith("bookend-")
               ? "A focused cover or closing headline, not the whole brief. Use deliberate line breaks when helpful; do not join multiple headings with pipes."
+              : /^authored-edition-(portrait-bulletin|portrait-rule|type-stack|dispatch|inset|scrapbook|device)$/.test(recipe.id) ? "An editorial headline in three short, purposeful display lines, separated with newline characters. Use one phrase per line. The last line delivers the payoff. No numbering or markup."
               : "Audience-facing headline preserving the original topic.",
             recipe.id.startsWith("bookend-") ? 44 : recipe.id === "authored-reference-comparison-playbook" ? 120 : 64,
           ),

@@ -122,3 +122,20 @@ test('measured native text preserves complete multilingual sentences without rel
  assert.throws(()=>validateNativeSocialParameters('chat-imessage',{...values,items:values.items.slice(0,2)},{measuredText:true}));
  assert.throws(()=>validateNativeSocialParameters('chat-imessage',{...values,items:values.items.map(x=>({...x,unknown:'x'}))},{measuredText:true}));
 });
+
+test('industry formats preserve variable step and hours groups while requiring both comparison assets',async()=>{
+ const {validateNativeSocialParameters,applicableCompositions}=await import('../dist/index.js');
+ const common={title:'Nøva Ω',body:'Complete details.'};
+ const items=Array.from({length:7},(_,i)=>({title:`Day ${i+1}`,description:'09:00–18:00'}));
+ for(const count of [1,3,7])assert.equal(validateNativeSocialParameters('service-hours',{...common,items:items.slice(0,count)}).items.length,count);
+ assert.throws(()=>validateNativeSocialParameters('service-hours',{...common,items:[]}));
+ for(const count of [3,6])assert.equal(validateNativeSocialParameters('recipe',{...common,value:'10 min',attribution:'2 servings',imageAssetId:'uploaded-food',items:items.slice(0,count)}).items.length,count);
+ assert.throws(()=>validateNativeSocialParameters('recipe',{...common,value:'10 min',attribution:'',imageAssetId:'uploaded-food',items:items.slice(0,2)}));
+ assert.throws(()=>validateNativeSocialParameters('before-after',{...common,items:items.slice(0,2)}));
+ const pair=items.slice(0,2).map((item,i)=>({...item,assetId:`uploaded-${i}`}));
+ assert.deepEqual(validateNativeSocialParameters('before-after',{...common,items:pair}).items,pair);
+ for(const id of ['social:before-after','social:recipe','social:service-hours']){
+  assert.ok(applicableCompositions('social',.8).some(c=>c.id===id));
+  assert.ok(!applicableCompositions('social',16/9).some(c=>c.id===id));
+ }
+});

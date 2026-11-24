@@ -44,3 +44,6 @@ export * from './textPresentation.js';
 export * from './exploreCollection.js';
 
 export {resolveIllustrationScene, illustrationSubject, ILLUSTRATION_GUIDANCE, type IllustrationScene} from './illustrationScenes.js';
+export {COMPOSITION_ICONS, COMPOSITION_ICON_GUIDANCE} from './compositionIcons.js';
+
+export * from "./campaignEditions.js";

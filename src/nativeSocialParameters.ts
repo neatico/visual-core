@@ -30,6 +30,9 @@ export interface NativeSocialContract {
 }
 interface Slots {items?:number;value?:boolean;attribution?:boolean;image?:boolean;itemImages?:boolean;quantities?:'share'|'comparison'|'benchmark'}
 const slots:Record<string,Slots>={
+ 'color-block-index':{items:3},'marker-broadside':{},
+ 'before-after':{items:2,itemImages:true},recipe:{items:6,image:true,value:true,attribution:true},'service-hours':{items:7},
+ 'hiring-role':{items:3},'hiring-openings':{items:3},'hiring-benefits':{items:3},
  'price-increase':{items:2,value:true,image:true},
  'dark-promo':{value:true,attribution:true},
  'neon-workflow':{items:3,value:true,attribution:true},
@@ -92,6 +95,7 @@ export function nativeSocialParameterContract(id:string):NativeSocialContract {
    item.description=copy(24,'Optional concise supporting detail. Use empty text when not needed.',0);
   }
   if(illustratedSlots.has(id))item.illustration={type:'string',enum:COMPOSITION_ILLUSTRATIONS,default:'symbol',description:ILLUSTRATION_GUIDANCE};
+  if(id==='bento')item.assetId={...asset(),minLength:0,default:'',description:'Select an actual photograph from the supplied asset catalog that illustrates this particular item. Use distinct relevant subjects in a photo series. If the item is abstract or no photograph fits, leave empty and select a suitable illustration.'};
   if(spec.itemImages)item.assetId=id.startsWith('chat-')?{...asset(),default:'',minLength:0,description:'AI-generated portrait asset ID from assets (generic-chat-avatar-man-v1 or generic-chat-avatar-woman-v1). Keep the same portrait for every message from the same speaker. Never use stock people as fictional speakers.'}:asset();
   if(id.startsWith('chat-'))item.title=copy(20,'A natural fictional nickname in the output language, authored for this conversation. Keep the same name for each speaker; do not use generic role labels.');
   if(spec.quantities){
@@ -100,6 +104,29 @@ export function nativeSocialParameterContract(id:string):NativeSocialContract {
    if(spec.quantities==='share')item.description={const:''};
   }
   properties.items={type:'array',minItems:spec.items,maxItems:spec.items,items:object(item),...(spec.quantities==='share'?{description:'Exactly three nonnegative percentage shares totaling at most one hundred.'}:{})};
+ }
+ if(['hiring-role','hiring-openings','hiring-benefits'].includes(id)){
+  properties.title=copy(40,'Role title or concise recruitment headline.');
+  properties.body=copy(96,'Short role or employer introduction; develop the creative brief without claiming an unrelated employer.');
+  const fields=(properties.items as any).items.properties;
+  fields.title=copy(28,id==='hiring-openings'?'One distinct open position.':'Section label for responsibilities, qualifications or employment benefits.');
+  fields.description=copy(96,'Readable supporting detail. Keep necessary requirements, location, compensation and application information. Do not invent factual contact addresses.');
+ }
+ if(id==='before-after'){
+  (properties.items as any).description='Two independently labeled visual states in their intended order. Each image ID must refer to its own supplied asset, and each description explains that state without inferring a result from appearance.';
+  (properties.items as any).items.properties.description=copy(80,'Describe this visual state, preserving supplied qualifications.');
+ }
+ if(id==='recipe'){
+  properties.body=copy(180,'Ingredients with quantities and any necessary preparation notes. Preserve all required ingredients.');
+  properties.value=copy(32,'Optional preparation or cooking time, including its unit.',0);
+  properties.attribution=copy(48,'Optional servings or yield, including its unit.',0);
+  Object.assign(properties.items as object,{minItems:3,maxItems:6,description:'Three to six ordered preparation steps. Keep every necessary action; choose another composition or multiple pages when more space is needed rather than deleting actions.'});
+  (properties.items as any).items.properties.description=copy(80,'Complete preparation instruction for this step.');
+ }
+ if(id==='service-hours'){
+  Object.assign(properties.items as object,{minItems:1,maxItems:7,description:'One to seven date/day groups and their complete service intervals, in the requested order. Include closure or exception text explicitly where relevant; do not infer availability from other copy.'});
+  (properties.items as any).items.properties.title=copy(28,'Date, day, or group label in the output language.');
+  (properties.items as any).items.properties.description=copy(56,'Complete opening interval or explicit closure/exception note.');
  }
  if(id==='price-increase') {
   properties.value=copy(24,'Current ticket price and currency, optionally followed by Now. Preserve supplied amounts exactly.');

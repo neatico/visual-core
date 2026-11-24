@@ -57,6 +57,9 @@ export const SEMANTIC_DISPLAY_NUMBERS: Readonly<Record<string,string>> = {
 
 /** Social numbers follow the established formal gallery, not registration order. */
 export const SOCIAL_DISPLAY_NUMBERS: Readonly<Record<string, string>> = {
+ "color-block-index":"S072","marker-broadside":"S073",
+ "before-after":"S069","recipe":"S070","service-hours":"S071",
+ "hiring-role":"H01","hiring-openings":"H02","hiring-benefits":"H03",
   "note-question": "S001",
   "note-marker": "S002",
   "note-editorial": "S003",

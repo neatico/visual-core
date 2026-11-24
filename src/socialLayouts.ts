@@ -1,6 +1,14 @@
 import {REFERENCE_POSTERS} from './referencePosters.js';
 /** Stable authored social layouts and their semantic scenes. */
 export const SOCIAL_LAYOUT_CATALOG = [
+  {id:"before-after",scene:"comparison",name:"Before and after"},
+  {id:"color-block-index",scene:"features",name:"Color-block brief"},
+  {id:"marker-broadside",scene:"editorial",name:"Highlight strip poster"},
+  {id:"recipe",scene:"steps",name:"Recipe guide"},
+  {id:"service-hours",scene:"event",name:"Opening hours"},
+  {id:"hiring-role",scene:"features",name:"Role profile"},
+  {id:"hiring-openings",scene:"features",name:"Open positions"},
+  {id:"hiring-benefits",scene:"features",name:"Career proposition"},
   {id:"note-question",scene:"editorial",name:"Emoji question"},
   {id:"note-marker",scene:"editorial",name:"Marker statement"},
   {id:"note-editorial",scene:"editorial",name:"Warm editorial note"},

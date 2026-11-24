@@ -8,7 +8,7 @@ test('every shared recipe has a unique complete data-only parameter contract',()
     assert.equal(contract.schemaVersion,1);
     assert.deepEqual(contract.parameterSchema.required,['title','blocks']);
     assert.ok(Array.isArray(contract.parameterSchema.properties.blocks.items));
-    assert.equal(contract.parameterSchema.properties.blocks.minItems,contract.id==='authored-explore-cover'?1:contract.parameterSchema.properties.blocks.items.length);
+    assert.equal(contract.parameterSchema.properties.blocks.minItems,['authored-explore-cover','authored-image-editorial','authored-image-inset','authored-image-campaign'].includes(contract.id)?1:contract.parameterSchema.properties.blocks.items.length);
     assert.equal(contract.parameterSchema.properties.blocks.maxItems,contract.parameterSchema.properties.blocks.items.length);
     assert.deepEqual([...contract.supportedKinds].sort(),DESIGN_RECIPES.filter(recipe=>recipe.id===contract.id).map(recipe=>recipe.kind).sort());
     assert.equal(contract.importance.title+contract.importance.blocks,10);
@@ -72,3 +72,44 @@ test('measured table and sequence contracts preserve detail without widening aut
  assert.deepEqual(blocks[0].properties.columns.items.properties.tone.enum,['positive','negative','caution','neutral']);
  assert.equal(blocks[0].properties.columns.items.properties.statuses,undefined);
  });
+
+test('lineup slots preserve two, three and four distinct people through serialized content',async()=>{
+ const {validateEditableContentPage}=await import('../dist/index.js');
+ const contract=FORMAL_COMPOSITIONS.find(item=>item.id==='new-reference:speaker-lineup');
+ const slots=contract.parameterSchema.properties.blocks;
+ assert.equal(slots.minItems,3);assert.equal(slots.maxItems,5);assert.equal(slots.additionalItems,false);
+ for(const count of [2,3,4]){
+  const blocks=[{id:'facts',kind:'parameters',evidence:[],rows:[{name:'本页人物 / people',value:String(count),description:''}]},
+   ...Array.from({length:count},(_,i)=>({id:`person-${i}`,kind:'quote',evidence:[],text:'A complete statement.',attribution:['未知 Δ','Nøva','モリ','Élan'][i],role:'Role',avatarAssetId:`person-${i}`}))];
+  assert.ok(blocks.length>=slots.minItems&&blocks.length<=slots.maxItems);
+  blocks.forEach((block,i)=>assert.equal(block.kind,slots.items[i].properties.kind.const));
+  const restored=validateEditableContentPage(JSON.parse(JSON.stringify({id:'roster',title:'People',purpose:'explain',evidence:[],blocks})));
+  assert.deepEqual(restored.blocks,blocks);
+ }
+});
+
+
+test('relationship diagrams declare their meaning and preserve it through save and reopen',async()=>{
+ const {validateEditableContentPage,applicableCompositions}=await import('../dist/index.js');
+ for(const shape of ['funnel','pyramid','cycle']){
+  const definition=FORMAL_COMPOSITIONS.find(c=>c.id===`diagram:${shape}`);
+  const block=definition.parameterSchema.properties.blocks.items[0];
+  assert.equal(block.properties.relationship.const,shape);
+  assert.ok(block.required.includes('relationship'));
+  assert.equal(block.properties.entries.minItems,3);assert.equal(block.properties.entries.maxItems,5);
+  for(const kind of ['presentation','social','article-illustration'])for(const ratio of [.5625,1,16/9])assert.equal(applicableCompositions(kind,ratio,definition.id).length,1);
+  const page={id:'unknown',title:'Nøva Ω',purpose:'explain',evidence:[],blocks:[{id:'diagram',kind:shape==='pyramid'?'features':'steps',relationship:shape,evidence:[],entries:['α','β','γ'].map(title=>({title,description:'Full detail'}))}]};
+  assert.deepEqual(validateEditableContentPage(JSON.parse(JSON.stringify(page))).blocks,page.blocks);
+  page.blocks[0].relationship='inferred';assert.throws(()=>validateEditableContentPage(page),/CONTENT_INVALID_RELATIONSHIP/);
+ }
+});
+
+test('recruitment compositions use explicit role slots and preserve arbitrary names and languages',()=>{
+ for(const id of ['hiring-role','hiring-openings','hiring-benefits']){
+  const contract=FORMAL_COMPOSITIONS.find(c=>c.id===`social:${id}`);
+  assert.equal(contract.parameterModel,'native-social');
+  assert.equal(contract.parameterSchema.properties.items.minItems,3);
+  assert.equal(contract.parameterSchema.properties.items.items.properties.description.maxLength,96);
+  assert.ok(contract.semanticDescription.length>80);
+ }
+});
