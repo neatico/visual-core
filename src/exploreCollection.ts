@@ -150,6 +150,10 @@ export const EXPLORE_LAYOUTS = [
     0,
     "Close with one clear takeaway and a concrete next action.",
   ],
+  ["evidence-spread", "parameters", 2, 3,
+    "Pair one conclusion or recommendation with two or three labelled pieces of evidence. A full-height thesis panel faces a measured evidence column; values may be words, observations or measurements."],
+  ["decision-path", "steps", 2, 3,
+    "End a proposal or explain a decision with a single requested action and two or three ordered checkpoints. Each checkpoint states what is tested, who acts or what unlocks the next step."],
 ] as const;
 export const EXPLORE_RECIPES: readonly DesignRecipe[] = EXPLORE_LAYOUTS.map(
   ([id, kind, min, max]) => ({
@@ -162,13 +166,18 @@ export const EXPLORE_RECIPES: readonly DesignRecipe[] = EXPLORE_LAYOUTS.map(
     maxEntries: max,
     accepts: (["cover", "photo-story"].includes(id)
       ? ["paragraph", "image"]
-      : [kind]) as SemanticKind[],
+      : ["evidence-spread","decision-path"].includes(id) ? ["paragraph",kind] : [kind]) as SemanticKind[],
     requiresImage: id === "photo-story",
   }),
 );
 export function exploreCompositionFits(page: ContentPage, id: string): boolean {
   if (!id.startsWith("authored-explore-")) return true;
   const variant = id.slice("authored-explore-".length);
+  if (variant === "evidence-spread" || variant === "decision-path") {
+    const kind = variant === "evidence-spread" ? "parameters" : "steps";
+    return page.purpose !== "cover" && page.blocks.length === 2 &&
+      page.blocks.some(b => b.kind === "paragraph") && page.blocks.some(b => b.kind === kind);
+  }
   if (variant === "cover") return page.purpose === "cover";
   if (variant === "closing") return page.purpose === "conclude";
   if (["cover", "conclude"].includes(page.purpose)) return false;

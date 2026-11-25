@@ -1,3 +1,4 @@
+import {PRESENTATION_EXHIBITS} from './presentationExhibits.js';
 import {CAMPAIGN_EDITIONS} from './campaignEditions.js';
 import {EXPLORE_LAYOUTS} from './exploreCollection.js';
 import {REFERENCE_POSTERS} from './referencePosters.js';
@@ -11,6 +12,8 @@ import {SEMANTIC_DISPLAY_NUMBERS,SOCIAL_DISPLAY_NUMBERS} from './compositionNumb
 import {articleCompositionCuration} from './articleCompositionCuration.js';
 
 export interface FormalComposition extends RecipeParameterContract {
+  /** A structured exhibit compiles its authoring parameters into this canvas. */
+  exhibit?:{direction:string;canvasId:string};
   displayNumber:string;
   aspectRatios:{min:number;max:number};
   recipe?:DesignRecipe;
@@ -121,6 +124,13 @@ const BASE_COMPOSITIONS:readonly FormalComposition[]=[
   ...[0,1,2].flatMap(variant=>[article(`article-cover-${variant}`,'cover',variant),...articleKinds.map(kind=>article(`article-${kind}-${variant}`,kind,variant))]),
   ...[3,4,5,6,7,8,9,10].map(variant=>article(`article-features-${variant}`,'features',variant)),
   article('article-process-3','process',3),
+  ...PRESENTATION_EXHIBITS.map(spec=>{
+    const canvas=semanticRecipes.find(recipe=>'semantic:'+recipe.kind+':'+recipe.id===spec.canvasId)!;
+    const contract=define(canvas,['presentation'],spec.id,spec.displayNumber,spec.aspectRatios.min,spec.aspectRatios.max);
+    return {...contract,rendererKey:spec.id,exhibit:{direction:spec.direction,canvasId:spec.canvasId},
+      semanticDescription:spec.description,parameterSchema:spec.parameterSchema,
+      capacity:{minEntries:spec.minEntries,maxEntries:spec.maxEntries,requiresImage:false}};
+  }),
 ];
 
 export const FORMAL_COMPOSITIONS:readonly FormalComposition[]=BASE_COMPOSITIONS.map(definition=>{

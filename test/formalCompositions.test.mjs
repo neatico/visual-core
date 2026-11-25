@@ -4,9 +4,9 @@ import {createHash} from 'node:crypto';
 import {isReferencePoster,FORMAL_COMPOSITIONS,applicableCompositions,articleCompositionCuration,ARTICLE_COMPOSITION_CURATION} from '../dist/index.js';
 test('formal inventory preserves every gallery ID and separates output capabilities',()=>{
  for(const id of ['edition:questions','edition:competitors']) assert.ok(FORMAL_COMPOSITIONS.some(item=>item.id===id));
- assert.equal(FORMAL_COMPOSITIONS.length,243);
- assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,243);
- assert.equal(applicableCompositions('presentation',16/9).length,117);
+ assert.equal(FORMAL_COMPOSITIONS.length,253);
+ assert.equal(new Set(FORMAL_COMPOSITIONS.map(item=>item.id)).size,253);
+ assert.equal(applicableCompositions('presentation',16/9).length,127);
  assert.equal(applicableCompositions('presentation',1).length,98);
  assert.equal(applicableCompositions('social',16/9).length,175);
  assert.equal(applicableCompositions('social',1).length,171);
@@ -56,7 +56,7 @@ test('article reuse changes no original identifier, schema, renderer, recipe, ra
  // preserves saved graphic-only cards.
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
- const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!item.id.startsWith('edition:')&&!item.id.startsWith('diagram:')&&!['social:color-block-index','social:marker-broadside','social:hiring-role','social:hiring-openings','social:hiring-benefits','social:before-after','social:recipe','social:service-hours'].includes(item.id)&&!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
+ const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!item.exhibit&&!['authored-explore-evidence-spread','authored-explore-decision-path'].includes(item.recipe?.id)&&!item.id.startsWith('edition:')&&!item.id.startsWith('diagram:')&&!['social:color-block-index','social:marker-broadside','social:hiring-role','social:hiring-openings','social:hiring-benefits','social:before-after','social:recipe','social:service-hours'].includes(item.id)&&!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
  assert.equal(createHash('sha256').update(original).digest('hex'),'0bc7786b93661da6718de633dcbf407d88c9cbb5685a38a21eaf8176f891eb8f');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
@@ -151,5 +151,24 @@ test('bookend contracts separate subtitle and optional identity from headline',(
   assert.deepEqual(s.properties.bookend.required,[]);
   assert.equal(s.properties.bookend.properties.date.maxLength,48);
   assert.equal(s.properties.bookend.additionalProperties,false);
+ }
+});
+
+test('widescreen presentation exhibits own their data contracts and compile to the portable canvas',()=>{
+ const expected=[['exhibit:locator','locator','places',8],['exhibit:paired-change','paired','rows',7],['exhibit:scenario-matrix','scenario-matrix','rows',6],
+ ['exhibit:multi-line','multi-line','categories',12],['exhibit:share-mosaic','share-mosaic','columns',6],
+ ['exhibit:chevron-process','chevron-process','steps',5],['exhibit:kpi-brief','kpi-brief','metrics',4],['exhibit:ratio-definitions','ratio-definitions','rows',3]];
+ for(const [id,kind,rows,max] of expected){
+  const [entry]=applicableCompositions('presentation',16/9,id);
+  assert.deepEqual(entry.supportedKinds,['presentation']);
+  assert.equal(entry.rendererKey,id);
+  assert.equal(entry.capacity.requiresImage,false);
+  assert.equal(entry.exhibit.canvasId,'semantic:presentation:authored-image-inset');
+  const [data,takeaway]=entry.parameterSchema.properties.blocks.items;
+  assert.equal(data.properties.kind.const,kind);
+  assert.equal(data.properties[rows].maxItems,max);
+  assert.equal(entry.capacity.minEntries,data.properties[rows].minItems);
+  assert.equal(takeaway.properties.kind.const,'paragraph');
+  assert.equal(applicableCompositions('presentation',1,id).length,0);
  }
 });

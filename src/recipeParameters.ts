@@ -254,6 +254,8 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
   let kinds: SemanticKind[];
   const edition=campaignEdition(id);
   if(edition) kinds=edition.blocks;
+  else if (id === "authored-explore-evidence-spread") kinds = ["paragraph","parameters"];
+  else if (id === "authored-explore-decision-path") kinds = ["paragraph","steps"];
   else if (["authored-explore-cover", "authored-explore-photo-story"].includes(id))
     kinds = ["paragraph", "image"];
   else if (id === "authored-reference-comparison-playbook") kinds = ["comparison", "paragraph", "steps", "paragraph"];
@@ -418,6 +420,10 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
     if (id.startsWith("authored-explore-")) {
       if (kind === "paragraph") {
         fields.text.maxLength = 220;
+        if (id === "authored-explore-evidence-spread" || id === "authored-explore-decision-path") {
+          fields.text.maxLength = 120;
+          fields.text.description = id.endsWith("decision-path") ? "One specific decision or next action." : "One clear conclusion supported by the evidence at right.";
+        }
         if (id !== "authored-explore-focus") {
           delete fields.heading;
           delete fields.level;

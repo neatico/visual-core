@@ -1,3 +1,4 @@
+import {PRESENTATION_EXHIBITS} from './presentationExhibits.js';
 import {CAMPAIGN_EDITIONS} from './campaignEditions.js';
 import type {RecipeParameterContract} from './recipeParameters.js';
 
@@ -27,6 +28,9 @@ const native:readonly ArticleCompositionRequirement[]=['editorial-copy','empty-p
  * renderer must be reviewed instead of inheriting eligibility from its name.
  */
 export const ARTICLE_COMPOSITION_CURATION:readonly CurationGroup[]=[
+  {category:'presentation-exhibit',cover:false,illustration:false,requirements:[],
+    reason:'Geographic routes, paired measurements and scenario grids use a full-width slide with a companion takeaway and a dedicated structured exhibit writer.',
+    rendererKeys:PRESENTATION_EXHIBITS.map(spec=>spec.id)},
   ...CAMPAIGN_EDITIONS.map((spec):CurationGroup=>{
     const detail=spec.blocks.includes('comparison')||['tiles','hub','questions'].includes(spec.key);
     const requirements:ArticleCompositionRequirement[]=['editorial-copy'];
@@ -102,6 +106,9 @@ export const ARTICLE_COMPOSITION_CURATION:readonly CurationGroup[]=[
   {category:'person-event-or-brand',cover:false,illustration:false,requirements:[],
     reason:'These dedicated renderers require speaker portraits/lineups, team identity, event admissions/recruitment/community invitations, or a brand collection. Repurposing them would change their semantic slots or remove their defining visual structure.',
     rendererKeys:[...semantic('authored-reference-speaker-spotlight','authored-reference-speaker-lineup','authored-event-poster','brand-collection-grid','ticket','webinar','hiring','community'),...catalog('ticket','webinar','hiring','hiring-role','hiring-openings','hiring-benefits','team','community')]},
+  {category:'presentation-decision-spread',cover:false,illustration:false,requirements:[],
+    reason:'The full-width presentation spread pairs a thesis with evidence or a decision with staged approval checkpoints. It depends on a widescreen reading distance and is reserved for presentations.',
+    rendererKeys:semantic('authored-explore-evidence-spread','authored-explore-decision-path')},
   {category:'promotion-and-brand-poster',cover:false,illustration:false,requirements:[],
     reason:'Price-plan/offer/price-increase posters encode commercial comparisons or deadline/terms slots; branded neon/navy service posters have dedicated website/product identity and fixed art direction. They remain available in their original workflows, not generic article generation.',
     rendererKeys:[...semantic('pricing','offer'),...catalog('pricing','offer','price-increase','dark-promo','neon-workflow','navy-service')]},

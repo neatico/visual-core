@@ -47,3 +47,5 @@ export {resolveIllustrationScene, illustrationSubject, ILLUSTRATION_GUIDANCE, ty
 export {COMPOSITION_ICONS, COMPOSITION_ICON_GUIDANCE} from './compositionIcons.js';
 
 export * from "./campaignEditions.js";
+
+export * from './presentationExhibits.js';
