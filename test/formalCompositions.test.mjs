@@ -153,26 +153,3 @@ test('bookend contracts separate subtitle and optional identity from headline',(
   assert.equal(s.properties.bookend.additionalProperties,false);
  }
 });
-
-test('discovery consolidates reviewed geometry without migrating any historical parameters', async () => {
- const {MERGED_COMPOSITIONS, RETIRED_COMPOSITIONS, ARTICLE_BODY_ONLY, discoverCompositions} = await import('../dist/index.js');
- const find = id => FORMAL_COMPOSITIONS.find(contract => contract.id === id);
- for (const [id, target] of Object.entries(MERGED_COMPOSITIONS)) {
-   const previous = find(id), replacement = find(target);
-   assert.ok(previous && replacement, id);
-   assert.ok(!Object.hasOwn(MERGED_COMPOSITIONS, target) && !RETIRED_COMPOSITIONS.has(target), target);
-   assert.ok(previous.supportedKinds.every(kind => replacement.supportedKinds.includes(kind)), id);
-   for (const kind of previous.supportedKinds) {
-     const ratio = previous.aspectRatios.min;
-     assert.ok(!discoverCompositions(kind, ratio).includes(previous), id);
-     assert.deepEqual(discoverCompositions(kind, ratio, id), [previous]);
-   }
- }
- for (const id of RETIRED_COMPOSITIONS) assert.ok(find(id));
- for (const id of ARTICLE_BODY_ONLY) {
-   const item = find(id);
-   assert.ok(item.supportedKinds.includes('article-cover') && item.supportedKinds.includes('article-illustration'), id);
-   assert.ok(discoverCompositions('article-illustration', item.aspectRatios.min).includes(item), id);
-   assert.ok(!discoverCompositions('article-cover', item.aspectRatios.min).includes(item), id);
- }
-});

@@ -33,7 +33,6 @@ export * from './contentBrief.js';
 export * from "./nativeSocialParameters.js";
 export * from "./referencePosters.js";
 export * from "./campaignAssets.js";
-export * from "./industryPhotos.js";
 
 export * from "./compositionUseCases.js";
 
@@ -48,4 +47,3 @@ export {resolveIllustrationScene, illustrationSubject, ILLUSTRATION_GUIDANCE, ty
 export {COMPOSITION_ICONS, COMPOSITION_ICON_GUIDANCE} from './compositionIcons.js';
 
 export * from "./campaignEditions.js";
-export * from './compositionDiscovery.js';
