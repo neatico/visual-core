@@ -36,6 +36,10 @@ const summary = object({
   kind:{const:'kpi-brief'}, metrics:list({anyOf:[measuredMetric,object({label:label(32),value:label(24),comparison:label(48)})]},2,4),
   insights:list(label(110),1,3),
 });
+const breakdown = object({
+  kind:{const:'reconciled-breakdown'}, totalLabel:label(36), total:figure, unit:label(20),
+  basis:label(90), rows:list(object({label:label(36),amount:figure}),2,6),
+});
 const formulaLabels = {label:label(36),symbol:label(20),detail:label(90)};
 const formulas = object({
   kind:{const:'ratio-definitions'}, rows:list({anyOf:[
@@ -73,4 +77,6 @@ export const PRESENTATION_EXHIBITS = [
     'Executive readout: two to four prominent KPIs with unit and comparable baseline or delta, then one to three separate judgements. For every measured baseline comparison provide current, baseline, display unit, baselineLabel, change and precision. The host prints the value and calculates the change. Use the value/comparison text variant only for a qualitative qualification when no numeric baseline exists. Each judgement explains the implication, driver or decision.'),
   exhibit('ratio-definitions','ratio-definitions','E08',3,formulas,
     'Metric glossary. For a quotient supply the numerator, denominator and optional trailing multiplier. For a difference, sum or product supply its direct expression. A difference between normalized shares is already normalized. Include a symbol and concise interpretation for each row. Use the same units, population and period throughout. Do not emit LaTeX in these plain labels.',1),
+  exhibit('reconciled-breakdown','reconciled-breakdown','E09',6,breakdown,
+    'Show one total beside a horizontal breakdown of its two to six mutually exclusive parts. Use a single period, population and display unit for the total and every amount. Reuse exact {{figureId}} references for amounts repeated elsewhere. Parts must add to the declared total. The renderer calculates each share and draws a linear bar from zero. State the period and reporting or illustrative basis in the basis field. Suitable for money, counts, volume and time.'),
 ] as const;
