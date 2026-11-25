@@ -40,6 +40,11 @@ const breakdown = object({
   kind:{const:'reconciled-breakdown'}, totalLabel:label(36), total:figure, unit:label(20),
   basis:label(90), rows:list(object({label:label(36),amount:figure}),2,6),
 });
+const barEvidence = object({
+  kind:{const:'bar-evidence'}, chartTitle:label(40),
+  rows:list(object({label:label(32),amount:figure,unit:label(18)}),2,5),
+  highlight:label(64), highlightDetail:label(92), methodTitle:label(32), method:label(140),
+});
 const formulaLabels = {label:label(36),symbol:label(20),detail:label(90)};
 const formulas = object({
   kind:{const:'ratio-definitions'}, rows:list({anyOf:[
@@ -79,4 +84,6 @@ export const PRESENTATION_EXHIBITS = [
     'Metric glossary. For a quotient supply the numerator, denominator and optional trailing multiplier. For a difference, sum or product supply its direct expression. A difference between normalized shares is already normalized. Include a symbol and concise interpretation for each row. Use the same units, population and period throughout. Do not emit LaTeX in these plain labels.',1),
   exhibit('reconciled-breakdown','reconciled-breakdown','E09',6,breakdown,
     'Show one total beside a horizontal breakdown of its two to six mutually exclusive parts. Use a single period, population and display unit for the total and every amount. Reuse exact {{figureId}} references for amounts repeated elsewhere. Parts must add to the declared total. The renderer calculates each share and draws a linear bar from zero. State the period and reporting or illustrative basis in the basis field. Suitable for money, counts, volume and time.'),
+  exhibit('bar-evidence','bar-evidence','E10',5,barEvidence,
+    'Horizontal bars with exact end labels on the left. On the right, put one key result in a tinted callout, then explain the population, method or counting basis below. Give each category a nonnegative observation and its explicit unit. Use at most two distinct units; each has an independent zero-based scale. Use the caption for context, source or a qualification. Suitable for outcomes, operations and research.'),
 ] as const;
