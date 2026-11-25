@@ -45,6 +45,19 @@ const barEvidence = object({
   rows:list(object({label:label(32),amount:figure,unit:label(18)}),2,5),
   highlight:label(64), highlightDetail:label(92), methodTitle:label(32), method:label(140),
 });
+const interfaces = object({
+  kind:{const:'interface-hub'}, hub:label(32),
+  links:list(object({peer:label(36),flow:label(42),direction:{enum:['to-hub','from-hub']}}),2,6),
+});
+const schedule = object({
+  kind:{const:'interval-roadmap'}, timeUnit:label(16), horizon:{type:'integer',minimum:2,maximum:120},
+  gateHeading:label(24), tasks:list(object({label:label(32),start:{type:'integer',minimum:1},end:{type:'integer',minimum:1},gate:label(46)}),2,7),
+});
+const returns = object({
+  kind:{const:'investment-return'}, unit:label(16), timeUnit:label(16), initial:figure,
+  headings:object({period:label(24),investment:label(24),benefit:label(24),balance:label(24),initial:label(24),roi:label(28),payback:label(28),unrecovered:label(32)}),
+  periods:list(object({label:label(18),investment:figure,netBenefit:figure}),2,6),
+});
 const formulaLabels = {label:label(36),symbol:label(20),detail:label(90)};
 const formulas = object({
   kind:{const:'ratio-definitions'}, rows:list({anyOf:[
@@ -86,4 +99,10 @@ export const PRESENTATION_EXHIBITS = [
     'Show one total beside a horizontal breakdown of its two to six mutually exclusive parts. Use a single period, population and display unit for the total and every amount. Reuse exact {{figureId}} references for amounts repeated elsewhere. Parts must add to the declared total. The renderer calculates each share and draws a linear bar from zero. State the period and reporting or illustrative basis in the basis field. Suitable for money, counts, volume and time.'),
   exhibit('bar-evidence','bar-evidence','E10',5,barEvidence,
     'Horizontal bars with exact end labels on the left. On the right, put one key result in a tinted callout, then explain the population, method or counting basis below. Give each category a nonnegative observation and its explicit unit. Use at most two distinct units; each has an independent zero-based scale. Use the caption for context, source or a qualification. Suitable for outcomes, operations and research.'),
+  exhibit('interface-hub','interface-hub','E11',6,interfaces,
+    'Directed interface map around a named hub. Each peer sends or receives an explicitly named payload. Use two links for a reciprocal exchange with different payloads. Arrowheads follow direction. A layer stack instead describes levels of responsibility.'),
+  exhibit('interval-roadmap','interval-roadmap','E12',7,schedule,
+    'Schedule on one proportional time axis, with overlapping workstreams and row-aligned acceptance gates. Start and end are inclusive 1-based period numbers within the horizon. Each gate identifies a verifiable deliverable or threshold.'),
+  exhibit('investment-return','investment-return','E13',6,returns,
+    'Investment decision schedule for equal periods. Positive time-zero investment, additional nonnegative period investment, and signed operating cash benefit net of recurring costs, before capital expenditure. Use the same currency and reporting magnitude as the budget. The host derives cumulative cash balance, undiscounted horizon ROI and first interpolated payback. Localize column headings and unrecovered status. Use the takeaway to describe ramp-up, exclusions or assumptions.'),
 ] as const;
