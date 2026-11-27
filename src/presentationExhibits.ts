@@ -18,6 +18,13 @@ const matrix = object({kind:{const:'scenario-matrix'},criteriaLabel:label(26),al
   highlighted:{anyOf:[label(24),{type:'integer',minimum:0,maximum:4}],description:'Use the exact name of the recommended alternative, or 0 for equal emphasis. Saved 1-based positions are accepted.'},
   rows:list(object({label:label(26),cells:list(label(45),2,4)}),2,6)});
 
+const level = {type:'integer',minimum:1,maximum:5};
+const riskMatrix = object({
+  kind:{const:'risk-matrix'}, likelihoodLabel:label(32), impactLabel:label(32), legendTitle:label(32),
+  bands:list(object({maxScore:{type:'integer',minimum:1,maximum:25},label:label(20),action:label(50)}),2,5),
+  risks:list(object({id:label(8),likelihood:level,impact:level}),1,16),
+});
+
 const trend = object({
   kind:{const:'multi-line'}, axisLabel:label(36), unit:label(20), categories:list(label(20),2,12),
   series:list(object({label:label(26),unit:label(20),values:list(figure,2,12)}),2,4),
@@ -103,6 +110,8 @@ export const PRESENTATION_EXHIBITS = [
     'Directed interface map around a named hub. Each peer sends or receives an explicitly named payload. Use two links for a reciprocal exchange with different payloads. Arrowheads follow direction. A layer stack instead describes levels of responsibility.'),
   exhibit('interval-roadmap','interval-roadmap','E12',7,schedule,
     'Schedule on one proportional time axis, with overlapping workstreams and row-aligned acceptance gates. Start and end are inclusive 1-based period numbers within the horizon. Each gate identifies a verifiable deliverable or threshold.'),
+  exhibit('risk-matrix','risk-matrix','E14',16,riskMatrix,
+    'Editable 5 by 5 likelihood–impact heatmap. Scores are likelihood times impact on 1–5 axes. Supply unique short register IDs and ordered band upper limits ending at 25, each with a localized response action. Counts, score ranges, locations and colors are computed from the records. Keep these IDs in subsequent mitigation, owner, deadline and verification records.',1),
   exhibit('investment-return','investment-return','E13',6,returns,
     'Investment decision schedule for equal periods. Positive time-zero investment, additional nonnegative period investment, and signed operating cash benefit net of recurring costs, before capital expenditure. Use the same currency and reporting magnitude as the budget. The host derives cumulative cash balance, undiscounted horizon ROI and first interpolated payback. Localize column headings and unrecovered status. Use the takeaway to describe ramp-up, exclusions or assumptions.'),
 ] as const;
