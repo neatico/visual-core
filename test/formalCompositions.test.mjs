@@ -54,10 +54,11 @@ test('article reuse changes no original identifier, schema, renderer, recipe, ra
  // Portrait contracts cover Korean regional assets alongside Chinese and Japanese.
  // Bento cards may bind a catalog photograph for each item. The empty default
  // preserves saved graphic-only cards.
+ // X16 accepts an optional deadline heading on its action paragraph.
  // A deliberate future contract migration must update this
  // baseline explicitly; curation alone must never silently rewrite one.
  const original=JSON.stringify(FORMAL_COMPOSITIONS.filter(item=>!item.exhibit&&!['authored-explore-evidence-spread','authored-explore-decision-path'].includes(item.recipe?.id)&&!item.id.startsWith('edition:')&&!item.id.startsWith('diagram:')&&!['social:color-block-index','social:marker-broadside','social:hiring-role','social:hiring-openings','social:hiring-benefits','social:before-after','social:recipe','social:service-hours'].includes(item.id)&&!isReferencePoster(item.id.replace(/^social:/,''))).map(({supportedKinds,...definition})=>definition));
- assert.equal(createHash('sha256').update(original).digest('hex'),'0bc7786b93661da6718de633dcbf407d88c9cbb5685a38a21eaf8176f891eb8f');
+ assert.equal(createHash('sha256').update(original).digest('hex'),'7e7e7ed36c3da7483be14fe6cea808bf0bc81bbbfac67968448ca6855cb69922');
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-cover-')).length,3);
  assert.equal(FORMAL_COMPOSITIONS.filter(item=>item.id.startsWith('article-')&&!item.id.startsWith('article-cover-')).length,30);
 });

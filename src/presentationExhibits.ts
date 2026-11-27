@@ -12,6 +12,10 @@ const locator = object({
   places:list(object({label:label(48), detail:label(120), latitude:number(-90,90), longitude:number(-180,180)}),2,8),
   links:list(object({from:{type:'integer',minimum:1,maximum:8},to:{type:'integer',minimum:1,maximum:8}}),0,12),
 });
+const benchmark = object({
+  kind:{const:'editorial-benchmark'}, unit:label(28),
+  rows:list(object({label:label(32),low:{type:'number'},high:{type:'number'}}),2,6),
+});
 const paired = object({kind:{const:'paired'},unit:label(24),firstLabel:label(22),secondLabel:label(22),
   rows:list(object({label:label(26),unit:label(24),first:figure,second:figure}),2,7)});
 const matrix = object({kind:{const:'scenario-matrix'},criteriaLabel:label(26),alternatives:list(label(24),2,4),
@@ -86,6 +90,8 @@ function exhibit(key: string, direction: string, displayNumber: string, maxEntri
 }
 
 export const PRESENTATION_EXHIBITS = [
+  {...exhibit('editorial-benchmark','editorial-benchmark','S065',6,benchmark,
+    'Compare numerical intervals for two to six named objects on one scale. Supply each lower and upper bound as a number in the same declared unit, with low <= high. Use a neutral chart title. The chart prints both endpoints directly.'), id:'social:editorial-benchmark'},
   exhibit('locator','locator','E01',8,locator,
     'Geographic locator map with a real basemap, numbered sites and a corresponding legend. Use actual approximate longitude/latitude; links are optional 1-based site pairs, only for meaningful routes. Name the place, then give a short role or quantity in detail. Mark illustrative sites or flows in the takeaway.'),
   exhibit('paired-change','paired','E02',7,paired,
@@ -115,3 +121,6 @@ export const PRESENTATION_EXHIBITS = [
   exhibit('investment-return','investment-return','E13',6,returns,
     'Investment decision schedule for equal periods. Positive time-zero investment, additional nonnegative period investment, and signed operating cash benefit net of recurring costs, before capital expenditure. Use the same currency and reporting magnitude as the budget. The host derives cumulative cash balance, undiscounted horizon ROI and first interpolated payback. Localize column headings and unrecovered status. Use the takeaway to describe ramp-up, exclusions or assumptions.'),
 ] as const;
+
+// Shared catalog layouts keep their existing renderer and article curation.
+export const NATIVE_PRESENTATION_EXHIBITS = PRESENTATION_EXHIBITS.filter(spec => spec.id.startsWith('exhibit:'));
