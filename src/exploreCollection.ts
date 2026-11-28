@@ -148,7 +148,7 @@ export const EXPLORE_LAYOUTS = [
     "paragraph",
     0,
     0,
-    "Close with one clear takeaway and a concrete next action.",
+    "Close with one clear takeaway and a concrete next action. When there is a deadline, put it in the paragraph heading and the action in text. Otherwise omit the heading.",
   ],
   ["evidence-spread", "parameters", 2, 3,
     "Pair one conclusion or recommendation with two or three labelled pieces of evidence. A full-height thesis panel faces a measured evidence column; values may be words, observations or measurements."],

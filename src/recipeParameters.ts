@@ -424,7 +424,10 @@ function fixedBlocks(recipe: DesignRecipe): ParameterSchema {
           fields.text.maxLength = 120;
           fields.text.description = id.endsWith("decision-path") ? "One specific decision or next action." : "One clear conclusion supported by the evidence at right.";
         }
-        if (id !== "authored-explore-focus") {
+        if (id === "authored-explore-closing") {
+          fields.heading = text("Optional short deadline or milestone supplied for the action. Put the action itself in text.", 48);
+          delete fields.level;
+        } else if (id !== "authored-explore-focus") {
           delete fields.heading;
           delete fields.level;
         }

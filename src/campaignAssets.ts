@@ -27,7 +27,6 @@ const defaults:Record<string,Record<string,string>>={
   'split-product-pricing':{imageAssetId:'generic-keyboard-macro-v1'},
   'neon-enterprise-trial':{imageAssetId:'generic-enterprise-glass-v1'},
   'city-service-offer':{imageAssetId:'generic-waterfront-city-v1'},
-  'editorial-benchmark':{imageAssetId:'generic-marble-owl-v1'},
   'portrait-news-cover':{imageAssetId:'generic-data-center-v1',foregroundAssetId:'generic-professional-man-v1',avatarAssetId:'generic-professional-woman-v1'},
   'hardware-offer':{imageAssetId:'generic-graphics-card-v1'},
   'planet-career':{imageAssetId:'generic-planet-career-v2'},

@@ -1,4 +1,4 @@
-import {PRESENTATION_EXHIBITS} from './presentationExhibits.js';
+import {NATIVE_PRESENTATION_EXHIBITS} from './presentationExhibits.js';
 import {CAMPAIGN_EDITIONS} from './campaignEditions.js';
 import type {RecipeParameterContract} from './recipeParameters.js';
 
@@ -30,7 +30,7 @@ const native:readonly ArticleCompositionRequirement[]=['editorial-copy','empty-p
 export const ARTICLE_COMPOSITION_CURATION:readonly CurationGroup[]=[
   {category:'presentation-exhibit',cover:false,illustration:false,requirements:[],
     reason:'Geographic routes, paired measurements and scenario grids use a full-width slide with a companion takeaway and a dedicated structured exhibit writer.',
-    rendererKeys:PRESENTATION_EXHIBITS.map(spec=>spec.id)},
+    rendererKeys:NATIVE_PRESENTATION_EXHIBITS.map(spec=>spec.id)},
   ...CAMPAIGN_EDITIONS.map((spec):CurationGroup=>{
     const detail=spec.blocks.includes('comparison')||['tiles','hub','questions'].includes(spec.key);
     const requirements:ArticleCompositionRequirement[]=['editorial-copy'];
