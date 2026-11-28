@@ -141,9 +141,15 @@ export const FORMAL_COMPOSITIONS:readonly FormalComposition[]=BASE_COMPOSITIONS.
   return {...definition,supportedKinds};
 });
 
+const compositionById = new Map(FORMAL_COMPOSITIONS.map(item => [item.id, item]));
+
 /** Only output, ratio, and explicit IDs are hard gates; semantic fit is scored. */
-export function applicableCompositions(kind:CompositionKind,ratio:number,id?:string):FormalComposition[] {
-  if(!Number.isFinite(ratio)||ratio<=0)throw new Error('COMPOSITION_INVALID_RATIO');
-  if(id&&!FORMAL_COMPOSITIONS.some(item=>item.id===id))throw new Error('COMPOSITION_UNKNOWN_ID');
-  return FORMAL_COMPOSITIONS.filter(item=>item.supportedKinds.includes(kind)&&ratio>=item.aspectRatios.min&&ratio<=item.aspectRatios.max&&(!id||item.id===id));
+export function applicableCompositions(kind: CompositionKind, ratio: number, id?: string): FormalComposition[] {
+  if (!Number.isFinite(ratio) || ratio <= 0) throw new Error('COMPOSITION_INVALID_RATIO');
+  const fits = (item: FormalComposition) => item.supportedKinds.includes(kind) &&
+    ratio >= item.aspectRatios.min && ratio <= item.aspectRatios.max;
+  if (!id) return FORMAL_COMPOSITIONS.filter(fits);
+  const item = compositionById.get(id);
+  if (!item) throw new Error('COMPOSITION_UNKNOWN_ID');
+  return fits(item) ? [item] : [];
 }

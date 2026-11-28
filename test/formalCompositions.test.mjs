@@ -173,3 +173,16 @@ test('widescreen presentation exhibits own their data contracts and compile to t
   assert.equal(applicableCompositions('presentation',1,id).length,0);
  }
 });
+
+test('indexed selection agrees with inventory at both ratio boundaries and returns a fresh list', () => {
+ for (const entry of FORMAL_COMPOSITIONS) {
+  for (const kind of ['presentation','social','article-cover','article-illustration']) {
+   for (const ratio of [entry.aspectRatios.min, entry.aspectRatios.max]) {
+    const matches = applicableCompositions(kind, ratio, entry.id);
+    assert.deepEqual(matches, entry.supportedKinds.includes(kind) ? [entry] : []);
+    matches.pop();
+    assert.equal(applicableCompositions(kind, ratio, entry.id).length, Number(entry.supportedKinds.includes(kind)));
+   }
+  }
+ }
+});
